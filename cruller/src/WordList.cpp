@@ -17,7 +17,7 @@ unsigned int WordList::AddWord(const char *word, const unsigned int occurances) 
     vector_current = distribution_current = false;
     const wordmap::iterator it = words.find(string(word));
     if(it != words.end()) {
-        it->second++;
+        it->second += occurances;
         return it->second;
     }
     words.insert(make_pair(string(word), occurances));

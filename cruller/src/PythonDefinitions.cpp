@@ -1,13 +1,16 @@
 #include "WordList.h"
 #include "Polygon.h"
+#include "Keyboard.h"
 
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/overloads.hpp>
+#include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/tuple.hpp>
+#include <boost/python/str.hpp>
 
 using namespace boost::python;
 
@@ -32,6 +35,32 @@ list PolygonVertexList(Polygon& p, bool close_loop) {
 list PolygonVertexListClosed(Polygon& p) {
     return PolygonVertexList(p, true);
 }
+/********************************************************/
+
+/***************** Keyboard class ************************/
+dict KeyboardPolygonDict(Keyboard& k) {
+    dict d;
+    for(unsigned int c = 0; c < 256; c++) {
+        Polygon p( k.GetKey(char(c)) );
+        if( p.VertexCount() > 0 ) {
+            d[char(c)] = p;
+        }
+    }
+    return d;
+}
+
+void AddKeyStr(Keyboard &k, str s, const Polygon& p) {
+    char const* c_str = extract<char const*>(s); k.AddKey(c_str[0], p);
+}
+void RemoveKeyStr(Keyboard &k, str s) {
+    char const* c_str = extract<char const*>(s); k.RemoveKey(c_str[0]);
+}
+Polygon GetKeyStr(Keyboard &k, str s) {
+    char const* c_str = extract<char const*>(s); return k.GetKey(c_str[0]);
+}
+
+//void AddKey(const unsigned char c, const Polygon& p);
+//void RemoveKey(const unsigned char c, const Polygon& p);
 /********************************************************/
 
 BOOST_PYTHON_MODULE(cruller)
@@ -66,5 +95,15 @@ BOOST_PYTHON_MODULE(cruller)
     ;
 /********************************************************/
 
-}
+/***************** Keyboard class ***********************/
+    
+    class_<Keyboard>("Keyboard")
+        .def("AddKey", &AddKeyStr)
+        .def("RemoveKey", &RemoveKeyStr)
+        .def("GetKey", &GetKeyStr)
+        .def("PolygonDict", &KeyboardPolygonDict)
+        .def("__deepcopy__", &DeepCopy<Keyboard>)
+    ;
+/********************************************************/
 
+}

@@ -5,7 +5,7 @@ Keyboard::Keyboard() {
 }
 
 Keyboard::Keyboard(const Keyboard& k) {
-    for(unsigned int c = 0; c < 256; c++) {
+    for(unsigned int c = 0; c < 128; c++) {
         polygons[c] = Polygon(k.GetKey(c));
     }
 }

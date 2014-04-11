@@ -40,13 +40,25 @@ list PolygonVertexListClosed(Polygon& p) {
 /***************** Keyboard class ************************/
 dict KeyboardPolygonDict(Keyboard& k) {
     dict d;
-    for(unsigned int c = 0; c < 256; c++) {
+    for(unsigned int c = 0; c < 128; c++) {
         Polygon p( k.GetKey(char(c)) );
         if( p.VertexCount() > 0 ) {
             d[char(c)] = p;
         }
     }
     return d;
+}
+void SetKeyboardPolygonDict(Keyboard& k, dict d) {
+    for(unsigned int c = 0; c < 128; c++) {
+        if(d.has_key(str(char(c)))) {
+            Polygon p = extract<Polygon>(d[str(char(c))]);
+            k.AddKey(char(c), p);
+        }
+        else {
+            Polygon p;
+            k.AddKey(char(c), p);
+        }
+    }
 }
 
 void AddKeyStr(Keyboard &k, str s, const Polygon& p) {
@@ -58,9 +70,6 @@ void RemoveKeyStr(Keyboard &k, str s) {
 Polygon GetKeyStr(Keyboard &k, str s) {
     char const* c_str = extract<char const*>(s); return k.GetKey(c_str[0]);
 }
-
-//void AddKey(const unsigned char c, const Polygon& p);
-//void RemoveKey(const unsigned char c, const Polygon& p);
 /********************************************************/
 
 BOOST_PYTHON_MODULE(cruller)
@@ -102,6 +111,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("RemoveKey", &RemoveKeyStr)
         .def("GetKey", &GetKeyStr)
         .def("PolygonDict", &KeyboardPolygonDict)
+        .def("SetPolygonDict", &SetKeyboardPolygonDict)
         .def("__deepcopy__", &DeepCopy<Keyboard>)
     ;
 /********************************************************/

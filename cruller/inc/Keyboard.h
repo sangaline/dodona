@@ -5,7 +5,7 @@
 
 class Keyboard {
   private:
-    Polygon polygons[256];
+    Polygon polygons[128];
   public:
     Keyboard();
     Keyboard(const Keyboard& k);

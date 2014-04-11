@@ -2,6 +2,16 @@
 
 using namespace std;
 
+Polygon::Polygon() {
+
+}
+
+Polygon::Polygon(const Polygon& p) {
+    for(unsigned int i = 0; i < p.VertexCount(); i++) {
+        AddVertex( p.VertexX(i), p.VertexY(i) );
+    }
+}
+
 void Polygon::Reset() {
     vertices.clear();
 }
@@ -16,19 +26,19 @@ unsigned int Polygon::ReplaceVertex(unsigned int i, double x, double y) {
     return vertices.size();
 }
 
-double Polygon::VertexX(unsigned int i) {
+double Polygon::VertexX(unsigned int i) const {
     return vertices[i].first;
 }
 
-double Polygon::VertexY(unsigned int i) {
+double Polygon::VertexY(unsigned int i) const {
     return vertices[i].second;
 }
 
-unsigned int Polygon::VertexCount() {
+unsigned int Polygon::VertexCount() const {
     return vertices.size();
 }
 
-double Polygon::LeftExtreme() {
+double Polygon::LeftExtreme() const {
     double extreme = vertices[0].first;
     for(unsigned int i = 1; i < vertices.size(); i++) {
         if(vertices[i].first < extreme) {
@@ -38,7 +48,7 @@ double Polygon::LeftExtreme() {
     return extreme;
 }
 
-double Polygon::RightExtreme() {
+double Polygon::RightExtreme() const {
     double extreme = vertices[0].first;
     for(unsigned int i = 1; i < vertices.size(); i++) {
         if(vertices[i].first > extreme) {
@@ -48,7 +58,7 @@ double Polygon::RightExtreme() {
     return extreme;
 }
 
-double Polygon::TopExtreme() {
+double Polygon::TopExtreme() const {
     double extreme = vertices[0].second;
     for(unsigned int i = 1; i < vertices.size(); i++) {
         if(vertices[i].second > extreme) {
@@ -58,7 +68,7 @@ double Polygon::TopExtreme() {
     return extreme;
 }
 
-double Polygon::BottomExtreme() {
+double Polygon::BottomExtreme() const {
     double extreme = vertices[0].second;
     for(unsigned int i = 1; i < vertices.size(); i++) {
         if(vertices[i].second < extreme) {

@@ -6,9 +6,13 @@
 #include <boost/python/class.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/list.hpp>
+#include <boost/python/dict.hpp>
 #include <boost/python/tuple.hpp>
 
 using namespace boost::python;
+
+//for general use in deep copying
+template<typename T> const T DeepCopy(const T& v, dict d) { return T(v); }
 
 /***************** WordList class ***********************/
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(AddWord_overloads, AddWord, 1, 2)
@@ -58,6 +62,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("RightExtreme", &Polygon::RightExtreme)
         .def("TopExtreme", &Polygon::TopExtreme)
         .def("BottomExtreme", &Polygon::BottomExtreme)
+        .def("__deepcopy__", &DeepCopy<Polygon>)
     ;
 /********************************************************/
 

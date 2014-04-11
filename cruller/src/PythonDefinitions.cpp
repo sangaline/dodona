@@ -29,7 +29,7 @@ list PolygonVertexList(Polygon& p, bool close_loop) {
     for(unsigned int i = 0; i < p.VertexCount(); i++) {
         l.append(make_tuple(p.VertexX(i), p.VertexY(i)));
     }
-    if(close_loop) { l.append(make_tuple(p.VertexX(0), p.VertexY(0))); }
+    if(close_loop && p.VertexCount() > 0) { l.append(make_tuple(p.VertexX(0), p.VertexY(0))); }
     return l;
 }
 list PolygonVertexListClosed(Polygon& p) {

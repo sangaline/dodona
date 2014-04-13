@@ -1,6 +1,6 @@
 #Relevent functions and their definitions for the genetic algorithm
 
-from donut import *
+from donut import cruller, bearclaw
 
 from random import random
 import numpy as np
@@ -41,15 +41,15 @@ def Evolve(kList, inputModel):
 
         #pick random crossover position
         co_index = int(np.random.rand()*26)
-        
+
         #Get freaky and make babies
         newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
 
         #create new keyboard corresponding to the new chromosomes created above
         newKeyboardA_string = ''.join(newChromeA_letters)
         newKeyboardB_string = ''.join(newChromeB_letters)
-        newKeyboardA = bearclaw.MakeKeyboard(newKeyboardA_string)
-        newKeyboardB = bearclaw.MakeKeyboard(newKeyboardB_string)
+        newKeyboardA = bearclaw.MakeStandardKeyboard(newKeyboardA_string)
+        newKeyboardB = bearclaw.MakeStandardKeyboard(newKeyboardB_string)
 
         newkList.append(newKeyboardA)
         newkList.append(newKeyboardB)
@@ -66,13 +66,13 @@ def NaturalSelection(chList):
     weights = []
 
     for i, chEntry in enumerate(chList):
-		weights.append(ChEntry[1])
+        weights.append(chEntry[1])
 
     choice = np.random.rand()*sum(weights)
     for i,w in enumerate(weights):
-	    choice -= w
-	    if choice < 0:
-		    return i
+        choice -= w
+        if choice < 0:
+            return i
 
 
 
@@ -89,9 +89,9 @@ def SwapGenes(keyBoard_A, keyBoard_B, co_index):
 
     newChromeA = newGenesA+oldGenesA
     newChromeB = newGenesB+oldGenesB
-    
+
     swpCommon = list(set(newGenesA)&set(newGenesB))  #find any genes that were swapped from both chromosomes
-    for i in range(len(swpCommon)):              #remove the swapped letters that each chromosome had in common from the list of letters that 
+    for i in range(len(swpCommon)):              #remove the swapped letters that each chromosome had in common from the list of letters that
         newGenesA.remove(swpCommon[i])           #still need to be swapped.  This is because with every letter we swap we end up with a duplicate
         newGenesB.remove(swpCommon[i])           #in the new chromosome so we need to remove the duplicates from both chromosomes simply by swapping them but
                                                  #if the same letter is present in both swapped genes then no duplicates will be created.
@@ -112,4 +112,4 @@ def SwapGenes(keyBoard_A, keyBoard_B, co_index):
 
     return finalChromeA, finalChromeB
 
- 
+

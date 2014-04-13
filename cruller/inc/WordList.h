@@ -11,6 +11,8 @@
 class WordList {
     typedef boost::unordered_map<std::string, unsigned int> wordmap;
 
+    unsigned int letters[128];
+    unsigned int total_letters;
     wordmap words;
     unsigned int total;
 
@@ -36,6 +38,9 @@ class WordList {
     unsigned int Occurances(const unsigned int index);
     unsigned int Words();
     const char* RandomWord();
+
+    unsigned int TotalLetterOccurances() { return total_letters; }
+    unsigned int LetterOccurances(const char c);
 };
 
 #endif

@@ -5,6 +5,11 @@
 using namespace std;
 
 WordList::WordList() {
+    for(unsigned int i = 0; i < 128; i++) {
+        letters[i] = 0;
+    }
+    total_letters = 0;
+
     vector_current = distribution_current = false;
     total = 0;
 }
@@ -13,14 +18,26 @@ WordList::~WordList() {
 }
 
 unsigned int WordList::AddWord(const char *word, const unsigned int occurances) {
+    string wordstring(word);
+
+    //first update the letter occurances:
+    for(unsigned int i = 0; i < wordstring.length(); i++) {
+        unsigned char c = (unsigned char) wordstring[i];
+        if(c < 128) {
+            letters[c] += occurances;
+            total_letters += occurances;
+        }
+    }
+
+    //no update the wordmap
     total += occurances;
     vector_current = distribution_current = false;
-    const wordmap::iterator it = words.find(string(word));
+    const wordmap::iterator it = words.find(wordstring);
     if(it != words.end()) {
         it->second += occurances;
         return it->second;
     }
-    words.insert(make_pair(string(word), occurances));
+    words.insert(make_pair(wordstring, occurances));
     return occurances;
 }
 
@@ -87,4 +104,12 @@ void WordList::UpdateDistribution() {
 void WordList::UpdateAll() {
     UpdateVectors();
     UpdateDistribution();
+}
+
+unsigned int WordList::LetterOccurances(const char c) {
+    unsigned char usc = (unsigned char) c;
+    if(usc < 128) {
+        return letters[usc];
+    }
+    return 0;
 }

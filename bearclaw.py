@@ -135,7 +135,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     plt.show()
 
 
-def MakeKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
+def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     width = 1.0
     height = 1.5
     gap = 0.2
@@ -180,28 +180,29 @@ def MakeKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
         k.AddKey(alphabetStr[i], l[i])
     return k
 
+def RandomKeyboard(keyboard):
+    d = keyboard.PolygonDict()
+    letters = list(d.keys())
+    polygons = list(d.values())
 
-def RandomKeyboard():
-    l = list('qwertyuiopasdfghjklzxcvbnm.')
-    shuffle(l)
-    rstr = ''.join(l)
-    return MakeKeyboard(rstr)
+    shuffle(letters)
+    newd = {}
+    for i, l in enumerate(letters):
+        newd[l] = polygons[i]
 
+    #and set it for the new keyboard
+    newk = cruller.Keyboard()
+    newk.SetPolygonDict(newd)
+
+    return newk
 
 def StandardQwerty():
-    return MakeKeyboard()
+    return MakeStandardKeyboard()
 
-
-
-def GetNRandomKeyboards(n):
+def GetNRandomKeyboards(keyboard, n):
     kList = []
 
     for i in range(0,n):
-        kList.append(RandomKeyboard())
+        kList.append(RandomKeyboard(keyboard))
 
     return kList
-
-
-
-
-

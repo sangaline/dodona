@@ -1,4 +1,5 @@
 from donut import cruller
+from random import shuffle
 
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
@@ -27,6 +28,7 @@ def DrawPolygon(p):
     ax.set_xlim(l-xpad, r+xpad)
     ax.set_ylim(b-ypad, t+ypad)
     plt.show()
+
 
 def DrawPolygons(polylist):
     fig = plt.figure()
@@ -132,7 +134,8 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
 
     plt.show()
 
-def StandardQwerty():
+
+def MakeKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     width = 1.0
     height = 1.5
     gap = 0.2
@@ -172,8 +175,33 @@ def StandardQwerty():
     p.AddVertex(startx + float(6)*(width+gap), starty-height)
     l.append(p)
 
-    qwerty = 'qwertyuiopasdfghjklzxcvbnm.'
     k = cruller.Keyboard()
     for i in range(27):
-        k.AddKey(qwerty[i], l[i])
+        k.AddKey(alphabetStr[i], l[i])
     return k
+
+
+def RandomKeyboard():
+    l = list('qwertyuiopasdfghjklzxcvbnm.')
+    shuffle(l)
+    rstr = ''.join(l)
+    return MakeKeyboard(rstr)
+
+
+def StandardQwerty():
+    return MakeKeyboard()
+
+
+
+def GetNRandomKeyboards(n):
+    kList = []
+
+    for i in range(0,n):
+        kList.append(RandomKeyboard())
+
+    return kList
+
+
+
+
+

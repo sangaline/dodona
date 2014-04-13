@@ -48,8 +48,8 @@ def Evolve(kList, inputModel):
         #create new keyboard corresponding to the new chromosomes created above
         newKeyboardA_string = ''.join(newChromeA_letters)
         newKeyboardB_string = ''.join(newChromeB_letters)
-        newKeyboardA = bearclaw.MakeStandardKeyboard(newKeyboardA_string)
-        newKeyboardB = bearclaw.MakeStandardKeyboard(newKeyboardB_string)
+        newKeyboardA = bearclaw.MakeKeyboard(newKeyboardA_string)
+        newKeyboardB = bearclaw.MakeKeyboard(newKeyboardB_string)
 
         newkList.append(newKeyboardA)
         newkList.append(newKeyboardB)
@@ -64,14 +64,15 @@ def Evolve(kList, inputModel):
 
 def NaturalSelection(chList):
     weights = []
-    for i in range(len(chList)):
-        weights.append(chList[i][1])
+
+    for i, chEntry in enumerate(chList):
+		weights.append(ChEntry[1])
 
     choice = np.random.rand()*sum(weights)
     for i,w in enumerate(weights):
-        choice -= w
-        if choice < 0:
-            return i
+	    choice -= w
+	    if choice < 0:
+		    return i
 
 
 

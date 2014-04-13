@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 
-from math import log, floor
+from math import log, floor, sqrt
+from copy import deepcopy
 
 
 #need to add this in notebooks:
@@ -174,6 +175,33 @@ def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     p.AddVertex(startx + float(6)*(width+gap) + width, starty-height)
     p.AddVertex(startx + float(6)*(width+gap), starty-height)
     l.append(p)
+
+    k = cruller.Keyboard()
+    for i in range(27):
+        k.AddKey(alphabetStr[i], l[i])
+    return k
+
+def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
+    shift = (sqrt(3), -1.5)
+    a, b, c = scale, scale/2.0, sqrt(3)*scale/2
+    h = cruller.Polygon()
+    h.AddVertex(0,-a)
+    h.AddVertex(c,-b)
+    h.AddVertex(c,b)
+    h.AddVertex(0,a)
+    h.AddVertex(-c,b)
+    h.AddVertex(-c,-b)
+
+    l = []
+    for j in range(3):
+        oldp = h
+        for i in range(10-j):
+            p = deepcopy(oldp)
+            p.Translate(shift[0],0)
+            l.append(p)
+            oldp = p
+        h.Translate(0.5*shift[0], shift[1])
+        oldp = h
 
     k = cruller.Keyboard()
     for i in range(27):

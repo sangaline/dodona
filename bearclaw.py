@@ -177,7 +177,7 @@ def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     l.append(p)
 
     k = cruller.Keyboard()
-    for i in range(27):
+    for i in range(len(alphabetStr)):
         k.AddKey(alphabetStr[i], l[i])
     return k
 

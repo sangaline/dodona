@@ -180,7 +180,9 @@ def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
         k.AddKey(alphabetStr[i], l[i])
     return k
 
-def RandomKeyboard(keyboard):
+def RandomKeyboard(keyboard = None):
+    if keyboard == None:
+        keyboard = MakeStandardKeyboard()
     d = keyboard.PolygonDict()
     letters = list(d.keys())
     polygons = list(d.values())
@@ -199,7 +201,7 @@ def RandomKeyboard(keyboard):
 def StandardQwerty():
     return MakeStandardKeyboard()
 
-def GetNRandomKeyboards(keyboard, n):
+def GetNRandomKeyboards(n, keyboard = None):
     kList = []
 
     for i in range(0,n):

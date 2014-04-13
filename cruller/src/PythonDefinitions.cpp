@@ -1,6 +1,10 @@
 #include "WordList.h"
 #include "Polygon.h"
 #include "Keyboard.h"
+#include "FitnessFunctions.h"
+
+#include "InputModels/InputModel.h"
+#include "InputModels/SimpleGaussianModel.h"
 
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
@@ -72,6 +76,24 @@ Polygon GetKeyStr(Keyboard &k, str s) {
 }
 /********************************************************/
 
+/***************** InputVector class ********************/
+list InputVectorList(InputVector& sigma) {
+    list l;
+    for(unsigned int i = 0; i < sigma.Length(); i++) {
+        l.append(make_tuple(sigma.X(i), sigma.Y(i), sigma.T(i)));
+    }
+    return l;
+}
+/********************************************************/
+
+
+
+
+/********************************************************/
+/********************************************************/
+/***************** Python Module ************************/
+/********************************************************/
+/********************************************************/
 BOOST_PYTHON_MODULE(cruller)
 {
 
@@ -85,6 +107,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("Word", &WordList::Word)
         .def("Words", &WordList::Words)
         .def("RandomWord", &WordList::RandomWord)
+        .def("LetterOccurances", &WordList::LetterOccurances)
+        .def("TotalLetterOccurances", &WordList::TotalLetterOccurances)
     ;
 /********************************************************/
 
@@ -116,4 +140,38 @@ BOOST_PYTHON_MODULE(cruller)
     ;
 /********************************************************/
 
+/***************** InputModel classes ***********************/
+
+    class_<InputModel>("InputModel")
+        //.def("RandomVector", &InputModel::RandomVector)
+        //.def("MarginalProbability", &InputModel::MarginalProbability)
+    ;
+    
+    class_<SimpleGaussianModel, bases<InputModel> >("SimpleGaussianModel")
+        .def("RandomVector", &SimpleGaussianModel::RandomVector)
+        .def("MarginalProbability", &SimpleGaussianModel::MarginalProbability)
+        .def("SetXScale", &SimpleGaussianModel::SetXScale)
+        .def("SetYScale", &SimpleGaussianModel::SetYScale)
+        .def("SetScale", &SimpleGaussianModel::SetScale)
+//        .def("__deepcopy__", &DeepCopy<Keyboard>)
+    ;
+/********************************************************/
+
+/***************** InputVector class ********************/
+    
+    class_<InputVector>("InputVector")
+        .def("Length", &InputVector::Length)
+        .def("AddPoint", &InputVector::AddPoint)
+        .def("X", &InputVector::X)
+        .def("Y", &InputVector::Y)
+        .def("T", &InputVector::T)
+        .def("PointList", &InputVectorList)
+    ;
+/********************************************************/
+
+/***************** FitnessFunctions ********************/
+    def("MonteCarloEfficiency", &FitnessFunctions::MonteCarloEfficiency);
+    
+
+/********************************************************/
 }

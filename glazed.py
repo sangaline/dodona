@@ -64,14 +64,15 @@ def Evolve(kList, inputModel):
 
 def NaturalSelection(chList):
     weights = []
-    for i in range(len(chList)):
-        weights.append(chList[i][1])
+
+    for i, chEntry in enumerate(chList):
+		weights.append(ChEntry[1])
 
     choice = np.random.rand()*sum(weights)
     for i,w in enumerate(weights):
-        choice -= w
-        if choice < 0:
-            return i
+	    choice -= w
+	    if choice < 0:
+		    return i
 
 
 

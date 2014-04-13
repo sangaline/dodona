@@ -115,6 +115,7 @@ BOOST_PYTHON_MODULE(cruller)
 /***************** Polygon class ************************/
     
     class_<Polygon>("Polygon")
+        .def("Translate", &Polygon::Translate)
         .def("AddVertex", &Polygon::AddVertex)
         .def("ReplaceVertex", &Polygon::ReplaceVertex)
         .def("Reset", &Polygon::Reset)

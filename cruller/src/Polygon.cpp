@@ -16,6 +16,13 @@ void Polygon::Reset() {
     vertices.clear();
 }
 
+void Polygon::Translate(double x, double y) {
+    for(unsigned int i = 0; i < vertices.size(); i++) {
+        vertices[i].first += x;
+        vertices[i].second += y;
+    }
+}
+
 unsigned int Polygon::AddVertex(double x, double y) {
     vertices.push_back( make_pair(x, y) );
     return vertices.size();

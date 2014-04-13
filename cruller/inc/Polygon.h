@@ -10,6 +10,7 @@ class Polygon {
   public:
     Polygon();
     Polygon(const Polygon& p);
+    void Translate(double x, double y);
     unsigned int AddVertex(double x, double y);
     unsigned int ReplaceVertex(unsigned int i, double x, double y);
     unsigned int VertexCount() const;

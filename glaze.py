@@ -48,8 +48,8 @@ def Evolve(kList, inputModel):
         #create new keyboard corresponding to the new chromosomes created above
         newKeyboardA_string = ''.join(newChromeA_letters)
         newKeyboardB_string = ''.join(newChromeB_letters)
-        newKeyboardA = bearclaw.MakeKeyboard(newKeyboardA_string)
-        newKeyboardB = bearclaw.MakeKeyboard(newKeyboardB_string)
+        newKeyboardA = bearclaw.MakeStandardKeyboard(newKeyboardA_string)
+        newKeyboardB = bearclaw.MakeStandardKeyboard(newKeyboardB_string)
 
         newkList.append(newKeyboardA)
         newkList.append(newKeyboardB)

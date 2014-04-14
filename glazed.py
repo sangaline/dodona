@@ -27,6 +27,7 @@ def Evolve(kList, inputModel):
         kExtList.append((i,randomFitness, kList[i]))
         chList.append((i,randomFitness))
 
+        print(kList[i].OrderedKeyList())
 
     #Pick pairs to repopulate the new generation with
     #Since each pair reproduces two new chromosomes this only needs to be done nChromosomes/2 times
@@ -34,14 +35,15 @@ def Evolve(kList, inputModel):
     for i in range(int(nk/2)):
         partnerA_index = NaturalSelection(chList)
         partnerB_index = NaturalSelection(chList)
-        dA = kList[partnerA_index].PolygonDict()
-        dB = kList[partnerB_index].PolygonDict()
-        partnerA_letters = list(dA.keys())
-        partnerB_letters = list(dB.keys())
 
+        partnerA_letters = kList[partnerA_index].OrderedKeyList()
+        partnerB_letters = kList[partnerB_index].OrderedKeyList()
+#        partnerA_letters = list(dA.keys())
+#        partnerB_letters = list(dB.keys())
+        
         #pick random crossover position
         co_index = int(np.random.rand()*26)
-
+        
         #Get freaky and make babies
         newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
 
@@ -81,6 +83,9 @@ def NaturalSelection(chList):
 #keyBoard_A and keyBoard_B are just the enumerated lists of letters corresponding to the actual keyboards
 
 def SwapGenes(keyBoard_A, keyBoard_B, co_index):
+    keyBoard_A = [a for a in keyBoard_A]
+    keyBoard_B = [b for b in keyBoard_B]
+        
     newGenesA = keyBoard_B[0:co_index] #the new genes to be swapped into chromosome A
     newGenesB = keyBoard_A[0:co_index] #   "           "            "  chromosome B
 

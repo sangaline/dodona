@@ -216,13 +216,9 @@ def RandomKeyboard(keyboard = None):
     polygons = list(d.values())
 
     shuffle(letters)
-    newd = {}
-    for i, l in enumerate(letters):
-        newd[l] = polygons[i]
-
-    #and set it for the new keyboard
     newk = cruller.Keyboard()
-    newk.SetPolygonDict(newd)
+    for i, l in enumerate(letters):
+        newk.AddKey(l, polygons[i])
 
     return newk
 

@@ -212,13 +212,14 @@ def RandomKeyboard(keyboard = None):
     if keyboard == None:
         keyboard = MakeStandardKeyboard()
     d = keyboard.PolygonDict()
-    letters = list(d.keys())
-    polygons = list(d.values())
+    letters = keyboard.OrderedKeyList()
+    polygons = [keyboard.GetKey(k) for k in letters]
 
-    shuffle(letters)
+    indices = list(range(len(letters)))
+    shuffle(indices)
     newk = cruller.Keyboard()
-    for i, l in enumerate(letters):
-        newk.AddKey(l, polygons[i])
+    for i, idx in enumerate(indices):
+        newk.AddKey(letters[idx], polygons[i])
 
     return newk
 

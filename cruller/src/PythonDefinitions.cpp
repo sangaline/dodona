@@ -69,10 +69,10 @@ void SetKeyboardPolygonDict(Keyboard& k, dict d) {
 
 list KeyboardOrderedKeyList(Keyboard& k) {
     list l;
-    for(unsigned int c = 0; c < 128; c++) {
+    for(unsigned int c = 0; c < k.NKeys(); c++) {
         Polygon p( k.GetKey(k.CharN(c)) );
         if( p.VertexCount() > 0 ) {
-            l.append(char(c));
+            l.append(char(k.CharN(c)));
         }
     }
     return l;

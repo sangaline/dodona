@@ -1,5 +1,5 @@
 from donut import cruller
-from random import shuffle
+from random import shuffle, choice
 
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
@@ -233,3 +233,22 @@ def GetNRandomKeyboards(n, keyboard = None):
         kList.append(RandomKeyboard(keyboard))
 
     return kList
+
+def RandomSwap(keyboard, Nswaps = 1):
+    d = keyboard.PolygonDict()
+    letters = keyboard.OrderedKeyList()
+    polygons = [keyboard.GetKey(k) for k in letters]
+
+    indices = list(range(len(letters)))
+
+    for swap in range(Nswaps):
+        c = (choice(indices), choice(indices))
+        print("choices:", c)
+        indices[c[0]], indices[c[1]] = indices[c[1]], indices[c[0]]
+
+    newk = cruller.Keyboard()
+    for i, idx in enumerate(indices):
+        newk.AddKey(letters[idx], polygons[i])
+
+    return newk
+

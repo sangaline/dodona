@@ -11,6 +11,11 @@ Keyboard::Keyboard(const Keyboard& k) {
     for(unsigned int c = 0; c < 128; c++) {
         polygons[c] = Polygon(k.GetKey(c));
     }
+
+    idx = k.idx;
+    for(unsigned int i = 0; i < idx; i++) {
+        entries[i] = k.entries[i];
+    }
 }
 
 void Keyboard::AddKey(const unsigned char c, const Polygon& p) {
@@ -23,9 +28,8 @@ void Keyboard::AddKey(const unsigned char c, const Polygon& p) {
 }
 
 void Keyboard::RemoveKey(const unsigned char c) {
-    polygons[c] = Polygon();
     bool subtract = false;
-    for(unsigned int i = 0; i < 127; i++) {
+    for(unsigned int i = 0; i < idx; i++) {
         if(entries[i] == c) {
             subtract = true;
         }
@@ -33,8 +37,11 @@ void Keyboard::RemoveKey(const unsigned char c) {
             entries[i] = entries[i+1];
         }
     }
-    idx--;
-    polygons[idx] = Polygon();
+    //if we found it to remove
+    if(subtract) {
+        polygons[c] = Polygon();
+        idx--;
+    }
 }
 
 Polygon Keyboard::GetKey(const unsigned char c) const {

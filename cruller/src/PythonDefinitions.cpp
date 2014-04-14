@@ -52,6 +52,7 @@ dict KeyboardPolygonDict(Keyboard& k) {
     }
     return d;
 }
+
 void SetKeyboardPolygonDict(Keyboard& k, dict d) {
     for(unsigned int c = 0; c < 128; c++) {
         if(d.has_key(str(char(c)))) {
@@ -63,6 +64,17 @@ void SetKeyboardPolygonDict(Keyboard& k, dict d) {
             k.AddKey(char(c), p);
         }
     }
+}
+
+list KeyboardOrderedKeyList(Keyboard& k) {
+    list l;
+    for(unsigned int c = 0; c < 128; c++) {
+        Polygon p( k.GetKey(char(c)) );
+        if( p.VertexCount() > 0 ) {
+            l.append(char(c));
+        }
+    }
+    return l;
 }
 
 void AddKeyStr(Keyboard &k, str s, const Polygon& p) {
@@ -137,6 +149,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("GetKey", &GetKeyStr)
         .def("PolygonDict", &KeyboardPolygonDict)
         .def("SetPolygonDict", &SetKeyboardPolygonDict)
+        .def("OrderedKeyList", &KeyboardOrderedKeyList)
         .def("__deepcopy__", &DeepCopy<Keyboard>)
     ;
 /********************************************************/

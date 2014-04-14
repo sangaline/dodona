@@ -2,6 +2,9 @@
 
 Keyboard::Keyboard() {
     idx = 0;
+    for(unsigned int c = 0; c < 128; c++) {
+        polygons[c] = Polygon();
+    }
 }
 
 Keyboard::Keyboard(const Keyboard& k) {
@@ -37,4 +40,12 @@ Polygon Keyboard::GetKey(const unsigned char c) const {
 
 unsigned char Keyboard::CharN(unsigned int i) {
     return entries[idx];
+}
+
+void Keyboard::Reset() {
+    for(unsigned int c = 0; c < 128; c++) {
+        polygons[c] = Polygon();
+        entries[c] = 0;
+    }
+    idx = 0;
 }

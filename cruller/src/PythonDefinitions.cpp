@@ -54,6 +54,7 @@ dict KeyboardPolygonDict(Keyboard& k) {
 }
 
 void SetKeyboardPolygonDict(Keyboard& k, dict d) {
+    k.Reset();
     for(unsigned int c = 0; c < 128; c++) {
         if(d.has_key(str(char(c)))) {
             Polygon p = extract<Polygon>(d[str(char(c))]);

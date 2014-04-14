@@ -14,6 +14,9 @@ Keyboard::Keyboard(const Keyboard& k) {
 }
 
 void Keyboard::AddKey(const unsigned char c, const Polygon& p) {
+    if(polygons[c].VertexCount() > 0) {
+        RemoveKey(c);
+    }
     polygons[c] = Polygon(p);
     entries[idx] = c;
     idx++;
@@ -27,11 +30,11 @@ void Keyboard::RemoveKey(const unsigned char c) {
             subtract = true;
         }
         if(subtract) {
-            polygons[i] = polygons[i+1];
+            entries[i] = entries[i+1];
         }
     }
-    polygons[127] = Polygon();
     idx--;
+    polygons[idx] = Polygon();
 }
 
 Polygon Keyboard::GetKey(const unsigned char c) const {
@@ -39,7 +42,7 @@ Polygon Keyboard::GetKey(const unsigned char c) const {
 }
 
 unsigned char Keyboard::CharN(unsigned int i) {
-    return entries[idx];
+    return entries[i];
 }
 
 void Keyboard::Reset() {

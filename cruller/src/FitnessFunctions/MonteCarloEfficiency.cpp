@@ -2,8 +2,9 @@
 #include "InputModels/InputVector.h"
 
 #include "string.h"
+#include "math.h"
 
-double FitnessFunctions::MonteCarloEfficiency(Keyboard& keyboard, InputModel& model, WordList& words, unsigned int iterations) {
+FitnessResult FitnessFunctions::MonteCarloEfficiency(Keyboard& keyboard, InputModel& model, WordList& words, unsigned int iterations) {
 
     unsigned int matched = 0, missed = 0;
     for(unsigned int iteration = 0; iteration < iterations; iteration++) {
@@ -28,6 +29,8 @@ double FitnessFunctions::MonteCarloEfficiency(Keyboard& keyboard, InputModel& mo
             missed++;
         }
     }
+    const double fitness = double(matched)/double(iterations);
+    const double error = sqrt( fitness*(1.0-fitness)/double(iterations));
 
-    return double(matched)/double(matched+missed);
+    return FitnessResult(iterations, fitness, error);
 }

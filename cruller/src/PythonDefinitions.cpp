@@ -2,6 +2,7 @@
 #include "Polygon.h"
 #include "Keyboard.h"
 #include "FitnessFunctions.h"
+#include "FitnessResult.h"
 
 #include "InputModels/InputModel.h"
 #include "InputModels/SimpleGaussianModel.h"
@@ -10,6 +11,7 @@
 #include <boost/python/def.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/overloads.hpp>
+#include <boost/python/operators.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
@@ -181,6 +183,16 @@ BOOST_PYTHON_MODULE(cruller)
         .def("Y", &InputVector::Y)
         .def("T", &InputVector::T)
         .def("PointList", &InputVectorList)
+    ;
+/********************************************************/
+
+/***************** FitnessResult class ********************/
+    
+    class_<FitnessResult>("FitnessResult", init<unsigned int, double, double>())
+        .def(self + self)
+        .def("Fitness", &FitnessResult::Fitness)
+        .def("Error", &FitnessResult::Error)
+        .def("Iterations", &FitnessResult::Iterations)
     ;
 /********************************************************/
 

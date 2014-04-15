@@ -10,7 +10,7 @@ import numpy as np
 #kList is the current generation (list) of keyboards paired with their fitness, and inputModel is the inputModel to be used in the fitness function
 #returns newkList which is the new generation (list) of keyboards
 
-def Evolve(kList, fitness, pressurePoint = 0):
+def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
     nk = len(kList)    
     fitnessList = [ kList[i][1] for i in range(len(kList))  ]   
 
@@ -43,9 +43,9 @@ def Evolve(kList, fitness, pressurePoint = 0):
         newKeyboardB = bearclaw.MakeStandardKeyboard(newKeyboardB_string)
 
         #Indroduce mutations
-        if np.random.rand() < 0.3:
+        if np.random.rand() < mutationRate:
             newKeyboardA = bearclaw.RandomSwap(newKeyboardA,2)
-        if np.random.rand() < 0.3:
+        if np.random.rand() < mutationRate:
             newKeyboardB = bearclaw.RandomSwap(newKeyboardB,2)
 
         newFitnessA = fitness(newKeyboardA)

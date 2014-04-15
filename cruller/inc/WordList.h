@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#define MAXN 25
+
 class WordList {
     typedef boost::unordered_map<std::string, unsigned int> wordmap;
 
@@ -22,6 +24,8 @@ class WordList {
 
     std::vector<unsigned int> occurance_vector;
     std::vector<std::string> word_vector;
+    std::vector<unsigned int> Noccurance_vector[MAXN];
+    std::vector<std::string> Nword_vector[MAXN];
     bool vector_current;
 
     void UpdateVectors();
@@ -37,6 +41,10 @@ class WordList {
     const char* Word(const unsigned int index);
     unsigned int Occurances(const unsigned int index);
     unsigned int Words();
+    const char* NWord(const unsigned int N, const unsigned int index);
+    unsigned int NOccurances(const unsigned int N, const unsigned int index);
+    unsigned int NWords(const unsigned int N);
+    unsigned int MaxN() { return MAXN; }
     const char* RandomWord();
 
     unsigned int TotalLetterOccurances() { return total_letters; }

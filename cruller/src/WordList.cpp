@@ -63,6 +63,29 @@ unsigned int WordList::Occurances(const unsigned int index) {
     return occurance_vector[index];
 }
 
+unsigned int WordList::NWords(const unsigned int N) {
+    if(N < 1 || N > MAXN) {
+        return 0;
+    }
+    return Nword_vector[N-1].size();
+}
+
+const char* WordList::NWord(const unsigned int N, const unsigned int index) {
+    UpdateVectors();
+    if(N < 1 || N > MAXN) {
+        return 0;
+    }
+    return Nword_vector[N-1][index].c_str();
+}
+
+unsigned int WordList::NOccurances(const unsigned int N, const unsigned int index) {
+    UpdateVectors();
+    if(N < 1 || N > MAXN) {
+        return 0;
+    }
+    return Noccurance_vector[N-1][index];
+}
+
 const char* WordList::RandomWord() {
     UpdateAll();
     return word_vector[distribution(generator)].c_str();
@@ -76,6 +99,10 @@ void WordList::UpdateVectors() {
     if(!vector_current) {
         word_vector.clear();
         occurance_vector.clear();
+        for(unsigned int i = 0; i < MAXN; i++) {
+            Nword_vector[i].clear();
+            Noccurance_vector[i].clear();
+        }
 
         vector< pair<string, unsigned int> > sorted; 
         for(wordmap::iterator it = words.begin(); it != words.end(); it++) {
@@ -87,11 +114,17 @@ void WordList::UpdateVectors() {
         for(it = sorted.begin(); it != sorted.end(); it++) {
             word_vector.push_back(it->first);
             occurance_vector.push_back(it->second);
+            const unsigned int l = it->first.length();
+            if(l > 0 && l <= MAXN) {
+                Nword_vector[l-1].push_back(it->first);
+                Noccurance_vector[l-1].push_back(it->second);
+            }
         }
         sorted.clear();
 
         vector_current = true;
     }
+
     distribution_current = false;
 }
 

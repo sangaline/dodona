@@ -27,11 +27,9 @@ def Evolve(kList, fitness, pressurePoint = 0):
         #pick random crossover position
         co_index = int(np.random.rand()*26)
        
-        #decide if we should swap from the front or from the back of the keyboard string
-        swpRand = np.random.rand()
-
         #Get freaky and make babies
-        if swpRand < 0.5:
+        #Randomly decide if the genes swap from the front or the back of the chromosom
+        if np.random.rand() < 0.5:
             newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
         else:
             tmpA, tmpB = SwapGenes(partnerA_letters[::-1], partnerB_letters[::-1], co_index)
@@ -43,6 +41,12 @@ def Evolve(kList, fitness, pressurePoint = 0):
         newKeyboardB_string = ''.join(newChromeB_letters)
         newKeyboardA = bearclaw.MakeStandardKeyboard(newKeyboardA_string)
         newKeyboardB = bearclaw.MakeStandardKeyboard(newKeyboardB_string)
+
+        #Indroduce mutations
+        if np.random.rand() < 0.3:
+            newKeyboardA = bearclaw.RandomSwap(newKeyboardA,2)
+        if np.random.rand() < 0.3:
+            newKeyboardB = bearclaw.RandomSwap(newKeyboardB,2)
 
         newFitnessA = fitness(newKeyboardA)
         newFitnessB = fitness(newKeyboardB)

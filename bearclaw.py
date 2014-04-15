@@ -243,7 +243,7 @@ def RandomSwap(keyboard, Nswaps = 1):
 
     for swap in range(Nswaps):
         c = (choice(indices), choice(indices))
-        print("choices:", c)
+#        print("choices:", c)
         indices[c[0]], indices[c[1]] = indices[c[1]], indices[c[0]]
 
     newk = cruller.Keyboard()

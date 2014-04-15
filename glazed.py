@@ -7,45 +7,34 @@ import numpy as np
 
 
 #Takes a generation (current list of keyboards) and evolves a new generation based on a genetic-ish algorithm
-#kList is the current generation (list) of keyboards, and inputModel is the inputModel to be used in the fitness function
+#kList is the current generation (list) of keyboards paired with their fitness, and inputModel is the inputModel to be used in the fitness function
 #returns newkList which is the new generation (list) of keyboards
 
-def Evolve(kList, inputModel):
-    nk = len(kList)
-    kExtList = []
-    chList = []
-    for i in range(nk):
-
-        ################## Need to substitute in real fitness function here #######################
-
-        #        kExtList.append((i,cruller.FittnessFunction(kList[i], inputModel), kList[i]))
-        #        chList.append((i,cruller.FittnessFunction(kList[i], inputMOdel)))
-        randomFitness = np.random.rand()
-
-        ###########################################################################################
-
-        kExtList.append((i,randomFitness, kList[i]))
-        chList.append((i,randomFitness))
-
-        print(kList[i].OrderedKeyList())
+def Evolve(kList, fitness, pressurePoint = 0):
+    nk = len(kList)    
+    fitnessList = [ kList[i][1] for i in range(len(kList))  ]   
 
     #Pick pairs to repopulate the new generation with
     #Since each pair reproduces two new chromosomes this only needs to be done nChromosomes/2 times
     newkList = []
     for i in range(int(nk/2)):
-        partnerA_index = NaturalSelection(chList)
-        partnerB_index = NaturalSelection(chList)
+        partnerA_index = NaturalSelection(fitnessList, pressurePoint)
+        partnerB_index = NaturalSelection(fitnessList, pressurePoint)
 
-        partnerA_letters = kList[partnerA_index].OrderedKeyList()
-        partnerB_letters = kList[partnerB_index].OrderedKeyList()
-#        partnerA_letters = list(dA.keys())
-#        partnerB_letters = list(dB.keys())
+        partnerA_letters = kList[partnerA_index][0].OrderedKeyList()
+        partnerB_letters = kList[partnerB_index][0].OrderedKeyList()
         
         #pick random crossover position
         co_index = int(np.random.rand()*26)
-        
+       
         #Get freaky and make babies
-        newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
+        #Randomly decide if the genes swap from the front or the back of the chromosom
+        if np.random.rand() < 0.5:
+            newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
+        else:
+            tmpA, tmpB = SwapGenes(partnerA_letters[::-1], partnerB_letters[::-1], co_index)
+            newChromeA_letters = tmpA[::-1]
+            newChromeB_letters = tmpB[::-1]
 
         #create new keyboard corresponding to the new chromosomes created above
         newKeyboardA_string = ''.join(newChromeA_letters)
@@ -53,10 +42,20 @@ def Evolve(kList, inputModel):
         newKeyboardA = bearclaw.MakeStandardKeyboard(newKeyboardA_string)
         newKeyboardB = bearclaw.MakeStandardKeyboard(newKeyboardB_string)
 
-        newkList.append(newKeyboardA)
-        newkList.append(newKeyboardB)
+        #Indroduce mutations
+        if np.random.rand() < 0.3:
+            newKeyboardA = bearclaw.RandomSwap(newKeyboardA,2)
+        if np.random.rand() < 0.3:
+            newKeyboardB = bearclaw.RandomSwap(newKeyboardB,2)
+
+        newFitnessA = fitness(newKeyboardA)
+        newFitnessB = fitness(newKeyboardB)
+
+        newkList.append((newKeyboardA,newFitnessA))
+        newkList.append((newKeyboardB,newFitnessB))
 
     return newkList
+
 
 
 
@@ -64,11 +63,17 @@ def Evolve(kList, inputModel):
 #Fitness proportionate selection
 #chList is a list of tuples containing the enumerated integer identity of the keyboard and it's fitness
 
-def NaturalSelection(chList):
+def NaturalSelection(wList, pressurePoint):
     weights = []
+    sortedWeights = sorted(wList)
 
-    for i, chEntry in enumerate(chList):
-        weights.append(chEntry[1])
+    min = sortedWeights[pressurePoint]
+    max = sortedWeights[len(wList)-1]
+
+    for i, chEntry in enumerate(wList):
+        weights.append(chEntry-min)
+
+    weights = [ (max-min)*0.01 if x <= 0 else x for x in weights ]
 
     choice = np.random.rand()*sum(weights)
     for i,w in enumerate(weights):

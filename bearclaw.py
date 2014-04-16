@@ -201,7 +201,6 @@ def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
             l.append(p)
             oldp = p
         h.Translate(0.5*shift[0], shift[1])
-        oldp = h
 
     k = cruller.Keyboard()
     for i in range(27):

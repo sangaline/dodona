@@ -182,6 +182,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("X", &InputVector::X)
         .def("Y", &InputVector::Y)
         .def("T", &InputVector::T)
+        .def("SpatialLength", &InputVector::SpatialLength)
+        .def("TemporalLength", &InputVector::TemporalLength)
         .def("PointList", &InputVectorList)
     ;
 /********************************************************/

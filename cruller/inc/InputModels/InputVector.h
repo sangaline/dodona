@@ -13,6 +13,8 @@ class InputVector {
    double X(unsigned int i);
    double Y(unsigned int i);
    double T(unsigned int i);
+   double SpatialLength();
+   double TemporalLength();
 };
 
 #endif

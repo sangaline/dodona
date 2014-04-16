@@ -76,7 +76,7 @@ def HeatMap(v):
     if bn < 0: bn = 0
     return (rn,gn,bn)
 
-def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None):
+def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None, t9 = False):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     (l, r, b, t) = (0, 0, 0, 0)
@@ -91,7 +91,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             pmin = min(frequencies)
         if pmax == None:
             pmax = max(frequencies)
-    for c in d.keys():
+    for i, c in enumerate(k.OrderedKeyList()):
         p = d[c]
         verts = p.VertexList()
         codes = [Path.MOVETO] + [Path.LINETO for i in range(len(verts)-2)] + [Path.CLOSEPOLY]
@@ -116,7 +116,19 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         patch = patches.PathPatch(path, facecolor=facecolor, lw=2)
         ax.add_patch(patch)
 
-        ax.text(newl + 0.2*(newr-newl),newb + 0.2*(newt-newb), c, fontsize=18)
+        t9shift = 0.0
+        if t9:
+            idx = i % 3
+            t9shift = (newr-newl)*0.25
+            if i == 25 or i == 18:
+                t9shift *= 3
+            else:
+                if i > 18:
+                    idx = (i-1) % 3
+                t9shift *= idx
+            t9shift -= (newr-newl)*0.15
+
+        ax.text(newl + 0.2*(newr-newl) + t9shift,newb + 0.2*(newt-newb), c, fontsize=18)
     xpad = (r-l)*0.1
     ypad = (t-b)*0.1
     ax.set_xlim(l-xpad, r+xpad)
@@ -205,6 +217,36 @@ def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
     k = cruller.Keyboard()
     for i in range(27):
         k.AddKey(alphabetStr[i], l[i])
+    return k
+
+#Left off the '.' because I think that was it's own key
+def MakeT9Keyboard(alphabetStr='abcdefghijklmnopqrstuvwxyz', scale=0.9):
+    shift = (1, -1)
+    a, b, c = scale, scale/2.0, sqrt(3)*scale/2
+    h = cruller.Polygon()
+    h.AddVertex(0,0)
+    h.AddVertex(1,0)
+    h.AddVertex(1,-1)
+    h.AddVertex(0,-1)
+
+    l = []
+    for j in range(3):
+        oldp = h
+        for i in range(3):
+            p = deepcopy(oldp)
+            p.Translate(shift[0],0)
+            if not (i==0 and j==0):
+                for k in range(3):
+                    l.append(p)
+                if j==2 and (i!=1):
+                    l.append(p)
+            oldp = p
+        h.Translate(0, shift[1])
+
+    k = cruller.Keyboard()
+    for i in range(26):
+        k.AddKey(alphabetStr[i], l[i])
+
     return k
 
 def RandomKeyboard(keyboard = None):

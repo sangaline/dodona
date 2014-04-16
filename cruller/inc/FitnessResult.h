@@ -14,7 +14,7 @@ class FitnessResult {
     int Iterations() { return iterations; }
 
     void SetFitness(double f) { fitness = f; }
-    void SetError(double e) { fitness = e; }
+    void SetError(double e) { error = e; }
     void SetIterations(unsigned int i) { iterations = i; }
 };
 

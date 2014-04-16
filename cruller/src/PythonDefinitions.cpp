@@ -6,6 +6,7 @@
 
 #include "InputModels/InputModel.h"
 #include "InputModels/SimpleGaussianModel.h"
+#include "InputModels/Interpolation.h"
 
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
@@ -200,7 +201,9 @@ BOOST_PYTHON_MODULE(cruller)
 
 /***************** FitnessFunctions ********************/
     def("MonteCarloEfficiency", &FitnessFunctions::MonteCarloEfficiency);
-    
+/********************************************************/
 
+/***************** Interpolation ************************/
+    def("SpatialInterpolation", &SpatialInterpolation);
 /********************************************************/
 }

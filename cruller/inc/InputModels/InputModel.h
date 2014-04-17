@@ -9,10 +9,14 @@
 class InputModel {
   protected:
     boost::mt19937 generator;
+    bool fixed_length;
 
   public:
-    virtual InputVector RandomVector(const char* word, Keyboard& k) { return InputVector(); }
-    virtual double MarginalProbability(InputVector& vector, const char* word, Keyboard& k) { return 0; }
+    InputModel() { fixed_length = false; }
+    bool FixedLength() { return fixed_length; }
+
+    virtual InputVector RandomVector(const char* word, Keyboard& k) = 0;
+    virtual double Distance(InputVector& vector, const char* word, Keyboard& k) = 0;
 };
 
 #endif

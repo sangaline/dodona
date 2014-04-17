@@ -11,6 +11,8 @@
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/class.hpp>
+#include <boost/python/wrapper.hpp>
+#include <boost/python/pure_virtual.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/operators.hpp>
 #include <boost/python/extract.hpp>
@@ -102,6 +104,16 @@ list InputVectorList(InputVector& sigma) {
 }
 /********************************************************/
 
+/***************** InputModel wrappers ******************/
+class InputModelWrapper : public InputModel, public boost::python::wrapper<InputModel> {
+    double Distance(InputVector& vector, const char* word, Keyboard& k) {
+        return this->get_override("Distance")(vector, word, k);
+    }
+    InputVector RandomVector(const char* word, Keyboard& k) {
+        return this->get_override("RandomVector")(word, k);
+    }
+};
+/********************************************************/
 
 
 
@@ -160,14 +172,15 @@ BOOST_PYTHON_MODULE(cruller)
 
 /***************** InputModel classes ***********************/
 
-    class_<InputModel>("InputModel")
-        //.def("RandomVector", &InputModel::RandomVector)
-        //.def("MarginalProbability", &InputModel::MarginalProbability)
+    class_<InputModelWrapper, boost::noncopyable>("InputModel")
+        .def("RandomVector", pure_virtual(&InputModel::RandomVector))
+        .def("Distance", pure_virtual(&InputModel::Distance))
     ;
     
     class_<SimpleGaussianModel, bases<InputModel> >("SimpleGaussianModel")
         .def("RandomVector", &SimpleGaussianModel::RandomVector)
         .def("MarginalProbability", &SimpleGaussianModel::MarginalProbability)
+        //.def("Distance", &SimpleGaussianModel::Distance)
         .def("SetXScale", &SimpleGaussianModel::SetXScale)
         .def("SetYScale", &SimpleGaussianModel::SetYScale)
         .def("SetScale", &SimpleGaussianModel::SetScale)

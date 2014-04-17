@@ -12,7 +12,7 @@ class InputModel {
 
   public:
     virtual InputVector RandomVector(const char* word, Keyboard& k) = 0;
-    virtual double MarginalProbability(InputVector& vector, const char* word, Keyboard& k) = 0;
+    virtual double Distance(InputVector& vector, const char* word, Keyboard& k) = 0;
 };
 
 #endif

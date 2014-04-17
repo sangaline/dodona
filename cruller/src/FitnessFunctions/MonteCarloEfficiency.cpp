@@ -19,7 +19,7 @@ FitnessResult FitnessFunctions::MonteCarloEfficiency(Keyboard& keyboard, InputMo
 
         const char *best_word = 0;
         double best_distance = 0;
-        if(wordlength <= words.MaxN() && wordlength > 0) {
+        if(model.FixedLength() && wordlength <= words.MaxN() && wordlength > 0) {
             for(unsigned int i = 0; i < words.NWords(wordlength); i++) {
                 const char *possible_word = words.NWord(wordlength, i);
                 const double distance = model.Distance(sigma, possible_word, keyboard);

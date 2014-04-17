@@ -10,6 +10,7 @@ using namespace std;
 SimpleGaussianModel::SimpleGaussianModel(double xscale, double yscale) {
     ysigma = xscale*0.5;
     xsigma = yscale*0.5;
+    fixed_length = true;
 }
 
 InputVector SimpleGaussianModel::RandomVector(const char* word, Keyboard& k) {

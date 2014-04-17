@@ -11,8 +11,8 @@ class InputModel {
     boost::mt19937 generator;
 
   public:
-    virtual InputVector RandomVector(const char* word, Keyboard& k) { return InputVector(); }
-    virtual double MarginalProbability(InputVector& vector, const char* word, Keyboard& k) { return 0; }
+    virtual InputVector RandomVector(const char* word, Keyboard& k) = 0;
+    virtual double MarginalProbability(InputVector& vector, const char* word, Keyboard& k) = 0;
 };
 
 #endif

@@ -33,13 +33,7 @@ def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
         co_index = int(np.random.rand()*26)
        
         #Get freaky and make babies
-        #Randomly decide if the genes swap from the front or the back of the chromosom
-        if np.random.rand() < 0.5:
-            newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
-        else:
-            tmpA, tmpB = SwapGenes(partnerA_letters[::-1], partnerB_letters[::-1], co_index)
-            newChromeA_letters = tmpA[::-1]
-            newChromeB_letters = tmpB[::-1]
+        newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
 
         #create new keyboard corresponding to the new chromosomes created above
         newKeyboardA_string = ''.join(newChromeA_letters)

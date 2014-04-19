@@ -12,14 +12,19 @@ import numpy as np
 
 def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
     nk = len(kList)    
-    fitnessList = [ kList[i][1] for i in range(len(kList))  ]   
+    fitnessResultList = [ kList[i][1] for i in range(len(kList))  ]   
 
     #Pick pairs to repopulate the new generation with
     #Since each pair reproduces two new chromosomes this only needs to be done nChromosomes/2 times
     newkList = []
     for i in range(int(nk/2)):
-        partnerA_index = NaturalSelection(fitnessList, pressurePoint)
-        partnerB_index = NaturalSelection(fitnessList, pressurePoint)
+        partnerA_index = NaturalSelection(fitnessResultList, pressurePoint)
+    
+        #Check to see if the halting condition has been met (i.e. if the fitnesses are all too close to differentiate within error)
+        if partnerA_index == -1:
+            return kList
+
+        partnerB_index = NaturalSelection(fitnessResultList, pressurePoint)
 
         partnerA_letters = kList[partnerA_index][0].OrderedKeyList()
         partnerB_letters = kList[partnerB_index][0].OrderedKeyList()
@@ -44,9 +49,9 @@ def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
 
         #Indroduce mutations
         if np.random.rand() < mutationRate:
-            newKeyboardA = bearclaw.RandomSwap(newKeyboardA,2)
+            newKeyboardA = bearclaw.RandomSwap(newKeyboardA,1)
         if np.random.rand() < mutationRate:
-            newKeyboardB = bearclaw.RandomSwap(newKeyboardB,2)
+            newKeyboardB = bearclaw.RandomSwap(newKeyboardB,1)
 
         newFitnessA = fitness(newKeyboardA)
         newFitnessB = fitness(newKeyboardB)
@@ -61,19 +66,26 @@ def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
 
 
 #Fitness proportionate selection
-#chList is a list of tuples containing the enumerated integer identity of the keyboard and it's fitness
+#frList is a list containing the FitnessResult objects from kList
 
-def NaturalSelection(wList, pressurePoint):
-    weights = []
-    sortedWeights = sorted(wList)
+def NaturalSelection(frList, pressurePoint):
+    weights = [ ]
+    fitnessList = [ frEntry.Fitness() for frEntry in frList ] 
+    sortedWeights = sorted(fitnessList)
 
     min = sortedWeights[pressurePoint]
-    max = sortedWeights[len(wList)-1]
+    max = sortedWeights[-1]
+    iMax = fitnessList.index(max)
+    scale = max-min
+    
+    for frEntry in frList:
+        weights.append(frEntry.Fitness() - min + 2*frEntry.Error())
 
-    for i, chEntry in enumerate(wList):
-        weights.append(chEntry-min)
+    #if the weights are clustered in a range smaller than the average then return -1, the halting condition
+    if scale < frList[iMax].Error():
+        return -1
 
-    weights = [ (max-min)*0.01 if x <= 0 else x for x in weights ]
+    weights = [ scale*0.01 if x <= 0 else x for x in weights ]
 
     choice = np.random.rand()*sum(weights)
     for i,w in enumerate(weights):

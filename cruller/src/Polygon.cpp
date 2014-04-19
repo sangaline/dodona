@@ -84,3 +84,25 @@ double Polygon::BottomExtreme() const {
     }
     return extreme;
 }
+
+//based on the crossing number/even-odd rule algorithm
+//note: basically undefined behavior if it's on an edge
+bool Polygon::IsInside(double x, double y) {
+    unsigned int crossings = 0;
+    for(unsigned int i = 0; i < vertices.size(); i++) {
+        const double x1 = i>0 ? vertices[i-1].first : vertices[vertices.size()-1].first;
+        const double y1 = i>0 ? vertices[i-1].second : vertices[vertices.size()-1].second;
+        const double x2 = vertices[i].first;
+        const double y2 = vertices[i].second;
+        if( ( y >= y1 && y <= y2) || (y >= y2 && y <= y1) ) {
+            const double intersection_x = y1==y2 ? 0.5*(x1+x2) : ((y-y1)*(x2-x1)/(y2-y1)) + x1;
+            if(intersection_x < x) {
+                crossings++;
+            }
+        }
+    }
+    if(crossings%2 == 1) {
+        return true;
+    }
+    return false;
+}

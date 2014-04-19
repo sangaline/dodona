@@ -153,6 +153,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("RightExtreme", &Polygon::RightExtreme)
         .def("TopExtreme", &Polygon::TopExtreme)
         .def("BottomExtreme", &Polygon::BottomExtreme)
+        .def("IsInside", &Polygon::IsInside)
         .def("__deepcopy__", &DeepCopy<Polygon>)
     ;
 /********************************************************/

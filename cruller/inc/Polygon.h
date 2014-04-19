@@ -20,6 +20,7 @@ class Polygon {
     double RightExtreme() const;
     double TopExtreme() const;
     double BottomExtreme() const;
+    bool IsInside(double x, double y);
     void Reset();
 };
 

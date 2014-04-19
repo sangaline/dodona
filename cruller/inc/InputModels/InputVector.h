@@ -15,6 +15,7 @@ class InputVector {
    double T(unsigned int i);
    double SpatialLength();
    double TemporalLength();
+   double DeltaPhi(unsigned int i);
 };
 
 #endif

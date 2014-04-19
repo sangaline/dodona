@@ -44,3 +44,14 @@ double InputVector::SpatialLength() {
 double InputVector::TemporalLength() {
     return tvector[tvector.size()-1] - tvector[0];
 }
+
+double InputVector::DeltaPhi(unsigned int i) {
+    //change in direction doesn't make sense at the ends
+    if( i == 0 || i >= xvector.size() - 1 ) {
+        return 0;
+    }
+    const double oldphi = atan2( (yvector[i]-yvector[i-1]), (xvector[i]-xvector[i-1]) );
+    const double newphi = atan2( (yvector[i+1]-yvector[i]), (xvector[i+1]-xvector[i]) );
+
+    return newphi - oldphi;
+}

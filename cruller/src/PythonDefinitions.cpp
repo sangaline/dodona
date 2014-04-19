@@ -200,6 +200,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SpatialLength", &InputVector::SpatialLength)
         .def("TemporalLength", &InputVector::TemporalLength)
         .def("PointList", &InputVectorList)
+        .def("DeltaPhi", &InputVector::DeltaPhi)
     ;
 /********************************************************/
 

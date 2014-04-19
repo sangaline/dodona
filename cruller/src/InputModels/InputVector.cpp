@@ -2,6 +2,9 @@
 
 #include "math.h"
 
+#include <string>
+using namespace std;
+
 unsigned int InputVector::Length() {
     return xvector.size();
 }
@@ -54,4 +57,24 @@ double InputVector::DeltaPhi(unsigned int i) {
     const double newphi = atan2( (yvector[i+1]-yvector[i]), (xvector[i+1]-xvector[i]) );
 
     return newphi - oldphi;
+}
+
+const char* InputVector::StringForm(Keyboard& k) {
+    string s;
+
+    unsigned int lastj = 0;
+    for(unsigned int i = 0; i < xvector.size(); i++) {
+        if( i>0 && k.GetKey(k.CharN(lastj)).IsInside(xvector[i], yvector[i]) ) {
+            continue;
+        }
+        for(unsigned int j = 0; j < k.NKeys(); j++) {
+            if( k.GetKey(k.CharN(j)).IsInside(xvector[i], yvector[i]) ) {
+                s.push_back(k.CharN(j));
+                lastj = j;
+                break;
+            }
+        }
+    }
+
+    return s.c_str();
 }

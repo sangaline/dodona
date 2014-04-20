@@ -1,3 +1,8 @@
+//boost include files
+#include <boost/python/module.hpp>
+#include <boost/python/def.hpp>
+
+//cruller include files
 #include "FitnessFunctions.h"
 #include "FitnessResult.h"
 
@@ -10,18 +15,6 @@
 #include "WordList_py.h"
 #include "InputModels/InputModel_py.h"
 
-//boost 
-#include <boost/python/def.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/wrapper.hpp>
-#include <boost/python/pure_virtual.hpp>
-#include <boost/python/overloads.hpp>
-#include <boost/python/operators.hpp>
-#include <boost/python/extract.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
-#include <boost/python/tuple.hpp>
-#include <boost/python/str.hpp>
 
 using namespace boost::python;
 

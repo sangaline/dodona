@@ -4,20 +4,13 @@
 
 #include "WordList.h"
 
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/wrapper.hpp>
+//bost include files
 #include <boost/python/pure_virtual.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/operators.hpp>
-#include <boost/python/extract.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
-#include <boost/python/tuple.hpp>
-#include <boost/python/str.hpp>
 
 using namespace boost::python;
+
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(AddWord_overloads, AddWord, 1, 2)
 unsigned int (WordList::*Occurances1)(const char*) = &WordList::Occurances;

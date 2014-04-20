@@ -4,20 +4,14 @@
 
 #include "InputModels/InputModel.h"
 
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
+//Boost include files
 #include <boost/python/class.hpp>
 #include <boost/python/wrapper.hpp>
 #include <boost/python/pure_virtual.hpp>
-#include <boost/python/overloads.hpp>
-#include <boost/python/operators.hpp>
-#include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
-#include <boost/python/dict.hpp>
-#include <boost/python/tuple.hpp>
-#include <boost/python/str.hpp>
 
 using namespace boost::python;
+
 
 /***************** InputVector class ********************/
 list InputVectorList(InputVector& sigma) {

@@ -1,14 +1,16 @@
-#include "WordList.h"
-#include "Polygon.h"
-#include "Keyboard.h"
 #include "FitnessFunctions.h"
 #include "FitnessResult.h"
 
-#include "InputModels/InputModel.h"
 #include "InputModels/SimpleGaussianModel.h"
 #include "InputModels/Interpolation.h"
 
-#include <boost/python/module.hpp>
+//special boost-python headers that contain functinos necessary for the python interface
+#include "Polygon_py.h"
+#include "Keyboard_py.h"
+#include "WordList_py.h"
+#include "InputModels/InputModel_py.h"
+
+//boost 
 #include <boost/python/def.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/wrapper.hpp>
@@ -26,102 +28,10 @@ using namespace boost::python;
 //for general use in deep copying
 template<typename T> const T DeepCopy(const T& v, dict d) { return T(v); }
 
-/***************** WordList class ***********************/
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(AddWord_overloads, AddWord, 1, 2)
-unsigned int (WordList::*Occurances1)(const char*) = &WordList::Occurances;
-unsigned int (WordList::*Occurances2)(const unsigned int) = &WordList::Occurances;
-/********************************************************/
-
-/***************** Polygon class ************************/
-list PolygonVertexList(Polygon& p, bool close_loop) {
-    list l;
-    for(unsigned int i = 0; i < p.VertexCount(); i++) {
-        l.append(make_tuple(p.VertexX(i), p.VertexY(i)));
-    }
-    if(close_loop && p.VertexCount() > 0) { l.append(make_tuple(p.VertexX(0), p.VertexY(0))); }
-    return l;
-}
-list PolygonVertexListClosed(Polygon& p) {
-    return PolygonVertexList(p, true);
-}
-/********************************************************/
-
-/***************** Keyboard class ************************/
-dict KeyboardPolygonDict(Keyboard& k) {
-    dict d;
-    for(unsigned int c = 0; c < 128; c++) {
-        Polygon p( k.GetKey(char(c)) );
-        if( p.VertexCount() > 0 ) {
-            d[char(c)] = p;
-        }
-    }
-    return d;
-}
-
-void SetKeyboardPolygonDict(Keyboard& k, dict d) {
-    k.Reset();
-    for(unsigned int c = 0; c < 128; c++) {
-        if(d.has_key(str(char(c)))) {
-            Polygon p = extract<Polygon>(d[str(char(c))]);
-            k.AddKey(char(c), p);
-        }
-        else {
-            Polygon p;
-            k.AddKey(char(c), p);
-        }
-    }
-}
-
-list KeyboardOrderedKeyList(Keyboard& k) {
-    list l;
-    for(unsigned int c = 0; c < k.NKeys(); c++) {
-        Polygon p( k.GetKey(k.CharN(c)) );
-        if( p.VertexCount() > 0 ) {
-            l.append(char(k.CharN(c)));
-        }
-    }
-    return l;
-}
-
-void AddKeyStr(Keyboard &k, str s, const Polygon& p) {
-    char const* c_str = extract<char const*>(s); k.AddKey(c_str[0], p);
-}
-void RemoveKeyStr(Keyboard &k, str s) {
-    char const* c_str = extract<char const*>(s); k.RemoveKey(c_str[0]);
-}
-Polygon GetKeyStr(Keyboard &k, str s) {
-    char const* c_str = extract<char const*>(s); return k.GetKey(c_str[0]);
-}
-/********************************************************/
-
-/***************** InputVector class ********************/
-list InputVectorList(InputVector& sigma) {
-    list l;
-    for(unsigned int i = 0; i < sigma.Length(); i++) {
-        l.append(make_tuple(sigma.X(i), sigma.Y(i), sigma.T(i)));
-    }
-    return l;
-}
-/********************************************************/
-
-/***************** InputModel wrappers ******************/
-class InputModelWrapper : public InputModel, public boost::python::wrapper<InputModel> {
-    double Distance(InputVector& vector, const char* word, Keyboard& k) {
-        return this->get_override("Distance")(vector, word, k);
-    }
-    InputVector RandomVector(const char* word, Keyboard& k) {
-        return this->get_override("RandomVector")(word, k);
-    }
-};
-/********************************************************/
-
-
-
-/********************************************************/
 /********************************************************/
 /***************** Python Module ************************/
 /********************************************************/
-/********************************************************/
+
 BOOST_PYTHON_MODULE(cruller)
 {
 

@@ -14,7 +14,27 @@ WordList::WordList() {
     total = 0;
 }
 
+WordList::WordList(wordmap wm) {
+    for(unsigned int i = 0; i < 128; i++) {
+        letters[i] = 0;
+    }
+    total_letters = 0;
+
+    vector_current = distribution_current = false;
+    total = 0;
+
+    SetWordMap(wm);
+    UpdateAll();
+}
+
 WordList::~WordList() {
+}
+
+void WordList::SetWordMap(wordmap wm) {
+    words.erase(wm.begin(), wm.end());
+    for(wordmap::iterator it = wm.begin(); it != wm.end(); it++) {
+        AddWord((it->first).c_str(), it->second); 
+    }
 }
 
 unsigned int WordList::AddWord(const char *word, const unsigned int occurances) {
@@ -29,7 +49,7 @@ unsigned int WordList::AddWord(const char *word, const unsigned int occurances) 
         }
     }
 
-    //no update the wordmap
+    //now update the wordmap
     total += occurances;
     vector_current = distribution_current = false;
     const wordmap::iterator it = words.find(wordstring);
@@ -146,3 +166,9 @@ unsigned int WordList::LetterOccurances(const char c) {
     }
     return 0;
 }
+
+//WordList WordList::operator+(const WordList& other) {    
+//   
+//}
+
+

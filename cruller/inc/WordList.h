@@ -33,7 +33,11 @@ class WordList {
     void UpdateAll();
   public:
     WordList();
+    WordList(wordmap wm);
     ~WordList();
+//    WordList operator+(const WordList& other);
+
+    void SetWordMap(wordmap wm);
 
     unsigned int AddWord(const char *word, const unsigned int occurances = 1);
     unsigned int Occurances(const char *word);

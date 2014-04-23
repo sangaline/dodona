@@ -33,6 +33,7 @@ class WordList {
     void UpdateAll();
   public:
     WordList();
+    WordList(const WordList& wl);
     WordList(wordmap wm);
     ~WordList();
     WordList operator+(const WordList& other);

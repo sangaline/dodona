@@ -14,6 +14,28 @@ WordList::WordList() {
     total = 0;
 }
 
+WordList::WordList(const WordList& wl) {
+    for(unsigned int i = 0; i < 128; i++) {
+        letters[i] = wl.letters[i];
+    }
+
+    total_letters = wl.total_letters;
+    words = wl.words;
+    total = wl.total;
+
+    generator = wl.generator;
+    distribution = wl.distribution;
+    distribution_current = wl.distribution_current;
+
+    occurance_vector = wl.occurance_vector;
+    word_vector = wl.word_vector;
+    for(unsigned int i = 0; i < MAXN; i++) {
+        Noccurance_vector[i] = wl.Noccurance_vector[i];
+        Nword_vector[i] = wl.Nword_vector[i];
+    }
+
+}
+
 WordList::WordList(wordmap wm) {
     for(unsigned int i = 0; i < 128; i++) {
         letters[i] = 0;

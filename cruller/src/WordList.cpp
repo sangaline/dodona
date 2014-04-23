@@ -24,7 +24,6 @@ WordList::WordList(wordmap wm) {
     total = 0;
 
     SetWordMap(wm);
-    UpdateAll();
 }
 
 WordList::~WordList() {

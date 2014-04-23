@@ -41,6 +41,9 @@ BOOST_PYTHON_MODULE(cruller)
         .def("LetterOccurances", &WordList::LetterOccurances)
         .def("TotalLetterOccurances", &WordList::TotalLetterOccurances)
         .def(self + self)
+        .def("WordListDict",&WordListMapDict)
+        .def("SetWordListDict",&SetWordListMapDict)
+        .def("__deepcopy__", &DeepCopy<WordList>)
     ;
 /********************************************************/
 

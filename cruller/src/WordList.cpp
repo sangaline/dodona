@@ -173,6 +173,7 @@ void WordList::UpdateDistribution() {
     if(!distribution_current) {
         distribution = boost::random::discrete_distribution<>(occurance_vector);
     }
+    distribution_current = true;
 }
 
 void WordList::UpdateAll() {

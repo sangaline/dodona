@@ -30,8 +30,8 @@ WordList::WordList(wordmap wm) {
 WordList::~WordList() {
 }
 
+//Should only be used by the constructor since a wordmap is immutable once it is created
 void WordList::SetWordMap(wordmap wm) {
-    words.erase(wm.begin(), wm.end());
     for(wordmap::iterator it = wm.begin(); it != wm.end(); it++) {
         AddWord((it->first).c_str(), it->second); 
     }
@@ -167,8 +167,16 @@ unsigned int WordList::LetterOccurances(const char c) {
     return 0;
 }
 
-//WordList WordList::operator+(const WordList& other) {    
-//   
-//}
+WordList WordList::operator+(const WordList& other) {    
+    wordmap wm1 = GetWordMap();
+    wordmap wm2 = other.words;
+        
+    WordList w = WordList(wm1);
+    for(wordmap::iterator it = wm2.begin(); it != wm2.end(); it++) {
+        w.AddWord((it->first).c_str(), it->second);
+    }
+    
+    return w;
+}
 
 

@@ -35,9 +35,10 @@ class WordList {
     WordList();
     WordList(wordmap wm);
     ~WordList();
-//    WordList operator+(const WordList& other);
+    WordList operator+(const WordList& other);
 
     void SetWordMap(wordmap wm);
+    wordmap GetWordMap() { return words; }
 
     unsigned int AddWord(const char *word, const unsigned int occurances = 1);
     unsigned int Occurances(const char *word);

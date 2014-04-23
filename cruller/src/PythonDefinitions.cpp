@@ -40,6 +40,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("RandomWord", &WordList::RandomWord)
         .def("LetterOccurances", &WordList::LetterOccurances)
         .def("TotalLetterOccurances", &WordList::TotalLetterOccurances)
+        .def(self + self)
     ;
 /********************************************************/
 

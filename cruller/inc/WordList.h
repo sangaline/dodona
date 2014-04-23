@@ -55,6 +55,7 @@ class WordList {
 
     unsigned int TotalLetterOccurances() { return total_letters; }
     unsigned int LetterOccurances(const char c);
+    void Reset();
 };
 
 #endif

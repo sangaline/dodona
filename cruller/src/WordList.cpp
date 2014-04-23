@@ -200,4 +200,17 @@ WordList WordList::operator+(const WordList& other) {
     return w;
 }
 
+//This could most likely be done better but this is a quick solution
+void WordList::Reset() {
+    wordmap wm = GetWordMap();
+
+    for(wordmap::iterator it = wm.begin(); it != wm.end(); it++) {
+        it->second = 0;
+    }
+}
+
+
+
+
+
 

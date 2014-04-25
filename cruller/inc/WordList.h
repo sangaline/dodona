@@ -17,6 +17,7 @@ class WordList {
     unsigned int total_letters;
     wordmap words;
     unsigned int total;
+    bool letters_current;
 
     boost::mt19937 generator;
     boost::random::discrete_distribution<> distribution;
@@ -28,6 +29,8 @@ class WordList {
     std::vector<std::string> Nword_vector[MAXN];
     bool vector_current;
 
+    void MarkNotCurrent();
+    void UpdateLetters();
     void UpdateVectors();
     void UpdateDistribution();
     void UpdateAll();
@@ -53,7 +56,7 @@ class WordList {
     unsigned int MaxN() { return MAXN; }
     const char* RandomWord();
 
-    unsigned int TotalLetterOccurances() { return total_letters; }
+    unsigned int TotalLetterOccurances();
     unsigned int LetterOccurances(const char c);
     void Reset();
 };

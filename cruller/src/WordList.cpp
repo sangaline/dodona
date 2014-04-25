@@ -20,6 +20,7 @@ WordList::WordList(const WordList& wl) {
     generator = wl.generator;
     distribution = wl.distribution;
     distribution_current = wl.distribution_current;
+    letters_current = wl.letters_current;
 
     occurance_vector = wl.occurance_vector;
     word_vector = wl.word_vector;
@@ -59,7 +60,7 @@ unsigned int WordList::AddWord(const char *word, const unsigned int occurances) 
 
     //now update the wordmap
     total += occurances;
-    vector_current = distribution_current = false;
+    MarkNotCurrent();
     const wordmap::iterator it = words.find(wordstring);
     if(it != words.end()) {
         it->second += occurances;
@@ -115,12 +116,44 @@ unsigned int WordList::NOccurances(const unsigned int N, const unsigned int inde
 }
 
 const char* WordList::RandomWord() {
-    UpdateAll();
+    UpdateVectors();
+    UpdateDistribution();
     return word_vector[distribution(generator)].c_str();
 }
 
 bool sortcomparison(const pair<string, unsigned int> &a, const pair<string, unsigned int> &b ) { 
     return (a.second > b.second); 
+}
+
+void WordList::MarkNotCurrent() {
+    vector_current = false;
+    distribution_current = false;
+    letters_current = false;
+}
+
+void WordList::UpdateLetters() {
+    if(!letters_current) {
+        //reset it first
+        for(unsigned int i = 0; i < 128; i++) {
+            letters[i] = 0;
+        }
+        total_letters = 0;
+
+        //now loop through all the words and update the letters stuff
+        for(wordmap::iterator it = words.begin(); it != words.end(); it++) {
+            string wordstring(it->first);
+
+            for(unsigned int i = 0; i < wordstring.length(); i++) {
+                unsigned char c = (unsigned char) wordstring[i];
+                if(c < 128) {
+                    letters[c] += it->second;
+                    total_letters += it->second;
+                }
+            }
+        }
+
+        letters_current = true;
+    }
 }
 
 void WordList::UpdateVectors() {
@@ -166,9 +199,17 @@ void WordList::UpdateDistribution() {
 void WordList::UpdateAll() {
     UpdateVectors();
     UpdateDistribution();
+    UpdateLetters();
+}
+
+
+unsigned int WordList::TotalLetterOccurances() { 
+    UpdateLetters();
+    return total_letters;
 }
 
 unsigned int WordList::LetterOccurances(const char c) {
+    UpdateLetters();
     unsigned char usc = (unsigned char) c;
     if(usc < 128) {
         return letters[usc];
@@ -194,15 +235,8 @@ void WordList::Reset() {
         letters[i] = 0;
     }
     total_letters = 0;
-
-    vector_current = distribution_current = false;
     total = 0;
 
     words.clear();
+    MarkNotCurrent();
 }
-
-
-
-
-
-

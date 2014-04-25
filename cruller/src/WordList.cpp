@@ -45,8 +45,8 @@ WordList::WordList(wordmap wm) {
 WordList::~WordList() {
 }
 
-//Should only be used by the constructor since a wordmap is immutable once it is created
 void WordList::SetWordMap(wordmap wm) {
+    Reset();
     for(wordmap::iterator it = wm.begin(); it != wm.end(); it++) {
         AddWord((it->first).c_str(), it->second); 
     }
@@ -195,7 +195,6 @@ WordList WordList::operator+(const WordList& other) {
     return w;
 }
 
-//This could most likely be done better but this is a quick solution
 void WordList::Reset() {
     for(unsigned int i = 0; i < 128; i++) {
         letters[i] = 0;

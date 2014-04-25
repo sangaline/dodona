@@ -218,11 +218,8 @@ unsigned int WordList::LetterOccurances(const char c) {
 }
 
 WordList WordList::operator+(const WordList& other) {    
-    wordmap wm1 = GetWordMap();
-    wordmap wm2 = other.words;
-        
-    WordList w = WordList(wm1);
-    for(wordmap::iterator it = wm2.begin(); it != wm2.end(); it++) {
+    WordList w = WordList(other);
+    for(wordmap::iterator it = words.begin(); it != words.end(); it++) {
         w.AddWord((it->first).c_str(), it->second);
     }
     

@@ -31,14 +31,7 @@ WordList::WordList(const WordList& wl) {
 }
 
 WordList::WordList(wordmap wm) {
-    for(unsigned int i = 0; i < 128; i++) {
-        letters[i] = 0;
-    }
-    total_letters = 0;
-
-    vector_current = distribution_current = false;
-    total = 0;
-
+    Reset();
     SetWordMap(wm);
 }
 

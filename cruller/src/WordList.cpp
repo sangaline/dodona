@@ -14,7 +14,48 @@ WordList::WordList() {
     total = 0;
 }
 
+WordList::WordList(const WordList& wl) {
+    for(unsigned int i = 0; i < 128; i++) {
+        letters[i] = wl.letters[i];
+    }
+
+    total_letters = wl.total_letters;
+    words = wl.words;
+    total = wl.total;
+
+    generator = wl.generator;
+    distribution = wl.distribution;
+    distribution_current = wl.distribution_current;
+
+    occurance_vector = wl.occurance_vector;
+    word_vector = wl.word_vector;
+    for(unsigned int i = 0; i < MAXN; i++) {
+        Noccurance_vector[i] = wl.Noccurance_vector[i];
+        Nword_vector[i] = wl.Nword_vector[i];
+    }
+
+}
+
+WordList::WordList(wordmap wm) {
+    for(unsigned int i = 0; i < 128; i++) {
+        letters[i] = 0;
+    }
+    total_letters = 0;
+
+    vector_current = distribution_current = false;
+    total = 0;
+
+    SetWordMap(wm);
+}
+
 WordList::~WordList() {
+}
+
+//Should only be used by the constructor since a wordmap is immutable once it is created
+void WordList::SetWordMap(wordmap wm) {
+    for(wordmap::iterator it = wm.begin(); it != wm.end(); it++) {
+        AddWord((it->first).c_str(), it->second); 
+    }
 }
 
 unsigned int WordList::AddWord(const char *word, const unsigned int occurances) {
@@ -29,7 +70,7 @@ unsigned int WordList::AddWord(const char *word, const unsigned int occurances) 
         }
     }
 
-    //no update the wordmap
+    //now update the wordmap
     total += occurances;
     vector_current = distribution_current = false;
     const wordmap::iterator it = words.find(wordstring);
@@ -132,6 +173,7 @@ void WordList::UpdateDistribution() {
     if(!distribution_current) {
         distribution = boost::random::discrete_distribution<>(occurance_vector);
     }
+    distribution_current = true;
 }
 
 void WordList::UpdateAll() {
@@ -146,3 +188,30 @@ unsigned int WordList::LetterOccurances(const char c) {
     }
     return 0;
 }
+
+WordList WordList::operator+(const WordList& other) {    
+    wordmap wm1 = GetWordMap();
+    wordmap wm2 = other.words;
+        
+    WordList w = WordList(wm1);
+    for(wordmap::iterator it = wm2.begin(); it != wm2.end(); it++) {
+        w.AddWord((it->first).c_str(), it->second);
+    }
+    
+    return w;
+}
+
+//This could most likely be done better but this is a quick solution
+void WordList::Reset() {
+    wordmap wm = GetWordMap();
+
+    for(wordmap::iterator it = wm.begin(); it != wm.end(); it++) {
+        it->second = 0;
+    }
+}
+
+
+
+
+
+

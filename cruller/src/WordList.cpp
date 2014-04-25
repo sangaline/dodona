@@ -5,13 +5,7 @@
 using namespace std;
 
 WordList::WordList() {
-    for(unsigned int i = 0; i < 128; i++) {
-        letters[i] = 0;
-    }
-    total_letters = 0;
-
-    vector_current = distribution_current = false;
-    total = 0;
+    Reset();
 }
 
 WordList::WordList(const WordList& wl) {
@@ -203,11 +197,15 @@ WordList WordList::operator+(const WordList& other) {
 
 //This could most likely be done better but this is a quick solution
 void WordList::Reset() {
-    wordmap wm = GetWordMap();
-
-    for(wordmap::iterator it = wm.begin(); it != wm.end(); it++) {
-        it->second = 0;
+    for(unsigned int i = 0; i < 128; i++) {
+        letters[i] = 0;
     }
+    total_letters = 0;
+
+    vector_current = distribution_current = false;
+    total = 0;
+
+    words.clear();
 }
 
 

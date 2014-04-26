@@ -32,7 +32,6 @@ WordList::WordList(const WordList& wl) {
 }
 
 WordList::WordList(wordmap wm) {
-    Reset();
     SetWordMap(wm);
 }
 

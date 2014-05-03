@@ -54,6 +54,7 @@ class WordList {
     unsigned int NOccurances(const unsigned int N, const unsigned int index);
     unsigned int NWords(const unsigned int N);
     unsigned int MaxN() { return MAXN; }
+    int WordIndex(const char* word);
     const char* RandomWord();
 
     unsigned int TotalLetterOccurances();

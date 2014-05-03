@@ -120,6 +120,17 @@ const char* WordList::RandomWord() {
     return word_vector[distribution(generator)].c_str();
 }
 
+int WordList::WordIndex(const char* word) {
+    unsigned int idx = 0;
+    for(std::vector<std::string> ::iterator it = word_vector.begin(); it != word_vector.end(); it++) {
+        if(strcmp(it->c_str(), word) == 0) {
+            return idx;
+        }
+        idx++;
+    }
+    return -1;
+}
+
 bool sortcomparison(const pair<string, unsigned int> &a, const pair<string, unsigned int> &b ) { 
     return (a.second > b.second); 
 }

@@ -4,6 +4,12 @@ AUX_SOURCE_DIRECTORY(src/InputModels INPUT_MODELS)
 AUX_SOURCE_DIRECTORY(src/FitnessFunctions FITNESS_FUNCTIONS)
 ADD_LIBRARY(${LIBRARY_NAME} SHARED ${SOURCE_FILES} ${INPUT_MODELS} ${FITNESS_FUNCTIONS})
 
+option(static "static" OFF)
+IF(static)
+    ADD_LIBRARY(${LIBRARY_NAME} STATIC ${SOURCE_FILES} ${INPUT_MODELS} ${FITNESS_FUNCTIONS})
+    MESSAGE("Building static version of the library.")
+ENDIF(static)
+
 INCLUDE_DIRECTORIES("inc")
 
 #don't add lib before the library

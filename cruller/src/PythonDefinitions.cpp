@@ -130,5 +130,6 @@ BOOST_PYTHON_MODULE(cruller)
 
 /***************** Interpolation ************************/
     def("SpatialInterpolation", &SpatialInterpolation);
+    def("BezierInterpolation", &BezierInterpolation);
 /********************************************************/
 }

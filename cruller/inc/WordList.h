@@ -7,6 +7,10 @@
 
 #include <string>
 #include <vector>
+#include "boost/serialization/vector.hpp"
+#include "boost/serialization/string.hpp"
+
+namespace boost {namespace serialization {class access;}}
 
 #define MAXN 25
 
@@ -60,6 +64,20 @@ class WordList {
     unsigned int TotalLetterOccurances();
     unsigned int LetterOccurances(const char c);
     void Reset();
+
+  private:
+    friend class boost::serialization::access;
+    template<typename Archive> void serialize(Archive& ar, const unsigned int version) {
+        //boost doesn't support serialization of unordered_maps so we'll store the vectors
+        UpdateVectors();
+        ar & occurance_vector & word_vector;
+        //and we'll rebuild the hash map if it doesn't already exist
+        if(words.size() == 0) {
+            for(unsigned int i = 0; i < word_vector.size(); i++) {
+                AddWord(word_vector[i].c_str(), occurance_vector[i]);
+            }
+        }
+    }
 };
 
 #endif

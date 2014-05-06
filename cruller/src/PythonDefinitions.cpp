@@ -70,6 +70,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("WordListDict",&WordListMapDict)
         .def("SetWordListDict",&SetWordListMapDict)
         .def("__deepcopy__", &DeepCopy<WordList>)
+        .def_pickle(serialization_pickle_suite<WordList>())
     ;
 /********************************************************/
 

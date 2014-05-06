@@ -237,12 +237,15 @@ WordList WordList::operator+(const WordList& other) {
 }
 
 void WordList::Reset() {
-    for(unsigned int i = 0; i < 128; i++) {
-        letters[i] = 0;
+    //clear up all memory
+    occurance_vector.clear();
+    word_vector.clear();
+    for(unsigned int i = 0; i < MAXN; i++) {
+        Noccurance_vector[i].clear();
+        Nword_vector[i].clear();
     }
-    total_letters = 0;
-    total = 0;
-
+    //reset the main map
     words.clear();
+    //mark others as not current
     MarkNotCurrent();
 }

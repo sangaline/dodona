@@ -9,6 +9,11 @@
 #include "InputModels/SimpleGaussianModel.h"
 #include "InputModels/Interpolation.h"
 
+#include <sstream>
+
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
 //special boost-python headers that contain functinos necessary for the python interface
 #include "Polygon_py.h"
 #include "Keyboard_py.h"
@@ -20,6 +25,25 @@ using namespace boost::python;
 
 //for general use in deep copying
 template<typename T> const T DeepCopy(const T& v, dict d) { return T(v); }
+
+//for general use in pickling
+template<typename T> struct serialization_pickle_suite : pickle_suite {
+    static object getstate(const T& t) {
+        std::ostringstream os;
+        boost::archive::text_oarchive oa(os);
+        oa << t;
+        return str(os.str());
+    };
+    static void setstate(T& t, object entries) {
+        str s = extract<str>(entries)();
+        std::string st = extract<std::string>(s)();
+        std::istringstream is(st);
+
+        boost::archive::text_iarchive ia(is);
+        ia >> t;
+    };
+};
+
 
 /********************************************************/
 /***************** Python Module ************************/

@@ -2,6 +2,12 @@
 
 #include "math.h"
 
+FitnessResult::FitnessResult() {
+    iterations = 0;
+    fitness = 0;
+    error = 0;
+}
+
 FitnessResult::FitnessResult(unsigned int iterations, double fitness, double error) 
     : iterations(iterations), fitness(fitness), error(error) {
 

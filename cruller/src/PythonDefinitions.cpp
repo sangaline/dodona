@@ -143,10 +143,12 @@ BOOST_PYTHON_MODULE(cruller)
 /***************** FitnessResult class ********************/
     
     class_<FitnessResult>("FitnessResult", init<unsigned int, double, double>())
+        .def(init<>())
         .def(self + self)
         .def("Fitness", &FitnessResult::Fitness)
         .def("Error", &FitnessResult::Error)
         .def("Iterations", &FitnessResult::Iterations)
+        .def_pickle(serialization_pickle_suite<FitnessResult>())
     ;
 /********************************************************/
 

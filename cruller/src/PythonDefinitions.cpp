@@ -102,6 +102,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetPolygonDict", &SetKeyboardPolygonDict)
         .def("OrderedKeyList", &KeyboardOrderedKeyList)
         .def("__deepcopy__", &DeepCopy<Keyboard>)
+        .def_pickle(serialization_pickle_suite<Keyboard>())
     ;
 /********************************************************/
 

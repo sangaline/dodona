@@ -1,3 +1,12 @@
+SET(OSX_BUILD ON)
+SET(LINUX_BUILD OFF)
+
+IF(OSX_BUILD)
+  SET(CMAKE_CXX_COMPILER /usr/bin/clang++)
+  SET(CMAKE_CXX_FLAGS "-std=c++11 -Wall")
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libstdc++")
+ENDIF()
+
 SET(LIBRARY_NAME cruller)
 AUX_SOURCE_DIRECTORY(src SOURCE_FILES)
 AUX_SOURCE_DIRECTORY(src/InputModels INPUT_MODELS)
@@ -36,6 +45,11 @@ ELSEIF(NOT Boost_FOUND)
   MESSAGE(FATAL_ERROR "Unable to find correct Boost version. Did you set BOOST_ROOT?")
 ENDIF()
 
+IF(OSX_BUILD)
+  SET(PYTHON_LIBRARY /opt/local/lib/libpython3.3.dylib)
+  SET(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.3/include/python3.3m)
+ENDIF()
+
 FIND_PACKAGE(PythonLibs 3.2)
 IF(PYTHONLIBS_FOUND)
   INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
@@ -44,8 +58,13 @@ ELSE()
   MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
 ENDIF()
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
-  ADD_DEFINITIONS("-Wall")
-ELSE()
-  MESSAGE(FATAL_ERROR "CMakeLists.txt has not been tested/written for your compiler.")
+IF(LINUX_BUILD)
+  IF(CMAKE_COMPILER_IS_GNUCXX)
+    ADD_DEFINITIONS("-Wall")
+  ELSE()
+    MESSAGE(FATAL_ERROR "CMakeLists.txt has not been tested/written for your compiler.")
+  ENDIF()
 ENDIF()
+
+
+

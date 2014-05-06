@@ -138,6 +138,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("PointList", &InputVectorList)
         .def("DeltaPhi", &InputVector::DeltaPhi)
         .def("StringForm", &InputVector::StringForm)
+        .def_pickle(serialization_pickle_suite<InputVector>())
     ;
 /********************************************************/
 

@@ -3,8 +3,10 @@
 
 #include "Keyboard.h"
 
+#include "boost/serialization/vector.hpp"
 #include <vector>
-#include <utility>
+
+namespace boost {namespace serialization {class access;}}
 
 class InputVector {
   protected:
@@ -19,6 +21,12 @@ class InputVector {
    double TemporalLength();
    double DeltaPhi(unsigned int i);
    const char* StringForm(Keyboard& k);
+
+  private:
+    friend class boost::serialization::access;
+    template<typename Archive> void serialize(Archive& ar, const unsigned int version) {
+        ar & xvector & yvector & tvector;
+    }
 };
 
 #endif

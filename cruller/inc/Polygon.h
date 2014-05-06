@@ -3,6 +3,11 @@
 
 #include <vector>
 #include <utility>
+#include "boost/serialization/vector.hpp"
+#include "boost/serialization/utility.hpp"
+
+//Forward declaration of class boost::serialization::access
+namespace boost {namespace serialization {class access;}}
 
 class Polygon {
     std::vector< std::pair<double, double> > vertices;
@@ -22,6 +27,14 @@ class Polygon {
     double BottomExtreme() const;
     bool IsInside(double x, double y);
     void Reset();
+
+  private:
+    //allow serialization to access non-public data members.
+    friend class boost::serialization::access;
+    //the implementation *has* to be in the header file
+    template<typename Archive> void serialize(Archive& ar, const unsigned int version) {
+        ar & vertices; //note that special includes were required to handle vectors and pairs
+    }
 };
 
 #endif

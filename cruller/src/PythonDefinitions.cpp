@@ -88,6 +88,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("BottomExtreme", &Polygon::BottomExtreme)
         .def("IsInside", &Polygon::IsInside)
         .def("__deepcopy__", &DeepCopy<Polygon>)
+        .def_pickle(serialization_pickle_suite<Polygon>())
     ;
 /********************************************************/
 

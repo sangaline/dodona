@@ -4,6 +4,8 @@
 
 #include "Keyboard.h"
 
+#include <string>
+
 //boost include files
 #include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
@@ -57,6 +59,14 @@ void RemoveKeyStr(Keyboard &k, str s) {
 }
 Polygon GetKeyStr(Keyboard &k, str s) {
     char const* c_str = extract<char const*>(s); return k.GetKey(c_str[0]);
+}
+
+//this is returning the number as a string, need to cast it with itoa or something
+str GetCharN(Keyboard &k, unsigned int i) {
+    return str((k.CharN(i)));
+}
+int GetCharIndex(Keyboard &k, str s) {
+    char const* c_str = extract<char const*>(s); return k.CharIndex(c_str[0]);
 }
 
 

@@ -17,6 +17,7 @@ class Keyboard {
     void RemoveKey(const unsigned char c);
     Polygon GetKey(const unsigned char c) const;
     unsigned char CharN(unsigned int i);
+    int CharIndex(unsigned char c);
     unsigned int NKeys() { return idx; }
     void Reset();
 

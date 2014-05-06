@@ -52,6 +52,15 @@ unsigned char Keyboard::CharN(unsigned int i) {
     return entries[i];
 }
 
+int Keyboard::CharIndex(unsigned char c) {
+    for(unsigned int i = 0; i < idx; i++) {
+        if(entries[i] == c) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void Keyboard::Reset() {
     for(unsigned int c = 0; c < 128; c++) {
         polygons[c] = Polygon();

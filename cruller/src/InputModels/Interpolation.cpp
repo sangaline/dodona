@@ -43,8 +43,116 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     return newiv;
 }
 
-// Basic Quadratic Interpolation
+// Basic Quadratic Interpolation Shifted
 InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
+    const double length = iv.SpatialLength();
+    const unsigned int points = iv.Length();
+
+	if (points <= 2) return SpatialInterpolation(iv, Nsteps);
+
+    InputVector tempiv;
+    InputVector newiv;
+
+	// adding points in between. if we instead want to put these turning points somewhere else, scale besides /2
+	double x1,y1,t1,x2,y2,t2,x3,y3,t3;
+
+	x2 = iv.X(0);
+	y2 = iv.Y(0);
+	t2 = iv.T(0);
+
+    tempiv.AddPoint(x2, y2, t2);
+
+	for (unsigned int i = 1; i < points; i++) {
+		x1 = x2;
+		y1 = y2;
+		t1 = t2;
+
+		x2 = iv.X(i);
+		y2 = iv.Y(i);
+		t2 = iv.T(i);
+
+		if (i!=1) tempiv.AddPoint((3*x1+x2)/4,(3*y1+y2)/4,(3*t1+t2)/4);
+		if (i!=points-1) tempiv.AddPoint((x1+3*x2)/4,(y1+3*y2)/4,(t1+3*t2)/4);
+
+		tempiv.AddPoint(x2,y2,t2);
+	}
+	
+	// we will draw line from 0->1, and then curve from 1->3, 3->5, 5->7, then (n-1)->n
+	// we will thus be splitting up into 2 straight lines, and (n-3)/2.
+	// for X points -> Y curves; 5 -> 2, 7 -> 3, 9 -> 4. So, split 100 by (n-1)/2
+
+	int time_points;
+
+	double current_time = 0;
+	double newx,newy,newt;
+
+	// now, we are going to walk through each of the curves
+	for (unsigned int i = 0; i < points-1; i++) {
+		// begin by adding the first line
+		x1 = tempiv.X(3*i);
+		y1 = tempiv.Y(3*i);
+		t1 = tempiv.T(3*i);
+
+		x2 = tempiv.X(3*i+1);
+		y2 = tempiv.Y(3*i+1);
+		t2 = tempiv.T(3*i+1);
+
+		if (i == points-2) {
+			int pt_left = Nsteps-newiv.Length();
+
+		    for(int t = 0; t < pt_left; t++) {
+				current_time = double(t)/double(pt_left);
+			
+				newx = x1*(1-current_time) + x2*current_time;
+				newy = y1*(1-current_time) + y2*current_time;
+				newt = t1*(1-current_time) + t2*current_time;
+	
+				newiv.AddPoint(newx, newy, newt);
+			}
+		} else {
+			time_points = Nsteps*sqrt(pow(x1-x2,2)+pow(y1-y2,2))/length;
+		
+			for(int t = 0; t < time_points; t++) {
+				current_time = double(t)/double(time_points);
+			
+				newx = x1*(1-current_time) + x2*current_time;
+				newy = y1*(1-current_time) + y2*current_time;
+				newt = t1*(1-current_time) + t2*current_time;
+	
+				newiv.AddPoint(newx, newy, newt);
+			}
+	
+			x1 = x2;
+			y1 = y2;
+			t1 = t2;
+
+			x2 = tempiv.X(3*i+2);
+			y2 = tempiv.Y(3*i+2);
+			t2 = tempiv.T(3*i+2);
+		
+			x3 = tempiv.X(3*i+3);
+			y3 = tempiv.Y(3*i+3);
+			t3 = tempiv.T(3*i+3);
+
+			time_points = Nsteps*(sqrt(pow(x1-x2,2)+pow(y1-y2,2))+sqrt(pow(x2-x3,2)+pow(y2-y3,2)))/length;
+
+		    for(unsigned int t = 0; t < time_points; t++) {
+				current_time = double(t)/double(time_points);
+
+				newx = x1*pow(1-current_time,2) + 2*x2*(1-current_time)*current_time + x3*pow(current_time,2);
+				newy = y1*pow(1-current_time,2) + 2*y2*(1-current_time)*current_time + y3*pow(current_time,2);
+				newt = t1*pow(1-current_time,2) + 2*t2*(1-current_time)*current_time + t3*pow(current_time,2);
+
+				newiv.AddPoint(newx, newy, newt);
+			}
+		}
+	}
+
+    return newiv;
+}
+
+// Basic Quadratic Interpolation
+InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     const unsigned int points = iv.Length();
 
 	if (points <= 2) return SpatialInterpolation(iv, Nsteps);
@@ -119,7 +227,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 
 	    for(unsigned int t = 0; t < pt_per; t++) {
 			current_time = double(t)/double(pt_per);
-		
+
 			newx = x1*pow(1-current_time,2) + 2*x2*(1-current_time)*current_time + x3*pow(current_time,2);
 			newy = y1*pow(1-current_time,2) + 2*y2*(1-current_time)*current_time + y3*pow(current_time,2);
 			newt = t1*pow(1-current_time,2) + 2*t2*(1-current_time)*current_time + t3*pow(current_time,2);

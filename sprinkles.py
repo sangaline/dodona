@@ -6,7 +6,7 @@ def AlphaOnly(word):
 def ReadBook(book, wordlist=None, cleaner=AlphaOnly):
     if wordlist == None:
         wordlist = cruller.WordList()
-    with open(book, "r") as f:
+    with open(book, "r", errors="replace") as f:
         for line in f:
             for word in line.split():
                 word = cleaner(word)

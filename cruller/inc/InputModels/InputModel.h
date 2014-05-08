@@ -16,6 +16,7 @@ class InputModel {
     bool FixedLength() { return fixed_length; }
 
     virtual InputVector RandomVector(const char* word, Keyboard& k) = 0;
+    virtual InputVector PerfectVector(const char* word, Keyboard& k) = 0;
     virtual double Distance(InputVector& vector, const char* word, Keyboard& k) = 0;
     virtual double VectorDistance(InputVector& vector1, InputVector& vector2, Keyboard& k) = 0;
     virtual void SetSeed(unsigned int s) { generator.seed(s); }

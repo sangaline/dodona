@@ -33,6 +33,15 @@ InputVector SimpleGaussianModel::RandomVector(const char* word, Keyboard& k) {
     return sigma;
 }
 
+InputVector SimpleGaussianModel::PerfectVector(const char* word, Keyboard& k) {
+    const double tmp_xsigma = xsigma; xsigma = 0;
+    const double tmp_ysigma = ysigma; ysigma = 0;
+    InputVector sigma = RandomVector(word, k);
+    xsigma = tmp_xsigma;
+    ysigma = tmp_ysigma;
+    return sigma;
+}
+
 double SimpleGaussianModel::MarginalProbability( InputVector& sigma, const char* word, Keyboard& k) {
     if(sigma.Length() != strlen(word)) {
         return 0;

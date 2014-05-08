@@ -12,7 +12,6 @@ SimpleInterpolationModel::SimpleInterpolationModel(unsigned int vector_length, d
     maxd = maxdistance;
     maxd2 = maxd*maxd;
     maxs = maxsigma;
-    perfectmodel.SetScale(0.0);
     model.SetXScale(xscale);
     model.SetYScale(yscale);
     vlength = vector_length;
@@ -33,6 +32,11 @@ InputVector SimpleInterpolationModel::RandomVector(const char* word, Keyboard& k
     return Interpolation(iv, vlength);
 }
 
+InputVector SimpleInterpolationModel::PerfectVector(const char* word, Keyboard& k) {
+    InputVector iv = model.PerfectVector(word, k);
+    return Interpolation(iv, vlength);
+}
+
 double SimpleInterpolationModel::Distance( InputVector& sigma, const char* word, Keyboard& k) { 
     if(maxs > 0) {
         Polygon p = k.GetKey(word[0]);
@@ -46,7 +50,7 @@ double SimpleInterpolationModel::Distance( InputVector& sigma, const char* word,
         }
     }
 
-    InputVector perfect = perfectmodel.RandomVector(word, k);
+    InputVector perfect = model.PerfectVector(word, k);
     perfect = Interpolation(perfect, vlength);
     return VectorDistance(sigma, perfect, k);
 }

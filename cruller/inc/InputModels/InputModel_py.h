@@ -34,6 +34,9 @@ class InputModelWrapper : public InputModel, public boost::python::wrapper<Input
     InputVector RandomVector(const char* word, Keyboard& k) {
         return this->get_override("RandomVector")(word, k);
     }
+    InputVector PerfectVector(const char* word, Keyboard& k) {
+        return this->get_override("PerfectVector")(word, k);
+    }
 };
 /********************************************************/
 

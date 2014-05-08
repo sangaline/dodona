@@ -125,6 +125,7 @@ BOOST_PYTHON_MODULE(cruller)
 
     class_<InputModelWrapper, boost::noncopyable>("InputModel")
         .def("RandomVector", pure_virtual(&InputModel::RandomVector))
+        .def("PerfectVector", pure_virtual(&InputModel::PerfectVector))
         .def("Distance", pure_virtual(&InputModel::Distance))
         .def("VectorDistance", pure_virtual(&InputModel::VectorDistance))
         .def("SetSeed", &InputModel::SetSeed)

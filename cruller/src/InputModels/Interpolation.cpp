@@ -45,6 +45,7 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
 
 // Basic Quadratic Interpolation
 InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    const double length = iv.SpatialLength();
     const unsigned int points = iv.Length();
     int n = iv.Length() - 1;
 
@@ -120,12 +121,13 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
 	// now, we are going to walk through each of the curves
 	for (unsigned int i = 0; i < points-1; i++) {
 		// begin by adding the first line
-		time_points = Nsteps/(points-1);
-		if (i == points-2) time_points = Nsteps - newiv.Length();
+		time_points = round(Nsteps*sqrt(pow(a_x[i]-a_x[i+1],2)+pow(a_y[i]-a_y[i+1],2))/length);
+		if (i == points-2) time_points = Nsteps-newiv.Length();
 		
 		// each curve goes from a time of 0, to a time of h(i)
 		for(int time = 0; time < time_points; time++) {
-			current_time = double(time)/double(time_points-1);
+			if (time_points != 1) current_time = double(time)/double(time_points-1);
+			else current_time = 1;
 			
 			newx = a_x[i] + b_x[i] * current_time + c_x[i] * pow(current_time,2) + d_x[i] * pow(current_time,3);
 			newy = a_y[i] + b_y[i] * current_time + c_y[i] * pow(current_time,2) + d_y[i] * pow(current_time,3);
@@ -192,11 +194,14 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 		y2 = tempiv.Y(3*i+1);
 		t2 = tempiv.T(3*i+1);
 
+		// last part
 		if (i == points-2) {
-			int pt_left = Nsteps-newiv.Length();
+			// time_points = Nsteps*sqrt(pow(x1-x2,2)+pow(y1-y2,2))/length;
+			time_points = Nsteps-newiv.Length();
 
-		    for(int t = 0; t < pt_left; t++) {
-				current_time = double(t)/double(pt_left);
+		    for(int t = 0; t < time_points; t++) {
+		    	if (time_points != 1) current_time = double(t)/double(time_points-1);
+		    	else current_time = 1;
 			
 				newx = x1*(1-current_time) + x2*current_time;
 				newy = y1*(1-current_time) + y2*current_time;
@@ -205,11 +210,12 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 				newiv.AddPoint(newx, newy, newt);
 			}
 		} else {
-			time_points = Nsteps*sqrt(pow(x1-x2,2)+pow(y1-y2,2))/length;
+			time_points = round(Nsteps*sqrt(pow(x1-x2,2)+pow(y1-y2,2))/length);
 		
 			for(int t = 0; t < time_points; t++) {
-				current_time = double(t)/double(time_points);
-			
+				if (time_points != 1) current_time = double(t)/double(time_points-1);
+				else current_time = 1;
+
 				newx = x1*(1-current_time) + x2*current_time;
 				newy = y1*(1-current_time) + y2*current_time;
 				newt = t1*(1-current_time) + t2*current_time;
@@ -229,14 +235,15 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 			y3 = tempiv.Y(3*i+3);
 			t3 = tempiv.T(3*i+3);
 
-			time_points = Nsteps*(sqrt(pow(x1-x2,2)+pow(y1-y2,2))+sqrt(pow(x2-x3,2)+pow(y2-y3,2)))/length;
+			time_points = round(Nsteps*(sqrt(pow(x1-x2,2)+pow(y1-y2,2))+sqrt(pow(x2-x3,2)+pow(y2-y3,2)))/length);
 
 		    for(unsigned int t = 0; t < time_points; t++) {
-				current_time = double(t)/double(time_points);
+				if (time_points != 1) current_time = double(t)/double(time_points-1);
+				else current_time = 1;
 
 				newx = x1*pow(1-current_time,2) + 2*x2*(1-current_time)*current_time + x3*pow(current_time,2);
 				newy = y1*pow(1-current_time,2) + 2*y2*(1-current_time)*current_time + y3*pow(current_time,2);
-				newt = t1*pow(1-current_time,2) + 2*t2*(1-current_time)*current_time + t3*pow(current_time,2);
+				newt = t1*(1-current_time) + t3*current_time;
 
 				newiv.AddPoint(newx, newy, newt);
 			}
@@ -248,6 +255,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 
 // Basic Quadratic Interpolation
 InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
+    const double length = iv.SpatialLength();
     const unsigned int points = iv.Length();
 
 	if (points <= 2) return SpatialInterpolation(iv, Nsteps);
@@ -277,12 +285,13 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
 		tempiv.AddPoint(x2,y2,t2);
 	}
 
+	int temp_length = tempiv.Length();
+
 	// we will draw line from 0->1, and then curve from 1->3, 3->5, 5->7, then (n-1)->n
 	// we will thus be splitting up into 2 straight lines, and (n-3)/2.
 	// for X points -> Y curves; 5 -> 2, 7 -> 3, 9 -> 4. So, split 100 by (n-1)/2
 
-	int temp_length = tempiv.Length();
-	int pt_per = Nsteps/(points-1);
+	int time_points;
 
 	double current_time = 0;
 	double newx,newy,newt;
@@ -295,9 +304,12 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
 	x2 = tempiv.X(1);
 	y2 = tempiv.Y(1);
 	t2 = tempiv.T(1);
+	
+	time_points = round(Nsteps*sqrt(pow(x1-x2,2)+pow(y1-y2,2))/length);
 
-    for(int t = 0; t < pt_per/2; t++) {
-		current_time = double(t*2)/double(pt_per);
+    for(int t = 0; t < time_points; t++) {
+		if (time_points != 1) current_time = double(t)/double(time_points-1);
+		else current_time = 1;
 		
 		newx = x1*(1-current_time) + x2*current_time;
 		newy = y1*(1-current_time) + y2*current_time;
@@ -320,12 +332,15 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
 		y3 = tempiv.Y(2*i+1);
 		t3 = tempiv.T(2*i+1);
 
-	    for(unsigned int t = 0; t < pt_per; t++) {
-			current_time = double(t)/double(pt_per);
+		time_points = round(Nsteps*(sqrt(pow(x1-x2,2)+pow(y1-y2,2))+sqrt(pow(x2-x3,2)+pow(y2-y3,2)))/length);
+
+	    for(int t = 0; t < time_points; t++) {
+			if (time_points != 1) current_time = double(t)/double(time_points-1);
+			else current_time = 1;
 
 			newx = x1*pow(1-current_time,2) + 2*x2*(1-current_time)*current_time + x3*pow(current_time,2);
 			newy = y1*pow(1-current_time,2) + 2*y2*(1-current_time)*current_time + y3*pow(current_time,2);
-			newt = t1*pow(1-current_time,2) + 2*t2*(1-current_time)*current_time + t3*pow(current_time,2);
+			newt = t1*(1-current_time) + t3*current_time;
 
 			newiv.AddPoint(newx, newy, newt);
 		}
@@ -340,10 +355,12 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
 	y2 = tempiv.Y(temp_length-1);
 	t2 = tempiv.T(temp_length-1);
 
-	int pt_left = Nsteps-newiv.Length();
+	//time_points = round(Nsteps*sqrt(pow(x1-x2,2)+pow(y1-y2,2))/length);
+	time_points = Nsteps-newiv.Length();
 
-    for(unsigned int t = 0; t < pt_left; t++) {
-		current_time = double(t)/double(pt_left);
+    for(unsigned int t = 0; t < time_points; t++) {
+		if (time_points != 1) current_time = double(t)/double(time_points-1);
+		else current_time = 1;
 		
 		newx = x1*(1-current_time) + x2*current_time;
 		newy = y1*(1-current_time) + y2*current_time;

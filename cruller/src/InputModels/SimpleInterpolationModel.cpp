@@ -59,7 +59,7 @@ double SimpleInterpolationModel::VectorDistance(InputVector& vector1, InputVecto
     double d2 = 0;
     for(unsigned int i = 0; i < vlength; i++) {
         d2 += pow( vector1.X(i) - vector2.X(i), 2) + pow( vector1.Y(i) - vector2.Y(i), 2);
-        if(d2 > maxd2) { d2 = maxd2; break; }
+        if(d2 > maxd2 && maxd2 > 0) { d2 = maxd2; break; }
     }
     return sqrt(d2);
 }

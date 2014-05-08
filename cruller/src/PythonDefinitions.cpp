@@ -7,6 +7,7 @@
 #include "FitnessResult.h"
 
 #include "InputModels/SimpleGaussianModel.h"
+#include "InputModels/SimpleInterpolationModel.h"
 #include "InputModels/Interpolation.h"
 
 #include <sstream>
@@ -124,6 +125,19 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetYScale", &SimpleGaussianModel::SetYScale)
         .def("SetScale", &SimpleGaussianModel::SetScale)
 //        .def("__deepcopy__", &DeepCopy<Keyboard>)
+    ;
+
+    class_<SimpleInterpolationModel, bases<InputModel> >("SimpleInterpolationModel")
+        .def("RandomVector", &SimpleInterpolationModel::RandomVector)
+        .def("Distance", &SimpleInterpolationModel::Distance)
+        .def("SetXScale", &SimpleInterpolationModel::SetXScale)
+        .def("SetYScale", &SimpleInterpolationModel::SetYScale)
+        .def("SetScale", &SimpleInterpolationModel::SetScale)
+        .def("SetMaxDistance", &SimpleInterpolationModel::SetMaxDistance)
+        .def("SetVectorLength", &SimpleInterpolationModel::SetVectorLength)
+        .def("SetLoops", &SimpleInterpolationModel::SetLoops)
+        //not sure how to implement this to take a function pointer, or whether it's possible
+        //.def("SetInterpolationFunction", &SimpleInterpolationModel::SetInterpolationFunction)
     ;
 /********************************************************/
 

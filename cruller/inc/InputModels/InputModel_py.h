@@ -28,8 +28,8 @@ class InputModelWrapper : public InputModel, public boost::python::wrapper<Input
     double Distance(InputVector& vector, const char* word, Keyboard& k) {
         return this->get_override("Distance")(vector, word, k);
     }
-    double VectorDistance(InputVector& vector1, InputVector& vector2, Keyboard& k) {
-        return this->get_override("VectorDistance")(vector1, vector2, k);
+    double VectorDistance(InputVector& vector1, InputVector& vector2) {
+        return this->get_override("VectorDistance")(vector1, vector2);
     }
     InputVector RandomVector(const char* word, Keyboard& k) {
         return this->get_override("RandomVector")(word, k);

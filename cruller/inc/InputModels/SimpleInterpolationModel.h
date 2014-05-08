@@ -18,7 +18,7 @@ class SimpleInterpolationModel : public InputModel {
     InputVector PerfectVector(const char* word, Keyboard& k);
     double MarginalProbability( InputVector& sigma, const char* word, Keyboard& k);
     double Distance( InputVector& sigma, const char* word, Keyboard& k);
-    double VectorDistance(InputVector& vector1, InputVector& vector2, Keyboard& k);
+    double VectorDistance(InputVector& vector1, InputVector& vector2);
     void SetXScale(double xscale) { model.SetXScale(xscale); }
     void SetYScale(double yscale) { model.SetYScale(yscale); }
     void SetScale(double scale) { SetXScale(scale); SetYScale(scale); }

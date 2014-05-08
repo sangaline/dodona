@@ -52,10 +52,10 @@ double SimpleInterpolationModel::Distance( InputVector& sigma, const char* word,
 
     InputVector perfect = model.PerfectVector(word, k);
     perfect = Interpolation(perfect, vlength);
-    return VectorDistance(sigma, perfect, k);
+    return VectorDistance(sigma, perfect);
 }
 
-double SimpleInterpolationModel::VectorDistance(InputVector& vector1, InputVector& vector2, Keyboard& k) {
+double SimpleInterpolationModel::VectorDistance(InputVector& vector1, InputVector& vector2) {
     double d2 = 0;
     for(unsigned int i = 0; i < vlength; i++) {
         d2 += pow( vector1.X(i) - vector2.X(i), 2) + pow( vector1.Y(i) - vector2.Y(i), 2);

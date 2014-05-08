@@ -43,8 +43,8 @@ ELSEIF(NOT Boost_FOUND)
 ENDIF()
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  SET(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4.dylib)
-  SET(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.4/include/python3.4m)
+  SET(PYTHON_LIBRARY /opt/local/Library/Frameworks/Python.framework/Versions/3.3/lib/libpython3.3.dylib)
+  SET(PYTHON_INCLUDE_DIR /opt/local/Library/Frameworks/Python.framework/Versions/3.3/include/python3.3m)
 ENDIF()
 
 FIND_PACKAGE(PythonLibs 3.2)

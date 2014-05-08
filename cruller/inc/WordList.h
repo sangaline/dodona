@@ -63,6 +63,7 @@ class WordList {
 
     unsigned int TotalLetterOccurances();
     unsigned int LetterOccurances(const char c);
+    void SetSeed(unsigned int s) { generator.seed(s); }
     void Reset();
 
   private:

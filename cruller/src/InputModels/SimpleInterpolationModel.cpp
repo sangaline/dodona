@@ -55,3 +55,8 @@ double SimpleInterpolationModel::Distance( InputVector& sigma, const char* word,
     }
     return sqrt(d2);
 }
+
+void SimpleInterpolationModel::SetSeed(unsigned int s) {
+    generator.seed(s);
+    model.SetSeed(s);
+}

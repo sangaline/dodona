@@ -17,6 +17,7 @@ class InputModel {
 
     virtual InputVector RandomVector(const char* word, Keyboard& k) = 0;
     virtual double Distance(InputVector& vector, const char* word, Keyboard& k) = 0;
+    virtual void SetSeed(unsigned int s) { generator.seed(s); }
 };
 
 #endif

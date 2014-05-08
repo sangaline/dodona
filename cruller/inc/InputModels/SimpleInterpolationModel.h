@@ -24,5 +24,6 @@ class SimpleInterpolationModel : public InputModel {
     void SetVectorLength(unsigned int vector_length) { vlength = vector_length; }
     void SetLoops(bool loop) { loop_letter = loop; }
     void SetInterpolationFunction(InputVector (*fun)(InputVector&, unsigned int)) { Interpolation = fun; }
+    void SetSeed(unsigned int s);
 };
 #endif

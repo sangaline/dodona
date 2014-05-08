@@ -45,7 +45,7 @@ double SimpleInterpolationModel::Distance( InputVector& sigma, const char* word,
         const double r = p.RightExtreme();
         const double l = p.LeftExtreme();
 
-        if( fabs(((t+b) - 2.0*sigma.Y(0))/(t-b)) > maxs || + fabs(((r+l) - 2.0*sigma.X(0))/(r-l)) > maxs) {
+        if( pow(((t+b) - 2.0*sigma.Y(0))/(model.YScale()*(t-b)), 2) + pow(((r+l) - 2.0*sigma.X(0))/(model.XScale()*(r-l)), 2) > maxs*maxs ) {
             return -1;
         }
     }

@@ -14,6 +14,8 @@ class SimpleGaussianModel : public InputModel {
     double VectorDistance(InputVector& vector1, InputVector& vector2);
     void SetXScale(double xscale) { xsigma = xscale*0.5; }
     void SetYScale(double yscale) { ysigma = yscale*0.5; }
+    double XScale() { return xsigma*2.0; }
+    double YScale() { return ysigma*2.0; }
     void SetScale(double scale) { SetXScale(scale); SetYScale(scale); }
 };
 #endif

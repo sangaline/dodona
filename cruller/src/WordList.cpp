@@ -246,6 +246,7 @@ void WordList::Reset() {
     }
     //reset the main map
     words.clear();
+    total = 0;
     //mark others as not current
     MarkNotCurrent();
 }

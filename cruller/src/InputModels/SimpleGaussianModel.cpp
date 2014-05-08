@@ -80,3 +80,11 @@ double SimpleGaussianModel::Distance( InputVector& sigma, const char* word, Keyb
 
     return (probability - MarginalProbability(sigma, word, k))/probability;
 }
+
+double SimpleGaussianModel::VectorDistance(InputVector& vector1, InputVector& vector2, Keyboard& k) {
+    double d2 = 0;
+    for(unsigned int i = 0; i < vector1.Length(); i++) {
+        d2 += pow( vector1.X(i) - vector2.X(i), 2) + pow( vector1.Y(i) - vector2.Y(i), 2);
+    }
+    return sqrt(d2);
+}

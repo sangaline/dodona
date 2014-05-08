@@ -48,9 +48,13 @@ double SimpleInterpolationModel::Distance( InputVector& sigma, const char* word,
 
     InputVector perfect = perfectmodel.RandomVector(word, k);
     perfect = Interpolation(perfect, vlength);
+    return VectorDistance(sigma, perfect, k);
+}
+
+double SimpleInterpolationModel::VectorDistance(InputVector& vector1, InputVector& vector2, Keyboard& k) {
     double d2 = 0;
     for(unsigned int i = 0; i < vlength; i++) {
-        d2 += pow( sigma.X(i) - perfect.X(i), 2) + pow( sigma.Y(i) - perfect.Y(i), 2);
+        d2 += pow( vector1.X(i) - vector2.X(i), 2) + pow( vector1.Y(i) - vector2.Y(i), 2);
         if(d2 > maxd2) { d2 = maxd2; break; }
     }
     return sqrt(d2);

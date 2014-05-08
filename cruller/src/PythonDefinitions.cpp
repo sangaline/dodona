@@ -5,6 +5,7 @@
 //cruller include files
 #include "FitnessFunctions.h"
 #include "FitnessResult.h"
+#include "Serialization.h"
 
 #include "InputModels/SimpleGaussianModel.h"
 #include "InputModels/SimpleInterpolationModel.h"
@@ -72,6 +73,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetWordListDict",&SetWordListMapDict)
         .def("__deepcopy__", &DeepCopy<WordList>)
         .def_pickle(serialization_pickle_suite<WordList>())
+        .def("SaveToFile", &SaveToFile<WordList>)
+        .def("LoadFromFile", &LoadFromFile<WordList>)
     ;
 /********************************************************/
 
@@ -91,6 +94,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("IsInside", &Polygon::IsInside)
         .def("__deepcopy__", &DeepCopy<Polygon>)
         .def_pickle(serialization_pickle_suite<Polygon>())
+        .def("SaveToFile", &SaveToFile<Polygon>)
+        .def("LoadFromFile", &LoadFromFile<Polygon>)
     ;
 /********************************************************/
 
@@ -107,6 +112,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("OrderedKeyList", &KeyboardOrderedKeyList)
         .def("__deepcopy__", &DeepCopy<Keyboard>)
         .def_pickle(serialization_pickle_suite<Keyboard>())
+        .def("SaveToFile", &SaveToFile<Keyboard>)
+        .def("LoadFromFile", &LoadFromFile<Keyboard>)
     ;
 /********************************************************/
 
@@ -155,6 +162,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("DeltaPhi", &InputVector::DeltaPhi)
         .def("StringForm", &InputVector::StringForm)
         .def_pickle(serialization_pickle_suite<InputVector>())
+        .def("SaveToFile", &SaveToFile<InputVector>)
+        .def("LoadFromFile", &LoadFromFile<InputVector>)
     ;
 /********************************************************/
 
@@ -167,6 +176,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("Error", &FitnessResult::Error)
         .def("Iterations", &FitnessResult::Iterations)
         .def_pickle(serialization_pickle_suite<FitnessResult>())
+        .def("SaveToFile", &SaveToFile<FitnessResult>)
+        .def("LoadFromFile", &LoadFromFile<FitnessResult>)
     ;
 /********************************************************/
 

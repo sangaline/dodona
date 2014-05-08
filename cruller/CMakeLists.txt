@@ -34,7 +34,7 @@ IF(Boost_FOUND)
   SET(Boost_USE_STATIC_LIBS OFF)
   SET(Boost_USE_MULTITHREADED ON)
   SET(Boost_USE_STATIC_RUNTIME OFF)
-  FIND_PACKAGE(Boost COMPONENTS serialization python3)
+  FIND_PACKAGE(Boost COMPONENTS iostreams serialization python3)
 
   MESSAGE("Linking libraries" ${Boost_LIBRARIES})
   TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${Boost_LIBRARIES})

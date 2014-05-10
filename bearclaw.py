@@ -76,7 +76,7 @@ def HeatMap(v):
     if bn < 0: bn = 0
     return (rn,gn,bn)
 
-def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None, t9 = False, letters = True, frequencymap = None):
+def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None, t9 = False, letters = True, frequencymap = None, oneletter = None):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     (l, r, b, t) = (0, 0, 0, 0)
@@ -138,6 +138,8 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             t9shift -= (newr-newl)*0.15
 
         if letters:
+            if oneletter != None:
+                c = oneletter
             ax.text(newl + 0.2*(newr-newl) + t9shift,newb + 0.2*(newt-newb), c, fontsize=18)
     xpad = (r-l)*0.1
     ypad = (t-b)*0.1

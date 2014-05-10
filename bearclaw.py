@@ -116,10 +116,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             elif frequencymap != None:
                 frequency = frequencymap[i]
 
-            value = 0
-            if frequency >= pmin:
-                value = (frequency - pmin)/(pmax - pmin)
-            facecolor = scalarmap.to_rgba(value)
+            facecolor = scalarmap.to_rgba(frequency)
 
         patch = patches.PathPatch(path, facecolor=facecolor, lw=2)
         ax.add_patch(patch)

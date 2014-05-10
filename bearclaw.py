@@ -1,6 +1,7 @@
 from donut import cruller
 from random import shuffle, choice
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
@@ -54,37 +55,28 @@ def DrawPolygons(polylist):
     ax.set_ylim(b-ypad, t+ypad)
     plt.show()
 
-def HeatMap(v):
-    r = [0, 1, 1]
-    g = [0, 1, 0]
-    b = [1, 1, 0]
+def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None,
+                t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None):
+    fig = None
+    if figsize != None:
+        fig = plt.figure(figsize=figsize)
+    else:
+        fig = plt.figure()
+    colored = False
+    ax = None
+    gs = None
+    if wordlist != None or frequencymap != None:
+        colored = True
+        ax = fig.add_axes([0.0, 0.0, 0.93, 1.0])
+    else:
+        ax = fig.add_subplot(111)
 
-    l = len(r) - 1.0
-    width = 1.0/l
-    closest = floor(v*l)
-    if closest == l:
-        return (r[-1], g[-1], b[-1])
-    extra = (v*l - closest)/l
-    rn = (r[closest+1]*extra + r[closest]*(width-extra))/width
-    gn = (g[closest+1]*extra + g[closest]*(width-extra))/width
-    bn = (b[closest+1]*extra + b[closest]*(width-extra))/width
-    if rn > 1: rn = 1
-    if gn > 1: gn = 1
-    if bn > 1: bn = 1
-    if rn < 0: rn = 0
-    if gn < 0: gn = 0
-    if bn < 0: bn = 0
-    return (rn,gn,bn)
-
-def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None, t9 = False, letters = True, frequencymap = None, oneletter = None):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
     (l, r, b, t) = (0, 0, 0, 0)
 
     d = k.PolygonDict()
 
-    frequencies = None
-    if wordlist != None or frequencymap != None:
+    frequencies, norm, scalarmap = None, None, None
+    if colored:
         rawfrequencies = None
         if wordlist != None:
             rawfrequencies = [wordlist.LetterOccurances(c)/wordlist.TotalLetterOccurances() for c in d.keys()]
@@ -95,6 +87,16 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             pmin = min(frequencies)
         if pmax == None:
             pmax = max(frequencies)
+        format = None
+        if logarithmic:
+            norm = mpl.colors.LogNorm(vmin=pmin, vmax=pmax)
+            format = mpl.ticker.LogFormatter(10, labelOnlyBase=False)
+        else:
+            norm = mpl.colors.Normalize(vmin=pmin, vmax=pmax)
+        scalarmap = mpl.cm.ScalarMappable(norm=norm, cmap=colormap)
+        ax2 = fig.add_axes([0.95, 0.0, 0.05, 1.0])
+        cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=colormap, norm=norm, format = format, orientation='vertical')
+
     for i, c in enumerate(k.OrderedKeyList()):
         p = d[c]
         verts = p.VertexList()
@@ -107,7 +109,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         t = max(t, newt)
 
         facecolor = 'orange'
-        if wordlist != None or frequencymap != None:
+        if colored:
             frequency = None
             if wordlist != None:
                 frequency = wordlist.LetterOccurances(c)/wordlist.TotalLetterOccurances()
@@ -120,7 +122,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
                     value = (log(frequency) - log(pmin))/(log(pmax) - log(pmin))
                 else:
                     value = (frequency - pmin)/(pmax - pmin)
-            facecolor = HeatMap(value)
+            facecolor = scalarmap.to_rgba(value)
 
         patch = patches.PathPatch(path, facecolor=facecolor, lw=2)
         ax.add_patch(patch)
@@ -140,7 +142,11 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         if letters:
             if oneletter != None:
                 c = oneletter
-            ax.text(newl + 0.2*(newr-newl) + t9shift,newb + 0.2*(newt-newb), c, fontsize=18)
+            patheffects = None
+            if colored:
+                from matplotlib import patheffects
+                patheffects = [patheffects.withStroke(linewidth=3,foreground="w")]
+            ax.text(newl + 0.2*(newr-newl) + t9shift,newb + 0.2*(newt-newb), c, fontsize=18, path_effects=patheffects)
     xpad = (r-l)*0.1
     ypad = (t-b)*0.1
     ax.set_xlim(l-xpad, r+xpad)

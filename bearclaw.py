@@ -76,7 +76,7 @@ def HeatMap(v):
     if bn < 0: bn = 0
     return (rn,gn,bn)
 
-def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None, t9 = False, letters = True):
+def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None, t9 = False, letters = True, frequencymap = None):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     (l, r, b, t) = (0, 0, 0, 0)
@@ -84,8 +84,12 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     d = k.PolygonDict()
 
     frequencies = None
-    if wordlist != None:
-        rawfrequencies = [wordlist.LetterOccurances(c)/wordlist.TotalLetterOccurances() for c in d.keys()]
+    if wordlist != None or frequencymap != None:
+        rawfrequencies = None
+        if wordlist != None:
+            rawfrequencies = [wordlist.LetterOccurances(c)/wordlist.TotalLetterOccurances() for c in d.keys()]
+        if frequencymap != None:
+            rawfrequencies = frequencymap
         frequencies = [f for f in rawfrequencies if f > 0]
         if pmin == None:
             pmin = min(frequencies)
@@ -103,8 +107,13 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         t = max(t, newt)
 
         facecolor = 'orange'
-        if wordlist != None:
-            frequency = wordlist.LetterOccurances(c)/wordlist.TotalLetterOccurances()
+        if wordlist != None or frequencymap != None:
+            frequency = None
+            if wordlist != None:
+                frequency = wordlist.LetterOccurances(c)/wordlist.TotalLetterOccurances()
+            elif frequencymap != None:
+                frequency = frequencymap[i]
+
             value = 0
             if frequency >= pmin:
                 if logarithmic:

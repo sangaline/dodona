@@ -51,6 +51,12 @@ list KeyboardOrderedKeyList(Keyboard& k) {
     return l;
 }
 
+void SwapCharactersStr(Keyboard &k, str s1, str s2) {
+    char const* c_str1 = extract<char const*>(s1);
+    char const* c_str2 = extract<char const*>(s2);
+    k.SwapCharacters(c_str1[0], c_str2[0]);
+}
+
 void AddKeyStr(Keyboard &k, str s, const Polygon& p) {
     char const* c_str = extract<char const*>(s); k.AddKey(c_str[0], p);
 }

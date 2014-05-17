@@ -139,6 +139,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetXScale", &SimpleGaussianModel::SetXScale)
         .def("SetYScale", &SimpleGaussianModel::SetYScale)
         .def("SetScale", &SimpleGaussianModel::SetScale)
+        .def("SetCorrelation", &SimpleGaussianModel::SetCorrelation);
 //        .def("__deepcopy__", &DeepCopy<Keyboard>)
     ;
 
@@ -151,6 +152,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetMaxDistance", &SimpleInterpolationModel::SetMaxDistance)
         .def("SetVectorLength", &SimpleInterpolationModel::SetVectorLength)
         .def("SetLoops", &SimpleInterpolationModel::SetLoops)
+        .def("SetCorrelation", &SimpleInterpolationModel::SetCorrelation);
         //not sure how to implement this to take a function pointer, or whether it's possible
         //.def("SetInterpolationFunction", &SimpleInterpolationModel::SetInterpolationFunction)
     ;
@@ -191,6 +193,7 @@ BOOST_PYTHON_MODULE(cruller)
 
 /***************** FitnessFunctions ********************/
     def("MonteCarloEfficiency", &FitnessFunctions::MonteCarloEfficiency);
+    def("FastEfficiency", &FitnessFunctions::FastEfficiency);
 /********************************************************/
 
 /***************** Interpolation ************************/

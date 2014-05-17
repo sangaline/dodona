@@ -2,15 +2,25 @@
 #include "Keyboard.h"
 #include "Polygon.h"
 
+#include "math.h"
+
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 
 using namespace std;
 
-SimpleGaussianModel::SimpleGaussianModel(double xscale, double yscale) {
+SimpleGaussianModel::SimpleGaussianModel(double xscale, double yscale, double corr) {
     ysigma = xscale*0.5;
     xsigma = yscale*0.5;
     fixed_length = true;
+    SetCorrelation(corr);
+}
+
+void SimpleGaussianModel::SetCorrelation(double corr) {
+    if(corr < 0) corr = 0;
+    if(corr > 1) corr = 1;
+    correlation = corr;
+    correlation_complement = sqrt(1.0-correlation*correlation);
 }
 
 InputVector SimpleGaussianModel::RandomVector(const char* word, Keyboard& k) {
@@ -19,6 +29,7 @@ InputVector SimpleGaussianModel::RandomVector(const char* word, Keyboard& k) {
     boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > normal(generator, nd);
 
     InputVector sigma;
+    double lastx = normal(), lasty = normal();
     for(unsigned int i = 0; i < strlen(word); i++) {
         Polygon p = k.GetKey(word[i]);
         const double t = p.TopExtreme();
@@ -26,8 +37,13 @@ InputVector SimpleGaussianModel::RandomVector(const char* word, Keyboard& k) {
         const double r = p.RightExtreme();
         const double l = p.LeftExtreme();
 
-        const double x = normal()*xsigma*(r-l) + 0.5*(r+l);
-        const double y = normal()*ysigma*(t-b) + 0.5*(t+b);
+        if(i > 0) {
+            lastx = lastx + normal()*correlation_complement;
+            lasty = lasty + normal()*correlation_complement;
+        }
+
+        const double x = lastx*xsigma*(r-l) + 0.5*(r+l);
+        const double y = lasty*ysigma*(t-b) + 0.5*(t+b);
         sigma.AddPoint(x, y, double(i));
     }
     return sigma;

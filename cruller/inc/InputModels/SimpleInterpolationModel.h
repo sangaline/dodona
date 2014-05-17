@@ -13,7 +13,7 @@ class SimpleInterpolationModel : public InputModel {
     unsigned int vlength;
     bool loop_letter;
   public:
-    SimpleInterpolationModel(unsigned int vector_length = 50, double xscale = 0.5, double yscale = 0.5, double maxdistance = 0.0, double maxsigmas = 0.0, bool loop = false);
+    SimpleInterpolationModel(unsigned int vector_length = 50, double xscale = 0.5, double yscale = 0.5, double correlation = 0, double maxdistance = 0.0, double maxsigmas = 0.0, bool loop = false);
     InputVector RandomVector(const char* word, Keyboard& k);
     InputVector PerfectVector(const char* word, Keyboard& k);
     double MarginalProbability( InputVector& sigma, const char* word, Keyboard& k);
@@ -22,6 +22,7 @@ class SimpleInterpolationModel : public InputModel {
     void SetXScale(double xscale) { model.SetXScale(xscale); }
     void SetYScale(double yscale) { model.SetYScale(yscale); }
     void SetScale(double scale) { SetXScale(scale); SetYScale(scale); }
+    void SetCorrelation(double corr) { model.SetCorrelation(corr); }
     void SetMaxDistance(double maxdistance) { maxd = maxdistance; maxd2 = maxd*maxd; }
     void SetVectorLength(unsigned int vector_length) { vlength = vector_length; }
     void SetLoops(bool loop) { loop_letter = loop; }

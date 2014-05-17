@@ -8,7 +8,7 @@
 #include <string.h>
 #include <math.h>
 
-SimpleInterpolationModel::SimpleInterpolationModel(unsigned int vector_length, double xscale, double yscale, double maxdistance, double maxsigma, bool loop) {
+SimpleInterpolationModel::SimpleInterpolationModel(unsigned int vector_length, double xscale, double yscale, double correlation, double maxdistance, double maxsigma, bool loop) {
     maxd = maxdistance;
     maxd2 = maxd*maxd;
     maxs = maxsigma;
@@ -16,7 +16,8 @@ SimpleInterpolationModel::SimpleInterpolationModel(unsigned int vector_length, d
     model.SetYScale(yscale);
     vlength = vector_length;
     loop_letter = loop;
-    Interpolation = &BezierInterpolation;
+    Interpolation = &SpatialInterpolation;
+    SetCorrelation(correlation);
 }
 
 InputVector SimpleInterpolationModel::RandomVector(const char* word, Keyboard& k) {

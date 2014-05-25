@@ -10,6 +10,7 @@
 #include "InputModels/SimpleGaussianModel.h"
 #include "InputModels/SimpleInterpolationModel.h"
 #include "InputModels/Interpolation.h"
+#include "RadixTree.h"
 
 #include <sstream>
 
@@ -17,6 +18,7 @@
 #include <boost/archive/text_iarchive.hpp>
 
 //special boost-python headers that contain functinos necessary for the python interface
+#include "RadixTree_py.h"
 #include "Polygon_py.h"
 #include "Keyboard_py.h"
 #include "WordList_py.h"
@@ -175,6 +177,17 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SaveToFile", &SaveToFile<InputVector>)
         .def("LoadFromFile", &LoadFromFile<InputVector>)
     ;
+/********************************************************/
+
+/******************* RadixTree class ********************/
+
+    class_<RadixTree>("RadixTree", init<bool>())
+        .def(init<>())
+        .def("AddWord", &RadixTree::AddWord)
+        .def("CheckWord", &RadixTree::CheckWord)
+        .def("Matches", &RadixTreeMatches)
+    ;
+
 /********************************************************/
 
 /***************** FitnessResult class ********************/

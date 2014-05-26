@@ -78,6 +78,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def_pickle(serialization_pickle_suite<WordList>())
         .def("SaveToFile", &SaveToFile<WordList>)
         .def("LoadFromFile", &LoadFromFile<WordList>)
+        .def("SubstringMatches", &WordListTreeMatches)
     ;
 /********************************************************/
 

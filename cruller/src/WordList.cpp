@@ -1,10 +1,12 @@
 #include "WordList.h"
 
+#include "RadixTree.h"
 
 #include <utility>
 using namespace std;
 
 WordList::WordList() {
+    tree = new RadixTree();
     Reset();
 }
 
@@ -29,6 +31,8 @@ WordList::WordList(const WordList& wl) {
         Nword_vector[i] = wl.Nword_vector[i];
     }
 
+    tree = new RadixTree();
+    tree_current = wl.tree_current;
 }
 
 WordList::WordList(wordmap wm) {
@@ -36,6 +40,7 @@ WordList::WordList(wordmap wm) {
 }
 
 WordList::~WordList() {
+    delete tree;
 }
 
 void WordList::SetWordMap(wordmap wm) {
@@ -78,6 +83,7 @@ unsigned int WordList::Occurances(const char *word) {
 }
 
 unsigned int WordList::Words() {
+    UpdateVectors();
     return words.size();
 }
 
@@ -139,6 +145,7 @@ void WordList::MarkNotCurrent() {
     vector_current = false;
     distribution_current = false;
     letters_current = false;
+    tree_current = false;
 }
 
 void WordList::UpdateLetters() {
@@ -206,10 +213,21 @@ void WordList::UpdateDistribution() {
     distribution_current = true;
 }
 
+void WordList::UpdateTree() {
+    if(tree_current == false) {
+        //tree->Reset();
+        for(unsigned int i = 0; i < Words(); i++) {
+            tree->AddWord(Word(i));
+        }
+    }
+    tree_current = true;
+}
+
 void WordList::UpdateAll() {
     UpdateVectors();
     UpdateDistribution();
     UpdateLetters();
+    UpdateTree();
 }
 
 
@@ -247,6 +265,8 @@ void WordList::Reset() {
     //reset the main map
     words.clear();
     total = 0;
+
+    tree->Reset();
     //mark others as not current
     MarkNotCurrent();
 }

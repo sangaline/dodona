@@ -3,6 +3,7 @@
 #define WordList_py_h
 
 #include "WordList.h"
+#include "RadixTree_py.h"
 
 //bost include files
 #include <boost/unordered_map.hpp>
@@ -40,6 +41,10 @@ void SetWordListMapDict(WordList& wl, dict d) {
         std::string key = extract<std::string>(keys[i]);
         wl.AddWord(key.c_str(), occurances);
     }
+}
+
+list WordListTreeMatches(WordList& wl, const char* stringform) {
+    return RadixTreeMatches( *wl.GetTree(), stringform);
 }
 
 

@@ -14,6 +14,8 @@ namespace boost {namespace serialization {class access;}}
 
 #define MAXN 25
 
+class RadixTree;
+
 class WordList {
     typedef boost::unordered_map<std::string, unsigned int> wordmap;
 
@@ -33,10 +35,14 @@ class WordList {
     std::vector<std::string> Nword_vector[MAXN];
     bool vector_current;
 
+    RadixTree *tree;
+    bool tree_current;
+
     void MarkNotCurrent();
     void UpdateLetters();
     void UpdateVectors();
     void UpdateDistribution();
+    void UpdateTree();
     void UpdateAll();
   public:
     WordList();
@@ -65,6 +71,8 @@ class WordList {
     unsigned int LetterOccurances(const char c);
     void SetSeed(unsigned int s) { generator.seed(s); }
     void Reset();
+
+    RadixTree *GetTree() { UpdateTree(); return tree; }
 
   private:
     friend class boost::serialization::access;

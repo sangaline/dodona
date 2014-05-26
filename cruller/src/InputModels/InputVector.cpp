@@ -69,7 +69,7 @@ const char* InputVector::StringForm(Keyboard& k) {
         }
         for(unsigned int j = 0; j < k.NKeys(); j++) {
             if( k.GetKey(k.CharN(j)).IsInside(xvector[i], yvector[i]) ) {
-                s.push_back(k.CharN(j));
+                s.push_back(char(k.CharN(j)));
                 lastj = j;
                 break;
             }

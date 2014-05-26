@@ -18,6 +18,7 @@ class RadixTree {
     bool AddWord(const char* word);
     bool CheckWord(const char* word);
     std::vector<std::string> Matches(const char* stringform);
+    void Reset();
 };
 
 #endif

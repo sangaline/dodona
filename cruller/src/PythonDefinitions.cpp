@@ -186,6 +186,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("AddWord", &RadixTree::AddWord)
         .def("CheckWord", &RadixTree::CheckWord)
         .def("Matches", &RadixTreeMatches)
+        .def("Reset", &RadixTree::Reset)
     ;
 
 /********************************************************/

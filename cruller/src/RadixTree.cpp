@@ -153,3 +153,13 @@ vector<string> RadixTree::MatchesHelper(const char* stringform, bool termination
 
     return matches;
 }
+
+void RadixTree::Reset() {
+    for(unsigned int i = 0; i < 256; i++) {
+        if(nodes[i] != 0) {
+            delete nodes[i];
+            nodes[i] = 0;
+        }
+    }
+    entries = 0;
+}

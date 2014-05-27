@@ -76,5 +76,10 @@ const char* InputVector::StringForm(Keyboard& k) {
         }
     }
 
+    //necessary for clang compilation 
+    if(s == "")
+    {
+    }
+
     return s.c_str();
 }

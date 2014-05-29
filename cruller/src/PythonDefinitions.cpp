@@ -23,6 +23,7 @@
 #include "Keyboard_py.h"
 #include "WordList_py.h"
 #include "InputModels/InputModel_py.h"
+#include "InputModels/SimpleInterpolationModel_py.h"
 
 
 using namespace boost::python;
@@ -135,10 +136,8 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetSeed", &InputModel::SetSeed)
     ;
     
-    class_<SimpleGaussianModel, bases<InputModel> >("SimpleGaussianModel")
-        .def("RandomVector", &SimpleGaussianModel::RandomVector)
+    class_<SimpleGaussianModel, bases<InputModelWrapper> >("SimpleGaussianModel")
         .def("MarginalProbability", &SimpleGaussianModel::MarginalProbability)
-        //.def("Distance", &SimpleGaussianModel::Distance)
         .def("SetXScale", &SimpleGaussianModel::SetXScale)
         .def("SetYScale", &SimpleGaussianModel::SetYScale)
         .def("SetScale", &SimpleGaussianModel::SetScale)
@@ -146,18 +145,21 @@ BOOST_PYTHON_MODULE(cruller)
 //        .def("__deepcopy__", &DeepCopy<Keyboard>)
     ;
 
-    class_<SimpleInterpolationModel, bases<InputModel> >("SimpleInterpolationModel")
-        .def("RandomVector", &SimpleInterpolationModel::RandomVector)
-        .def("Distance", &SimpleInterpolationModel::Distance)
+    class_<SimpleInterpolationModel, SimpleInterpolationModelCallback, bases<InputModelWrapper> >("SimpleInterpolationModel")
         .def("SetXScale", &SimpleInterpolationModel::SetXScale)
         .def("SetYScale", &SimpleInterpolationModel::SetYScale)
         .def("SetScale", &SimpleInterpolationModel::SetScale)
         .def("SetMaxDistance", &SimpleInterpolationModel::SetMaxDistance)
         .def("SetVectorLength", &SimpleInterpolationModel::SetVectorLength)
         .def("SetLoops", &SimpleInterpolationModel::SetLoops)
-        .def("SetCorrelation", &SimpleInterpolationModel::SetCorrelation);
-        //not sure how to implement this to take a function pointer, or whether it's possible
-        //.def("SetInterpolationFunction", &SimpleInterpolationModel::SetInterpolationFunction)
+        .def("SetCorrelation", &SimpleInterpolationModel::SetCorrelation)
+        .def("Interpolation", &SimpleInterpolationModelCallback::default_Interpolation)
+        //still need these...
+        .def("RandomVector", &SimpleInterpolationModel::RandomVector)
+        .def("PerfectVector", &SimpleInterpolationModel::PerfectVector)
+        .def("Distance", &SimpleInterpolationModel::Distance)
+        .def("VectorDistance", &SimpleInterpolationModel::VectorDistance)
+        .def("SetSeed", &SimpleInterpolationModel::SetSeed)
     ;
 /********************************************************/
 

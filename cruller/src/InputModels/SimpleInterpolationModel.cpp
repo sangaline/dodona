@@ -16,7 +16,7 @@ SimpleInterpolationModel::SimpleInterpolationModel(unsigned int vector_length, d
     model.SetYScale(yscale);
     vlength = vector_length;
     loop_letter = loop;
-    Interpolation = &SpatialInterpolation;
+    interpolation = &SpatialInterpolation;
     SetCorrelation(correlation);
 }
 
@@ -68,4 +68,8 @@ double SimpleInterpolationModel::VectorDistance(InputVector& vector1, InputVecto
 void SimpleInterpolationModel::SetSeed(unsigned int s) {
     generator.seed(s);
     model.SetSeed(s);
+}
+
+InputVector SimpleInterpolationModel::Interpolation(InputVector& iv, unsigned int N) const {
+    return interpolation(iv, N);
 }

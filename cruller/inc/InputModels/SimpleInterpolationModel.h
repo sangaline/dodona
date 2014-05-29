@@ -6,7 +6,7 @@
 
 class SimpleInterpolationModel : public InputModel {
     SimpleGaussianModel model;
-    InputVector (*Interpolation)(InputVector&, unsigned int);
+    InputVector (*interpolation)(InputVector&, unsigned int);
 
     double ysigma, xsigma;
     double maxd, maxd2, maxs;
@@ -26,7 +26,8 @@ class SimpleInterpolationModel : public InputModel {
     void SetMaxDistance(double maxdistance) { maxd = maxdistance; maxd2 = maxd*maxd; }
     void SetVectorLength(unsigned int vector_length) { vlength = vector_length; }
     void SetLoops(bool loop) { loop_letter = loop; }
-    void SetInterpolationFunction(InputVector (*fun)(InputVector&, unsigned int)) { Interpolation = fun; }
+    void SetInterpolationFunction(InputVector (*fun)(InputVector&, unsigned int)) { interpolation = fun; }
+    virtual InputVector Interpolation(InputVector& iv, unsigned int N) const;
     void SetSeed(unsigned int s);
 };
 #endif

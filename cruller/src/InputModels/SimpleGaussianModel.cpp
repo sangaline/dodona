@@ -38,8 +38,8 @@ InputVector SimpleGaussianModel::RandomVector(const char* word, Keyboard& k) {
         const double l = p.LeftExtreme();
 
         if(i > 0) {
-            lastx = lastx + normal()*correlation_complement;
-            lasty = lasty + normal()*correlation_complement;
+            lastx = lastx*correlation + normal()*correlation_complement;
+            lasty = lasty*correlation + normal()*correlation_complement;
         }
 
         const double x = lastx*xsigma*(r-l) + 0.5*(r+l);

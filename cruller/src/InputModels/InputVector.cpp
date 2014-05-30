@@ -3,6 +3,7 @@
 #include "math.h"
 
 #include <string>
+#include "string.h"
 using namespace std;
 
 unsigned int InputVector::Length() {
@@ -76,10 +77,10 @@ const char* InputVector::StringForm(Keyboard& k) {
         }
     }
 
-    //necessary for clang compilation 
-    if(s == "")
-    {
-    }
+    const char *cstr = s.c_str();
+    const unsigned int length = strlen(cstr);
+    char *newstring = new char [length+1];
+    strcpy(newstring, cstr);
 
-    return s.c_str();
+    return newstring;
 }

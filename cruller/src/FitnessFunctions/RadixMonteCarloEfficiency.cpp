@@ -51,7 +51,7 @@ FitnessResult FitnessFunctions::RadixMonteCarloEfficiency(Keyboard& keyboard, In
         efficiency_sum2 += pow(single_efficiency, 2);
 
         //why can't I?
-        delete word;
+        //delete word;
     }
     efficiency_sum /= double(iterations);
     efficiency_sum2 /= double(iterations);

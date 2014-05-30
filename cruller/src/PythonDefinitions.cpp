@@ -136,7 +136,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetSeed", &InputModel::SetSeed)
     ;
     
-    class_<SimpleGaussianModel, bases<InputModelWrapper> >("SimpleGaussianModel")
+    class_<SimpleGaussianModel, bases<InputModel> >("SimpleGaussianModel")
         .def("MarginalProbability", &SimpleGaussianModel::MarginalProbability)
         .def("SetXScale", &SimpleGaussianModel::SetXScale)
         .def("SetYScale", &SimpleGaussianModel::SetYScale)
@@ -145,7 +145,7 @@ BOOST_PYTHON_MODULE(cruller)
 //        .def("__deepcopy__", &DeepCopy<Keyboard>)
     ;
 
-    class_<SimpleInterpolationModel, SimpleInterpolationModelCallback, bases<InputModelWrapper> >("SimpleInterpolationModel")
+    class_<SimpleInterpolationModel, SimpleInterpolationModelCallback, bases<InputModel> >("SimpleInterpolationModel")
         .def("SetXScale", &SimpleInterpolationModel::SetXScale)
         .def("SetYScale", &SimpleInterpolationModel::SetYScale)
         .def("SetScale", &SimpleInterpolationModel::SetScale)
@@ -155,11 +155,11 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetCorrelation", &SimpleInterpolationModel::SetCorrelation)
         .def("Interpolation", &SimpleInterpolationModelCallback::default_Interpolation)
         //still need these...
-        .def("RandomVector", &SimpleInterpolationModel::RandomVector)
-        .def("PerfectVector", &SimpleInterpolationModel::PerfectVector)
-        .def("Distance", &SimpleInterpolationModel::Distance)
-        .def("VectorDistance", &SimpleInterpolationModel::VectorDistance)
-        .def("SetSeed", &SimpleInterpolationModel::SetSeed)
+        //.def("RandomVector", &SimpleInterpolationModel::RandomVector)
+        //.def("PerfectVector", &SimpleInterpolationModel::PerfectVector)
+        //.def("Distance", &SimpleInterpolationModel::Distance)
+        //.def("VectorDistance", &SimpleInterpolationModel::VectorDistance)
+        //.def("SetSeed", &SimpleInterpolationModel::SetSeed)
     ;
 /********************************************************/
 

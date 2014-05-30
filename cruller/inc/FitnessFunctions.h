@@ -9,6 +9,7 @@
 namespace FitnessFunctions {
     FitnessResult MonteCarloEfficiency(Keyboard& keyboard, InputModel& model, WordList& words, unsigned int iterations);
     FitnessResult FastEfficiency(Keyboard& keyboard, InputModel& model, WordList& words, double exp_par);
+    FitnessResult RadixMonteCarloEfficiency(Keyboard& keyboard, InputModel& model, WordList& words, unsigned int iterations, unsigned int possibility_tries);
 };
 
 #endif

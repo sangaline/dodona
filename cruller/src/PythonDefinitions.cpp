@@ -211,6 +211,7 @@ BOOST_PYTHON_MODULE(cruller)
 /***************** FitnessFunctions ********************/
     def("MonteCarloEfficiency", &FitnessFunctions::MonteCarloEfficiency);
     def("FastEfficiency", &FitnessFunctions::FastEfficiency);
+    def("RadixMonteCarloEfficiency", &FitnessFunctions::RadixMonteCarloEfficiency);
 /********************************************************/
 
 /***************** Interpolation ************************/

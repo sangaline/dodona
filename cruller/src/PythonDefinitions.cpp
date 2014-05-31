@@ -9,6 +9,7 @@
 
 #include "InputModels/SimpleGaussianModel.h"
 #include "InputModels/SimpleInterpolationModel.h"
+#include "InputModels/NeuralNetworkModel.h"
 #include "InputModels/Interpolation.h"
 #include "RadixTree.h"
 
@@ -160,6 +161,10 @@ BOOST_PYTHON_MODULE(cruller)
         //.def("Distance", &SimpleInterpolationModel::Distance)
         //.def("VectorDistance", &SimpleInterpolationModel::VectorDistance)
         //.def("SetSeed", &SimpleInterpolationModel::SetSeed)
+    ;
+
+    class_<NeuralNetworkModel, bases<SimpleInterpolationModel, InputModel> >("NeuralNetworkModel", init<const char*>())
+
     ;
 /********************************************************/
 

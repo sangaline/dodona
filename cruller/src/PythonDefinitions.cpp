@@ -25,6 +25,7 @@
 #include "WordList_py.h"
 #include "InputModels/InputModel_py.h"
 #include "InputModels/SimpleInterpolationModel_py.h"
+#include "InputModels/NeuralNetworkModel_py.h"
 
 
 using namespace boost::python;
@@ -164,7 +165,7 @@ BOOST_PYTHON_MODULE(cruller)
     ;
 
     class_<NeuralNetworkModel, bases<SimpleInterpolationModel, InputModel> >("NeuralNetworkModel", init<const char*>())
-
+        .def("CreateInputs", &NeuralNetworkInputs)
     ;
 /********************************************************/
 

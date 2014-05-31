@@ -14,9 +14,9 @@ class InputVector {
   public:
    unsigned int Length(); 
    unsigned int AddPoint(double x, double y, double t = 0);
-   double X(unsigned int i);
-   double Y(unsigned int i);
-   double T(unsigned int i);
+   double X(int i);
+   double Y(int i);
+   double T(int i);
    double SpatialLength();
    double TemporalLength();
    double DeltaPhi(unsigned int i);

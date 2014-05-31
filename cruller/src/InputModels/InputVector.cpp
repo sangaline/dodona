@@ -24,16 +24,18 @@ unsigned int InputVector::AddPoint(double x, double y, double t) {
 
     return Length();
 }
-
-double InputVector::X(unsigned int i) {
+double InputVector::X(int i) {
+    while(i<0) { i += Length(); }
     return xvector[i];
 }
 
-double InputVector::Y(unsigned int i) {
+double InputVector::Y(int i) {
+    while(i<0) { i += Length(); }
     return yvector[i];
 }
 
-double InputVector::T(unsigned int i) {
+double InputVector::T(int i) {
+    while(i<0) { i += Length(); }
     return tvector[i];
 }
 

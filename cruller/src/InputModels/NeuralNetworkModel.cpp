@@ -80,5 +80,5 @@ void NeuralNetworkModel::CreateInputs(InputVector& v1, InputVector& v2, float* i
 double NeuralNetworkModel::VectorDistance(InputVector& vector1, InputVector& vector2) {
     float inputs[11];
     CreateInputs(vector1, vector2, inputs);
-    return double(*fann_run(ann, inputs));
+    return 1.0 - double(*fann_run(ann, inputs));
 }

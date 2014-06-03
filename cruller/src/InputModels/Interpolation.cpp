@@ -276,7 +276,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 		}
 	}
 
-    return newiv;
+    return SpatialInterpolation(newiv, Nsteps);
 }
 
 // Basic Quadratic Interpolation

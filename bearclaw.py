@@ -5,10 +5,13 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
+import collections
+import matplotlib.cm as cm
 
-from math import log, floor, sqrt
+from math import log, floor, sqrt, exp
 from copy import deepcopy
 
+from itertools import cycle
 
 #need to add this in notebooks:
 #%matplotlib inline
@@ -147,18 +150,51 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     ax.set_ylim(b-ypad, t+ypad)
 
     if inputvector != None:
-        points = inputvector.PointList()
-        times = [t[2] for t in points]
-        tmin = min(times)
-        tmax = max(times)
-        for i, p in enumerate(points):
-            color = (0.8, 0.5, 0.5)
-            if tmax > tmin:
-                color = (0.8, 1.0 - ((p[2]-tmin)/(tmax-tmin)), 0.5)
-            ax.plot(p[0], p[1], color=color, markersize=10, marker='o')
+        color = (0.0,0.0,0.0)
+        colorlist = [(0.0,0.0,0.0)]
+        finalcolor = [(1.0,1.0,1.0)]
+
+        #Test if inputvector is a list or not
+        if not isinstance(inputvector,collections.Iterable):
+            inputvector = [inputvector]
+            color = [(.8, 0.5, 0.5)]
+        else:
+            colorlist = [(1.0,0.0,0.0),(0.0,100/255.,0.0),(0.0,0.0,1.0),
+                         (1.0,1.0,0.0),(1.0,0.0,1.0),(0.0,1.0,1.0)]
+            finalcolor =[(1.0,128/255.,128/255.),(89/255.,189/255.,89/255.),(148/255.,148/255.,1.0),
+                         (1.0,1.0,175/255.),(1.0,171/255.,1.0),(179/255.,1.0,1.0)] 
+            color = colorlist
+            
+        iEntry = 0
+        for entry in inputvector:
+
+            points = entry.PointList()
+            times = [t[2] for t in points]
+            tmin = min(times)
+            tmax = max(times)
+            for i, p in enumerate(points):
+                if tmax > tmin:
+                    colortmp = (0.0,0.0,0.0)
+                    if len(colorlist) > 1:
+                        colortmp = (color[iEntry][0]+((finalcolor[iEntry][0]-color[iEntry][0])/(tmax-tmin))*p[2],
+                                    color[iEntry][1]+((finalcolor[iEntry][1]-color[iEntry][1])/(tmax-tmin))*p[2], 
+                                    color[iEntry][2]+((finalcolor[iEntry][2]-color[iEntry][2])/(tmax-tmin))*p[2])
+                    else :
+                        colortmp = (color[iEntry][0],1.0 - ((p[2]-tmin)/(tmax-tmin)), color[iEntry][2])
+                                
+                    ax.plot(p[0], p[1],color=colortmp, markersize=10, marker='o')        
+            
+            iEntry = iEntry+1
+            if iEntry >= len(colorlist):
+                iEntry =0;
 
     plt.show()
 
+  #          for i, p in enumerate(points):
+  #              color = (0.8, 0.5, 0.5)
+  #              if tmax > tmin:
+  #                  color = (0.8, 1.0 - ((p[2]-tmin)/(tmax-tmin)), 0.5)
+  #                  ax.plot(p[0], p[1], color=color, markersize=10, marker='o')
 
 def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     width = 1.0

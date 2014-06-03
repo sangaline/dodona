@@ -2,12 +2,29 @@
 #define SimpleInterpolationModel_py_h
 
 #include "InputModels/SimpleInterpolationModel.h"
+#include "InputModels/Interpolation.h"
 
 #include <boost/python/wrapper.hpp>
 #include <boost/python/pure_virtual.hpp>
 #include <boost/python/call_method.hpp>
+#include <boost/python/str.hpp>
 
 using namespace boost::python;
+
+
+bool SetInterpolationByName(SimpleInterpolationModel& model, str name) {
+    if(name == "bezier") {
+        model.SetInterpolationFunction(BezierInterpolation);
+    }
+    else if(name == "spatial") {
+        model.SetInterpolationFunction(SpatialInterpolation);
+    }
+    else {
+        return false;
+    }
+
+    return true;
+}
 
 /******* SimpleInterpolationModel Callback **************/
 struct SimpleInterpolationModelCallback : SimpleInterpolationModel {

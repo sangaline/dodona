@@ -156,6 +156,7 @@ BOOST_PYTHON_MODULE(cruller)
         .def("SetLoops", &SimpleInterpolationModel::SetLoops)
         .def("SetCorrelation", &SimpleInterpolationModel::SetCorrelation)
         .def("Interpolation", &SimpleInterpolationModelCallback::default_Interpolation)
+        .def("SetInterpolation", &SetInterpolationByName)
         //still need these...
         //.def("RandomVector", &SimpleInterpolationModel::RandomVector)
         //.def("PerfectVector", &SimpleInterpolationModel::PerfectVector)

@@ -7,6 +7,7 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 import collections
 import matplotlib.cm as cm
+from matplotlib.pylab import savefig
 
 from math import log, floor, sqrt, exp
 from copy import deepcopy
@@ -59,7 +60,7 @@ def DrawPolygons(polylist):
     plt.show()
 
 def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None,
-                t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None):
+                t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None, saveas = None):
     fig = None
     if figsize != None:
         fig = plt.figure(figsize=figsize)
@@ -162,9 +163,9 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             colorlist = [(1.0,0.0,0.0),(0.0,100/255.,0.0),(0.0,0.0,1.0),
                          (1.0,1.0,0.0),(1.0,0.0,1.0),(0.0,1.0,1.0)]
             finalcolor =[(1.0,128/255.,128/255.),(89/255.,189/255.,89/255.),(148/255.,148/255.,1.0),
-                         (1.0,1.0,175/255.),(1.0,171/255.,1.0),(179/255.,1.0,1.0)] 
+                         (1.0,1.0,175/255.),(1.0,171/255.,1.0),(179/255.,1.0,1.0)]
             color = colorlist
-            
+
         iEntry = 0
         for entry in inputvector:
 
@@ -177,17 +178,19 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
                     colortmp = (0.0,0.0,0.0)
                     if len(colorlist) > 1:
                         colortmp = (color[iEntry][0]+((finalcolor[iEntry][0]-color[iEntry][0])/(tmax-tmin))*p[2],
-                                    color[iEntry][1]+((finalcolor[iEntry][1]-color[iEntry][1])/(tmax-tmin))*p[2], 
+                                    color[iEntry][1]+((finalcolor[iEntry][1]-color[iEntry][1])/(tmax-tmin))*p[2],
                                     color[iEntry][2]+((finalcolor[iEntry][2]-color[iEntry][2])/(tmax-tmin))*p[2])
                     else :
                         colortmp = (color[iEntry][0],1.0 - ((p[2]-tmin)/(tmax-tmin)), color[iEntry][2])
-                                
-                    ax.plot(p[0], p[1],color=colortmp, markersize=10, marker='o')        
-            
+
+                    ax.plot(p[0], p[1],color=colortmp, markersize=10, marker='o')
+
             iEntry = iEntry+1
             if iEntry >= len(colorlist):
                 iEntry =0;
 
+    if saveas:
+        savefig(saveas)
     plt.show()
 
   #          for i, p in enumerate(points):

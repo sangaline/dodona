@@ -170,8 +170,8 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         x = [x for x,y,t in points]
         y = [y for x,y,t in points]
         from matplotlib import patheffects
-        patheffects = [patheffects.withStroke(linewidth=5,foreground="w")]
-        ax.plot(x, y, path_effects=patheffects, lw=3)
+        patheffects = [patheffects.withStroke(linewidth=5,foreground=(53*0.5/255,120*0.5/255,255*0.5/255))]
+        ax.plot(x, y, path_effects=patheffects, lw=3, color=(53/255,120/255,255/255))
 
     if inputvector != None:
         color = (0.0,0.0,0.0)

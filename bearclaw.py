@@ -83,7 +83,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     if (wordlist != None or frequencymap != None):
         colored = True
         if not nopalette:
-            ax = fig.add_axes([0.0, 0.0, 0.93, 1.0])
+            ax = fig.add_axes([0.04, 0.04, 0.85, 0.92])
         else:
             ax = fig.add_subplot(111)
     else:
@@ -113,7 +113,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             norm = mpl.colors.Normalize(vmin=pmin, vmax=pmax)
         scalarmap = mpl.cm.ScalarMappable(norm=norm, cmap=colormap)
         if not nopalette:
-            ax2 = fig.add_axes([0.95, 0.0, 0.05, 1.0])
+            ax2 = fig.add_axes([0.91, 0.04, 0.05, 0.92])
             cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=colormap, norm=norm, format = format, orientation='vertical')
 
     for i, c in enumerate(k.OrderedKeyList()):

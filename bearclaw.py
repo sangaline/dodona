@@ -61,7 +61,7 @@ def DrawPolygons(polylist):
 
 def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None,
                 t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None, saveas = None,
-                nopalette = False):
+                nopalette = False, perfectvector = None):
     fig = None
     if figsize != None:
         fig = plt.figure(figsize=figsize)
@@ -155,6 +155,14 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     ax.set_xlim(l-xpad, r+xpad)
     ax.set_ylim(b-ypad, t+ypad)
 
+    if perfectvector != None:
+        points = perfectvector.PointList()
+        x = [x for x,y,t in points]
+        y = [y for x,y,t in points]
+        from matplotlib import patheffects
+        patheffects = [patheffects.withStroke(linewidth=5,foreground="w")]
+        ax.plot(x, y, path_effects=patheffects, lw=3)
+
     if inputvector != None:
         color = (0.0,0.0,0.0)
         colorlist = [(0.0,0.0,0.0)]
@@ -197,12 +205,6 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     if saveas:
         savefig(saveas)
     plt.show()
-
-  #          for i, p in enumerate(points):
-  #              color = (0.8, 0.5, 0.5)
-  #              if tmax > tmin:
-  #                  color = (0.8, 1.0 - ((p[2]-tmin)/(tmax-tmin)), 0.5)
-  #                  ax.plot(p[0], p[1], color=color, markersize=10, marker='o')
 
 def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     width = 1.0

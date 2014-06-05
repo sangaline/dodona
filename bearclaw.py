@@ -70,6 +70,16 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     colored = False
     ax = None
     gs = None
+
+    #if frequencymap is a word then build a new frequencymap highlighting the included letters
+    if isinstance(frequencymap, str):
+        word = frequencymap
+        frequencymap = []
+        for letter in k.OrderedKeyList():
+            if letter in word:
+                frequencymap.append(1.0)
+            else:
+                frequencymap.append(0.2)
     if (wordlist != None or frequencymap != None):
         colored = True
         if not nopalette:

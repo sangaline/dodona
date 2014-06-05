@@ -60,7 +60,8 @@ def DrawPolygons(polylist):
     plt.show()
 
 def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None,
-                t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None, saveas = None):
+                t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None, saveas = None,
+                nopalette = False):
     fig = None
     if figsize != None:
         fig = plt.figure(figsize=figsize)
@@ -69,9 +70,12 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
     colored = False
     ax = None
     gs = None
-    if wordlist != None or frequencymap != None:
+    if (wordlist != None or frequencymap != None):
         colored = True
-        ax = fig.add_axes([0.0, 0.0, 0.93, 1.0])
+        if not nopalette:
+            ax = fig.add_axes([0.0, 0.0, 0.93, 1.0])
+        else:
+            ax = fig.add_subplot(111)
     else:
         ax = fig.add_subplot(111)
 
@@ -98,8 +102,9 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         else:
             norm = mpl.colors.Normalize(vmin=pmin, vmax=pmax)
         scalarmap = mpl.cm.ScalarMappable(norm=norm, cmap=colormap)
-        ax2 = fig.add_axes([0.95, 0.0, 0.05, 1.0])
-        cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=colormap, norm=norm, format = format, orientation='vertical')
+        if not nopalette:
+            ax2 = fig.add_axes([0.95, 0.0, 0.05, 1.0])
+            cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=colormap, norm=norm, format = format, orientation='vertical')
 
     for i, c in enumerate(k.OrderedKeyList()):
         p = d[c]

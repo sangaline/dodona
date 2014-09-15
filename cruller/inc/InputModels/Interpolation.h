@@ -5,6 +5,7 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps);
 InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps);
 InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps);
 InputVector BezierInterpolationV2(InputVector& iv, unsigned int Nsteps);
+InputVector BezierSloppyInterpolationV2(InputVector& iv, unsigned int Nsteps);
 
 //helper functions
 InputVector QuadraticBezierInterpolation(InputVector& iv, unsigned int Nsteps);

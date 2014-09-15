@@ -442,12 +442,10 @@ InputVector BezierInterpolationV2(InputVector& iv, unsigned int Nsteps)
     //These will all be combined in end to form the final swype pattern
     std::vector<InputVector> IVlist;
 
-    //the first segmens is just a strait line
+    //the first segmens is just a straight line
     InputVector firstSeg;
     firstSeg.AddPoint(bezIV.X(0), bezIV.Y(0), bezIV.T(0));
     firstSeg.AddPoint(bezIV.X(1), bezIV.Y(1), bezIV.T(1));
-
-    //Add the input vector of the first segment to the list
     IVlist.push_back(firstSeg);
 
     //create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
@@ -466,14 +464,68 @@ InputVector BezierInterpolationV2(InputVector& iv, unsigned int Nsteps)
         InputVector linSeg;
         linSeg.AddPoint(bezIV.X(i+1),bezIV.Y(i+1),bezIV.T(i+1));
         linSeg.AddPoint(bezIV.X(i+2),bezIV.Y(i+2),bezIV.T(i+2));
-
-        int nLinSteps = int(Nsteps*(dist2next(bezIV,i+1)/bezIV.SpatialLength()));
         IVlist.push_back(linSeg);
     }
 
+    //combine all of the segments into one input vector
     InputVector combinedIV;
     combinedIV = CombineInputVectors(IVlist);
+    return combinedIV;
+}
 
+
+//Very similar to the quadratic bezier interpolation algorith above.  The only difference is that
+//the control points here are halfway between each letter.
+InputVector BezierSloppyInterpolationV2(InputVector& iv, unsigned int Nsteps)
+{
+    const unsigned int nPoints = iv.Length();
+    const unsigned int nBezPoints = 2*nPoints - 1;
+
+    //no fancy interpolation necessary for one or two letter words
+    if (nPoints <= 2)
+        return SpatialInterpolation(iv,Nsteps);
+
+    //create a new input vector with the bezier control points included
+    InputVector bezIV;
+
+    bezIV.AddPoint(iv.X(0),iv.Y(0),iv.T(0));
+    for(unsigned int i = 1; i < nPoints; i++)
+    {
+        bezIV.AddPoint((iv.X(i)+iv.X(i-1))/2.0,(iv.Y(i)+iv.Y(i-1))/2.0,(iv.T(i)+iv.T(i-1))/2.0);
+        bezIV.AddPoint(iv.X(i),iv.Y(i),iv.T(i));
+    }
+
+    //Create a list to hold the input veectors corresponding to various segments of the swype pattern
+    std::vector<InputVector> IVlist;
+
+    //the first segmens is just a straight line
+    InputVector firstSeg;
+    firstSeg.AddPoint(bezIV.X(0), bezIV.Y(0), bezIV.T(0));
+    firstSeg.AddPoint(bezIV.X(1), bezIV.Y(1), bezIV.T(1));
+    IVlist.push_back(firstSeg);
+
+    //create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
+    for(unsigned int i = 2; i < nBezPoints-1; i+=2)
+    {
+        //Create the next input vector segment to be bezier interpolated
+        InputVector bezSeg;
+        bezSeg.AddPoint(bezIV.X(i-1),bezIV.Y(i-1),bezIV.T(i-1));
+        bezSeg.AddPoint(bezIV.X(i),bezIV.Y(i),bezIV.T(i));
+        bezSeg.AddPoint(bezIV.X(i+1),bezIV.Y(i+1),bezIV.T(i+1));
+
+        int nSegSteps = int(Nsteps*((1.5*dist2next(bezIV,i-1))/bezIV.SpatialLength()));
+        IVlist.push_back(QuadraticBezierInterpolation(bezSeg,nSegSteps));
+    }
+
+    //the final segment is also just a straight line
+    InputVector lastSeg;
+    lastSeg.AddPoint(bezIV.X(bezIV.Length()-2),bezIV.Y(bezIV.Length()-2),bezIV.T(bezIV.Length()-2));
+    lastSeg.AddPoint(bezIV.X(bezIV.Length()-1),bezIV.Y(bezIV.Length()-1),bezIV.T(bezIV.Length()-1));
+    IVlist.push_back(lastSeg);
+
+    //combine all of the segments into a single input vector
+    InputVector combinedIV;
+    combinedIV = CombineInputVectors(IVlist);
     return combinedIV;
 }
 

@@ -43,119 +43,9 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     return newiv;
 }
 
-// Cubic Spline Interpolation
+
+//Cubic spline interpolation
 InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
-
-    const double length = iv.SpatialLength();
-
-    const unsigned int points = iv.Length();
-    int n = iv.Length() - 1;
-
-    double length_left = length;
-    int Nsteps_left = Nsteps;
-
-    double dist;
-
-    if (points <= 2) return SpatialInterpolation(iv, Nsteps);
-    // we add the last point twice, and then don't plot the last piece of the curve
-    //int size = iv.Length();
-    //iv.AddPoint(iv.X(size-1), iv.Y(size-1), iv.T(size-1));
-
-    InputVector newiv;
-
-    double a_x[n+1],alpha_x[n+1],b_x[n+1],d_x[n+1]; //keep track of spline coefficients in x
-    double a_y[n+1],alpha_y[n+1],b_y[n+1],d_y[n+1]; //keep track of spline coefficients in y
-
-    double h[n+1];
-    double t[n+1];
-
-    for(int i = 0; i < n+1; ++i) {
-        a_x[i] = iv.X(i);
-        a_y[i] = iv.Y(i);
-
-        h[i] = iv.T(i+1)-iv.T(i); //corresponds to difference in times.
-        t[i] = iv.T(i);
-    }
-
-    for(int i = 0; i < n; ++i) {
-        alpha_x[i] = 3*(a_x[i+1]-a_x[i])/h[i] - 3*(a_x[i]-a_x[i-1])/h[i-1];
-        alpha_y[i] = 3*(a_y[i+1]-a_y[i])/h[i] - 3*(a_y[i]-a_y[i-1])/h[i-1];
-    }
-
-    double c_x[n+1],z_x[n+1];
-    double c_y[n+1],z_y[n+1];
-
-    double l[n+1],mu[n+1];
-
-    l[0] = 1;
-    mu[0] = 0;
-
-    z_x[0] = 0;
-    z_y[0] = 0;
-
-    for(int i = 1; i < n; ++i)
-    {
-        l[i] = 2 *(t[i+1]-t[i-1])-h[i-1]*mu[i-1];
-        mu[i] = h[i]/l[i];
-
-        z_x[i] = (alpha_x[i]-h[i-1]*z_x[i-1])/l[i];
-        z_y[i] = (alpha_y[i]-h[i-1]*z_y[i-1])/l[i];
-    }
-
-    l[n] = 1;
-    z_x[n] = 0;
-    z_y[n] = 0;
-
-    c_x[n] = 0;
-    c_y[n] = 0;
-
-    for(int j = n-1; j >= 0; --j)
-    {
-        c_x[j] = z_x[j] - mu[j] * c_x[j+1];
-        c_y[j] = z_y[j] - mu[j] * c_y[j+1];
-
-        b_x[j] = (a_x[j+1]-a_x[j])/h[j]-h[j]*(c_x[j+1]+2*c_x[j])/3;
-        b_y[j] = (a_y[j+1]-a_y[j])/h[j]-h[j]*(c_y[j+1]+2*c_y[j])/3;
-
-        d_x[j] = (c_x[j+1]-c_x[j])/3/h[j];
-        d_y[j] = (c_y[j+1]-c_y[j])/3/h[j];
-    }
-
-    int time_points;
-    double current_time;
-    double newx, newy, newt;
-
-    // now, we are going to walk through each of the curves
-    for (unsigned int i = 0; i < points-1; i++) {
-        dist = sqrt(pow(a_x[i]-a_x[i+1],2)+pow(a_y[i]-a_y[i+1],2));
-        // begin by adding the first line
-        time_points = Nsteps_left*dist/length_left;
-
-        Nsteps_left = Nsteps_left - time_points;
-        length_left = length_left - dist;
-
-        if (i == points-2) time_points = Nsteps-newiv.Length();
-
-        // each curve goes from a time of 0, to a time of h(i)
-        for(int time = 0; time < time_points; time++) {
-            if (time_points != 1) current_time = double(time)/double(time_points-1);
-            else current_time = 1;
-
-            newx = a_x[i] + b_x[i] * current_time + c_x[i] * pow(current_time,2) + d_x[i] * pow(current_time,3);
-            newy = a_y[i] + b_y[i] * current_time + c_y[i] * pow(current_time,2) + d_y[i] * pow(current_time,3);
-            newt = (1-current_time)*iv.T(i) + current_time*iv.T(i+1);
-
-            newiv.AddPoint(newx, newy, newt);
-        }
-    }
-
-    return newiv;
-}
-
-
-
-//A cleaned up version of cubic spline interpolation
-InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
     const unsigned int nPoints = iv.Length();
     const unsigned int nSplines = nPoints-1;
 
@@ -227,7 +117,6 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
             newIV.AddPoint(newx,newy,newt);
         }
     }
-
     newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
 
     return newIV;

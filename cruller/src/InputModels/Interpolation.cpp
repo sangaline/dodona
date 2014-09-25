@@ -56,37 +56,40 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     //spline coefficiencts
     double ax[nSplines],bx[nSplines],cx[nSplines],dx[nSplines],alphax[nSplines],zx[nSplines];
     double ay[nSplines],by[nSplines],cy[nSplines],dy[nSplines],alphay[nSplines],zy[nSplines];
+    cx[0]=0; cy[0]=0;
 
     double tstep[nSplines],l[nSplines], mu[nSplines];
     l[0]=1; mu[0]=0; zx[0]=0; zy[0]=0;
 
     //calculate the spline coefficients
-    for(unsigned int i = 0; i < nSplines; i++)
-    {
+    for(unsigned int i = 0; i < nSplines; i++) {
         ax[i] = iv.X(i);
         ay[i] = iv.Y(i);
         tstep[i] = iv.T(i+1)-iv.T(i);
     }
-    ax[nSplines] = iv.X(nSplines); ay[nSplines] = iv.Y(nSplines);
+    ax[nSplines]=iv.X(nSplines); ay[nSplines]=iv.Y(nSplines);
 
-    for(unsigned int i = 1; i < nSplines; i++)
-    {
+    for(unsigned int i = 1; i < nSplines; i++) {
         alphax[i] = 3*(ax[i+1]-ax[i])/tstep[i] - 3*(ax[i]-ax[i-1])/tstep[i-1];
         alphay[i] = 3*(ay[i+1]-ay[i])/tstep[i] - 3*(ay[i]-ay[i-1])/tstep[i-1];
 
-        l[i] = 2*(iv.T(i+1)-iv.T(i-1))-tstep[i-1]*mu[i-1];
+        l[i] = 2*(tstep[i]+tstep[i-1])-tstep[i-1]*mu[i-1];
         mu[i]= tstep[i]/l[i];
 
         zx[i] = (alphax[i]-tstep[i-1]*zx[i-1])/l[i];
         zy[i] = (alphay[i]-tstep[i-1]*zy[i-1])/l[i];
     }
 
-    l[nSplines]=1; zx[nSplines]=0; zy[nSplines]=0; cx[nSplines]=0; cy[nSplines]=0;
+//    l[nSplines]=1; zx[nSplines]=0; zy[nSplines]=0; cx[nSplines]=0; cy[nSplines]=0;
+    l[nSplines-1]=1; zx[nSplines-1]=0; zy[nSplines-1]=0; cx[nSplines]=0; cy[nSplines]=0;
 
     for(int i = nSplines-1; i >= 0; i--)
     {
-        cx[i] = zx[i] - mu[i]*cx[i+1];
-        cy[i] = zy[i] - mu[i]*cy[i+1];
+        if(i != 0)
+        {
+            cx[i] = zx[i] - mu[i]*cx[i+1];
+            cy[i] = zy[i] - mu[i]*cy[i+1];
+        }
 
         bx[i] = (ax[i+1]-ax[i])/tstep[i] - tstep[i]*(cx[i+1]+2*cx[i])/3;
         by[i] = (ay[i+1]-ay[i])/tstep[i] - tstep[i]*(cy[i+1]+2*cy[i])/3;
@@ -99,14 +102,15 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     InputVector newIV;
     
     //walk through each spline function to add to the new input vector
-    for(unsigned int i = 0; i < nSplines; i++)
-    {
+    for(unsigned int i = 0; i < nSplines; i++) {
         double newx, newy, newt;
         double step; 
         int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
 
-        for(unsigned int j = 0; j < nSteps; j++)
-        {
+        std::cout << std::endl << "ax[" << i << "] = " << ax[i] << "   bx[" << i << "] = " << bx[i] << "   cx[" << i << "] = " << cx[i] << "   dx[" << i << "] = " << dx[i] << std::endl;
+        std::cout << "ay[" << i << "] = " << ay[i] << "   by[" << i << "] = " << by[i] << "   cy[" << i << "] = " << cy[i] << "   dy[" << i << "] = " << dy[i] << std::endl << std::endl;
+
+        for(unsigned int j = 0; j < nSteps; j++) {
             if(nSteps == 1) step = 1;
             else step = double(j)/double(nSteps);
 
@@ -117,7 +121,8 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
             newIV.AddPoint(newx,newy,newt);
         }
     }
-    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
+    newIV.AddPoint(iv.X(1),iv.Y(1),iv.T(1));
+//    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
 
     return newIV;
 }
@@ -136,14 +141,12 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
     InputVector bezIV;
 
     bezIV.AddPoint(iv.X(0),iv.Y(0),iv.T(0));
-    for(unsigned int i = 1; i < nPoints-1; i++)
-    {
+    for(unsigned int i = 1; i < nPoints-1; i++) {
         bezIV.AddPoint(iv.X(i)-(iv.X(i)-iv.X(i-1))/4,iv.Y(i)-(iv.Y(i)-iv.Y(i-1))/4,iv.T(i)-(iv.T(i)-iv.T(i-1))/4);
         bezIV.AddPoint(iv.X(i),iv.Y(i),iv.T(i));
         bezIV.AddPoint(iv.X(i)+(iv.X(i+1)-iv.X(i))/4,iv.Y(i)+(iv.Y(i+1)-iv.Y(i))/4,iv.T(i)+(iv.T(i+1)-iv.T(i))/4);
     }
     bezIV.AddPoint(iv.X(nPoints-1),iv.Y(nPoints-1),iv.T(nPoints-1));
-
 
     //Create a list of input vectors corresponding to the different segments of the swype pattern.
     //These will all be combined in end to form the final swype pattern
@@ -156,8 +159,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
     IVlist.push_back(firstSeg);
 
     //create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
-    for(unsigned int i = 2; i < nBezPoints; i+=3)
-    {
+    for(unsigned int i = 2; i < nBezPoints; i+=3) {
         //Create the next input vector segment to be bezier interpolated
         InputVector bezSeg;
         bezSeg.AddPoint(bezIV.X(i-1),bezIV.Y(i-1),bezIV.T(i-1));
@@ -195,8 +197,7 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     InputVector bezIV;
 
     bezIV.AddPoint(iv.X(0),iv.Y(0),iv.T(0));
-    for(unsigned int i = 1; i < nPoints; i++)
-    {
+    for(unsigned int i = 1; i < nPoints; i++) {
         bezIV.AddPoint((iv.X(i)+iv.X(i-1))/2.0,(iv.Y(i)+iv.Y(i-1))/2.0,(iv.T(i)+iv.T(i-1))/2.0);
         bezIV.AddPoint(iv.X(i),iv.Y(i),iv.T(i));
     }
@@ -211,8 +212,7 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     IVlist.push_back(firstSeg);
 
     //create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
-    for(unsigned int i = 2; i < nBezPoints-1; i+=2)
-    {
+    for(unsigned int i = 2; i < nBezPoints-1; i+=2) {
         //Create the next input vector segment to be bezier interpolated
         InputVector bezSeg;
         bezSeg.AddPoint(bezIV.X(i-1),bezIV.Y(i-1),bezIV.T(i-1));
@@ -244,9 +244,9 @@ InputVector QuadraticBezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 
     for(unsigned int i = 0; i <= Nsteps; i++)
     {
+        //find the endpoints for the line that contains the new points (as a function of t)
         double px1 = iv.X(0)+(iv.X(1)-iv.X(0))*(i/double(Nsteps));
         double py1 = iv.Y(0)+(iv.Y(1)-iv.Y(0))*(i/double(Nsteps));
-
         double px2 = iv.X(1)+(iv.X(2)-iv.X(1))*(i/double(Nsteps));
         double py2 = iv.Y(1)+(iv.Y(2)-iv.Y(1))*(i/double(Nsteps));
 
@@ -264,20 +264,15 @@ InputVector QuadraticBezierInterpolation(InputVector& iv, unsigned int Nsteps) {
 InputVector CombineInputVectors(std::vector<InputVector> IVvect) {
     InputVector newIV;
 
-    for(unsigned int i = 0; i < IVvect.size(); i++)
-    {
-        if(i==0)
-        {
-            for(unsigned int j=0; j < IVvect[i].Length(); j++)
-            {
+    for(unsigned int i = 0; i < IVvect.size(); i++) {
+        if(i==0) {
+            for(unsigned int j=0; j < IVvect[i].Length(); j++) {
                 newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
             }
         }
 
-        else
-        {
-            for(unsigned int j=1; j < IVvect[i].Length(); j++)
-            {
+        else {
+            for(unsigned int j=1; j < IVvect[i].Length(); j++) {
                 newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
             }
         }

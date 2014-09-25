@@ -83,10 +83,8 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
 //    l[nSplines]=1; zx[nSplines]=0; zy[nSplines]=0; cx[nSplines]=0; cy[nSplines]=0;
     l[nSplines-1]=1; zx[nSplines-1]=0; zy[nSplines-1]=0; cx[nSplines]=0; cy[nSplines]=0;
 
-    for(int i = nSplines-1; i >= 0; i--)
-    {
-        if(i != 0)
-        {
+    for(int i = nSplines-1; i >= 0; i--) {
+        if(i != 0) {
             cx[i] = zx[i] - mu[i]*cx[i+1];
             cy[i] = zy[i] - mu[i]*cy[i+1];
         }

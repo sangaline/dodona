@@ -80,8 +80,8 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
         zy[i] = (alphay[i]-tstep[i-1]*zy[i-1])/l[i];
     }
 
-//    l[nSplines]=1; zx[nSplines]=0; zy[nSplines]=0; cx[nSplines]=0; cy[nSplines]=0;
-    l[nSplines-1]=1; zx[nSplines-1]=0; zy[nSplines-1]=0; cx[nSplines]=0; cy[nSplines]=0;
+    l[nSplines]=1; zx[nSplines]=0; zy[nSplines]=0; cx[nSplines]=0; cy[nSplines]=0;
+//    l[nSplines-1]=1; zx[nSplines-1]=0; zy[nSplines-1]=0; cx[nSplines]=0; cy[nSplines]=0;
 
     for(int i = nSplines-1; i >= 0; i--) {
         if(i != 0) {
@@ -105,8 +105,8 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
         double step; 
         int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
 
-        std::cout << std::endl << "ax[" << i << "] = " << ax[i] << "   bx[" << i << "] = " << bx[i] << "   cx[" << i << "] = " << cx[i] << "   dx[" << i << "] = " << dx[i] << std::endl;
-        std::cout << "ay[" << i << "] = " << ay[i] << "   by[" << i << "] = " << by[i] << "   cy[" << i << "] = " << cy[i] << "   dy[" << i << "] = " << dy[i] << std::endl << std::endl;
+//        std::cout << std::endl << "ax[" << i << "] = " << ax[i] << "   bx[" << i << "] = " << bx[i] << "   cx[" << i << "] = " << cx[i] << "   dx[" << i << "] = " << dx[i] << std::endl;
+//        std::cout << "ay[" << i << "] = " << ay[i] << "   by[" << i << "] = " << by[i] << "   cy[" << i << "] = " << cy[i] << "   dy[" << i << "] = " << dy[i] << std::endl << std::endl;
 
         for(unsigned int j = 0; j < nSteps; j++) {
             if(nSteps == 1) step = 1;
@@ -119,9 +119,99 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
             newIV.AddPoint(newx,newy,newt);
         }
     }
-    newIV.AddPoint(iv.X(1),iv.Y(1),iv.T(1));
-//    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
+    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
 
+    return newIV;
+}
+
+
+//New cubic spline interpolation function
+InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
+    const unsigned int nPoints = iv.Length();
+    const unsigned int nSplines = nPoints-1;
+
+    if (nPoints <= 2)
+        return SpatialInterpolation(iv,Nsteps);
+
+    //spline coefficients
+    double ax[nSplines],bx[nSplines],cx[nSplines],dx[nSplines];
+    double ay[nSplines],by[nSplines],cy[nSplines],dy[nSplines];
+
+    //algorithm coefficients
+    double Dx[nPoints],cpx[nSplines],dpx[nPoints];
+    double Dy[nPoints],cpy[nSplines],dpy[nPoints];
+
+    //first step of tridiagonal matrix algorithm, a forward step to modify the coefficients
+    for(unsigned int i=0; i < nPoints; i++) {
+        if(i==0) {
+            cpx[i] = 0.5;
+            cpy[i] = 0.5;
+
+            dpx[i] = 0.5*3*(iv.X(i+1)-iv.X(i));
+            dpy[i] = 0.5*3*(iv.Y(i+1)-iv.Y(i));
+        }
+        else if (i < nPoints-1) {
+            cpx[i] = 1.0/(4-cpx[i-1]);
+            cpy[i] = 1.0/(4-cpy[i-1]);
+
+            dpx[i] = (3*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(2-cpx[i-1]);
+            dpy[i] = (3*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(2-cpy[i-1]); 
+        }
+        else {
+            dpx[i] = (3*(iv.X(i)-iv.X(i-1))-dpx[i-1])/(2-cpx[i-1]);
+            dpy[i] = (3*(iv.Y(i)-iv.Y(i-1))-dpy[i-1])/(2-cpy[i-1]); 
+        }
+    }
+
+    //Backward substitution step of tridiagnoal matrix algorithm.
+    //This obtains the value of the derivative of the interpolation curve at each point.
+    for(int i=nPoints-1; i>=0; i--) {
+        if(i==nPoints-1) {
+            Dx[i] = dpx[i];
+            Dy[i] = dpy[i];
+        }
+        else {
+            Dx[i] = dpx[i]-cpx[i]*Dx[i+1];
+            Dy[i] = dpy[i]-cpy[i]*Dy[i+1];
+        }
+    }
+
+    //Calculate all of the spline coefficients
+    for(unsigned int i=0; i < nSplines; i++) {
+        ax[i] = iv.X(i); ay[i] = iv.Y(i);
+        bx[i] = Dx[i]; by[i] = Dy[i];
+
+        cx[i] = 3*(iv.X(i+1)-iv.X(i)) - 2*Dx[i] - Dx[i+1];
+        cy[i] = 3*(iv.Y(i+1)-iv.Y(i)) - 2*Dy[i] - Dy[i+1];
+
+        dx[i] = 2*(iv.X(i)-iv.X(i+1)) + Dx[i] + Dx[i+1];
+        dy[i] = 2*(iv.Y(i)-iv.Y(i+1)) + Dy[i] + Dy[i+1];
+    }
+
+    //create new InputVector by walking through each spline curve
+    InputVector newIV;
+
+    for(unsigned int i=0; i < nSplines; i++) {
+        double newX, newY, newT, step;
+        int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
+
+        for(unsigned int j=0; j < nSteps; j++) {
+            if(nSteps==1) step = 1;
+            else step = double(j)/double(nSteps);
+
+            newX = ax[i] + bx[i]*step + cx[i]*pow(step,2) + dx[i]*pow(step,3);
+            newY = ay[i] + by[i]*step + cy[i]*pow(step,2) + dy[i]*pow(step,3);
+        
+//            newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+//            newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);
+            
+            newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step;
+
+            newIV.AddPoint(newX,newY,newT);
+        }
+    }
+
+    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
     return newIV;
 }
 

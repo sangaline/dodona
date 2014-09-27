@@ -147,19 +147,19 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
             cpx[i] = 0.5;
             cpy[i] = 0.5;
 
-            dpx[i] = 0.5*3*(iv.X(i+1)-iv.X(i));
-            dpy[i] = 0.5*3*(iv.Y(i+1)-iv.Y(i));
+            dpx[i] = 0.5*3.0*(iv.X(i+1)-iv.X(i));
+            dpy[i] = 0.5*3.0*(iv.Y(i+1)-iv.Y(i));
         }
         else if (i < nPoints-1) {
-            cpx[i] = 1.0/(4-cpx[i-1]);
-            cpy[i] = 1.0/(4-cpy[i-1]);
+            cpx[i] = 1.0/(4.0-cpx[i-1]);
+            cpy[i] = 1.0/(4.0-cpy[i-1]);
 
-            dpx[i] = (3*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(2-cpx[i-1]);
-            dpy[i] = (3*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(2-cpy[i-1]); 
+            dpx[i] = (3.0*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(4.0-cpx[i-1]);
+            dpy[i] = (3.0*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(4.0-cpy[i-1]); 
         }
         else {
-            dpx[i] = (3*(iv.X(i)-iv.X(i-1))-dpx[i-1])/(2-cpx[i-1]);
-            dpy[i] = (3*(iv.Y(i)-iv.Y(i-1))-dpy[i-1])/(2-cpy[i-1]); 
+            dpx[i] = (3.0*(iv.X(i)-iv.X(i-1))-dpx[i-1])/(2.0-cpx[i-1]);
+            dpy[i] = (3.0*(iv.Y(i)-iv.Y(i-1))-dpy[i-1])/(2.0-cpy[i-1]); 
         }
     }
 
@@ -176,18 +176,6 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
         }
     }
 
-    //Calculate all of the spline coefficients
-    for(unsigned int i=0; i < nSplines; i++) {
-        ax[i] = iv.X(i); ay[i] = iv.Y(i);
-        bx[i] = Dx[i]; by[i] = Dy[i];
-
-        cx[i] = 3*(iv.X(i+1)-iv.X(i)) - 2*Dx[i] - Dx[i+1];
-        cy[i] = 3*(iv.Y(i+1)-iv.Y(i)) - 2*Dy[i] - Dy[i+1];
-
-        dx[i] = 2*(iv.X(i)-iv.X(i+1)) + Dx[i] + Dx[i+1];
-        dy[i] = 2*(iv.Y(i)-iv.Y(i+1)) + Dy[i] + Dy[i+1];
-    }
-
     //create new InputVector by walking through each spline curve
     InputVector newIV;
 
@@ -199,12 +187,8 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
             if(nSteps==1) step = 1;
             else step = double(j)/double(nSteps);
 
-            newX = ax[i] + bx[i]*step + cx[i]*pow(step,2) + dx[i]*pow(step,3);
-            newY = ay[i] + by[i]*step + cy[i]*pow(step,2) + dy[i]*pow(step,3);
-        
-//            newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
-//            newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);
-            
+            newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+            newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
             newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step;
 
             newIV.AddPoint(newX,newY,newT);

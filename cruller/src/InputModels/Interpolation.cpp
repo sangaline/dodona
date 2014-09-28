@@ -105,9 +105,6 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
         double step; 
         int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
 
-//        std::cout << std::endl << "ax[" << i << "] = " << ax[i] << "   bx[" << i << "] = " << bx[i] << "   cx[" << i << "] = " << cx[i] << "   dx[" << i << "] = " << dx[i] << std::endl;
-//        std::cout << "ay[" << i << "] = " << ay[i] << "   by[" << i << "] = " << by[i] << "   cy[" << i << "] = " << cy[i] << "   dy[" << i << "] = " << dy[i] << std::endl << std::endl;
-
         for(unsigned int j = 0; j < nSteps; j++) {
             if(nSteps == 1) step = 1;
             else step = double(j)/double(nSteps);
@@ -132,10 +129,6 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
 
     if (nPoints <= 2)
         return SpatialInterpolation(iv,Nsteps);
-
-    //spline coefficients
-    double ax[nSplines],bx[nSplines],cx[nSplines],dx[nSplines];
-    double ay[nSplines],by[nSplines],cy[nSplines],dy[nSplines];
 
     //algorithm coefficients
     double Dx[nPoints],cpx[nSplines],dpx[nPoints];
@@ -178,7 +171,6 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
 
     //create new InputVector by walking through each spline curve
     InputVector newIV;
-
     for(unsigned int i=0; i < nSplines; i++) {
         double newX, newY, newT, step;
         int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
@@ -191,10 +183,13 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
             newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
             newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step;
 
+            if(i==0) {
+                newX = iv.X(i) - Dx[i]*step + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+                newY = iv.Y(i) - Dy[i]*step + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);
+            }
             newIV.AddPoint(newX,newY,newT);
         }
     }
-
     newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
     return newIV;
 }

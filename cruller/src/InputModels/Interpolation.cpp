@@ -2,6 +2,59 @@
 
 #include "math.h"
 
+//Helper functions
+namespace {
+    //This function simply returns the list of points from a quadratic bezier interpolation
+    //of three control points.
+    InputVector QuadraticBezierInterpolation(InputVector& iv, unsigned int Nsteps) {
+        InputVector newIV;
+
+        for(unsigned int i = 0; i <= Nsteps; i++)
+        {
+            //find the endpoints for the line that contains the new points (as a function of t)
+            double px1 = iv.X(0)+(iv.X(1)-iv.X(0))*(i/double(Nsteps));
+            double py1 = iv.Y(0)+(iv.Y(1)-iv.Y(0))*(i/double(Nsteps));
+            double px2 = iv.X(1)+(iv.X(2)-iv.X(1))*(i/double(Nsteps));
+            double py2 = iv.Y(1)+(iv.Y(2)-iv.Y(1))*(i/double(Nsteps));
+
+            double newT = iv.T(0)+(iv.T(2)-iv.T(0))*(i/double(Nsteps));
+
+            newIV.AddPoint(px1+(px2-px1)*(i/double(Nsteps)),py1+(py2-py1)*(i/double(Nsteps)),newT);
+        }
+
+        return newIV;
+    }
+
+
+    //Helper function that combines a vector of InputVectors into a single continuous InputVector.
+    //The input vectors must be ordered correctly in the vector
+    InputVector CombineInputVectors(std::vector<InputVector> IVvect) {
+        InputVector newIV;
+
+        for(unsigned int i = 0; i < IVvect.size(); i++) {
+            if(i==0) {
+                for(unsigned int j=0; j < IVvect[i].Length(); j++) {
+                    newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
+                }
+            }
+
+            else {
+                for(unsigned int j=1; j < IVvect[i].Length(); j++) {
+                    newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
+                }
+            }
+        }
+
+        return newIV;
+    }
+
+
+    //Helper function that returns the distance between point i in input vector iv and the next point in iv
+    double DistanceToNextPoint(InputVector& iv, unsigned int i) {
+        return sqrt(pow(iv.X(i+1)-iv.X(i),2) + pow(iv.Y(i+1)-iv.Y(i),2));
+    }
+}
+
 InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     const double length = iv.SpatialLength();
     const unsigned int points = iv.Length();
@@ -103,7 +156,7 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     for(unsigned int i = 0; i < nSplines; i++) {
         double newx, newy, newt;
         double step; 
-        int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
+        int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
 
         for(unsigned int j = 0; j < nSteps; j++) {
             if(nSteps == 1) step = 1;
@@ -173,7 +226,7 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
     InputVector newIV;
     for(unsigned int i=0; i < nSplines; i++) {
         double newX, newY, newT, step;
-        int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
+        int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
 
         for(unsigned int j=0; j < nSteps; j++) {
             if(nSteps==1) step = 1;
@@ -233,7 +286,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
         bezSeg.AddPoint(bezIV.X(i),bezIV.Y(i),bezIV.T(i));
         bezSeg.AddPoint(bezIV.X(i+1),bezIV.Y(i+1),bezIV.T(i+1));
 
-        int nSegSteps = int(Nsteps*((1.5*dist2next(bezIV,i-1))/bezIV.SpatialLength()));
+        int nSegSteps = int(Nsteps*((1.5*DistanceToNextPoint(bezIV,i-1))/bezIV.SpatialLength()));
         IVlist.push_back(QuadraticBezierInterpolation(bezSeg,nSegSteps));
 
         //Create the next linear segment that connects neighboring bezier segments
@@ -286,7 +339,7 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
         bezSeg.AddPoint(bezIV.X(i),bezIV.Y(i),bezIV.T(i));
         bezSeg.AddPoint(bezIV.X(i+1),bezIV.Y(i+1),bezIV.T(i+1));
 
-        int nSegSteps = int(Nsteps*((1.5*dist2next(bezIV,i-1))/bezIV.SpatialLength()));
+        int nSegSteps = int(Nsteps*((1.5*DistanceToNextPoint(bezIV,i-1))/bezIV.SpatialLength()));
         IVlist.push_back(QuadraticBezierInterpolation(bezSeg,nSegSteps));
     }
 
@@ -302,55 +355,4 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     return combinedIV;
 }
 
-
-//Helper function for the bezier interpolation.
-//This function simply returns the list of points from a quadratic bezier interpolation
-//of three control points.
-InputVector QuadraticBezierInterpolation(InputVector& iv, unsigned int Nsteps) {
-    InputVector newIV;
-
-    for(unsigned int i = 0; i <= Nsteps; i++)
-    {
-        //find the endpoints for the line that contains the new points (as a function of t)
-        double px1 = iv.X(0)+(iv.X(1)-iv.X(0))*(i/double(Nsteps));
-        double py1 = iv.Y(0)+(iv.Y(1)-iv.Y(0))*(i/double(Nsteps));
-        double px2 = iv.X(1)+(iv.X(2)-iv.X(1))*(i/double(Nsteps));
-        double py2 = iv.Y(1)+(iv.Y(2)-iv.Y(1))*(i/double(Nsteps));
-
-        double newT = iv.T(0)+(iv.T(2)-iv.T(0))*(i/double(Nsteps));
-
-        newIV.AddPoint(px1+(px2-px1)*(i/double(Nsteps)),py1+(py2-py1)*(i/double(Nsteps)),newT);
-    }
-
-    return newIV;
-}
-
-
-//Helper function that combines a vector of InputVectors into a single continuous InputVector.
-//The input vectors must be ordered correctly in the vector
-InputVector CombineInputVectors(std::vector<InputVector> IVvect) {
-    InputVector newIV;
-
-    for(unsigned int i = 0; i < IVvect.size(); i++) {
-        if(i==0) {
-            for(unsigned int j=0; j < IVvect[i].Length(); j++) {
-                newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
-            }
-        }
-
-        else {
-            for(unsigned int j=1; j < IVvect[i].Length(); j++) {
-                newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
-            }
-        }
-    }
-
-    return newIV;
-}
-
-
-//Helper function that returns the distance between point i in input vector iv and the next point in iv
-double dist2next(InputVector& iv, unsigned int i) {
-    return sqrt(pow(iv.X(i+1)-iv.X(i),2) + pow(iv.Y(i+1)-iv.Y(i),2));
-}
 

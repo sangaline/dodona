@@ -156,7 +156,7 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     for(unsigned int i = 0; i < nSplines; i++) {
         double newx, newy, newt;
         double step; 
-        int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
+        unsigned int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
 
         for(unsigned int j = 0; j < nSteps; j++) {
             if(nSteps == 1) step = 1;
@@ -211,22 +211,22 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
 
     //Backward substitution step of tridiagnoal matrix algorithm.
     //This obtains the value of the derivative of the interpolation curve at each point.
-    for(int i=nPoints-1; i>=0; i--) {
-        if(i==nPoints-1) {
-            Dx[i] = dpx[i];
-            Dy[i] = dpy[i];
-        }
-        else {
-            Dx[i] = dpx[i]-cpx[i]*Dx[i+1];
-            Dy[i] = dpy[i]-cpy[i]*Dy[i+1];
-        }
+    if(nPoints > 0) {
+        unsigned int i = nPoints - 1;
+        Dx[i] = dpx[i];
+        Dy[i] = dpy[i];
+        while(i > 0) {
+             Dx[i-1] = dpx[i-1]-cpx[i-1]*Dx[i];
+             Dy[i-1] = dpy[i-1]-cpy[i-1]*Dy[i];
+             i--;
+         }
     }
 
     //create new InputVector by walking through each spline curve
     InputVector newIV;
     for(unsigned int i=0; i < nSplines; i++) {
         double newX, newY, newT, step;
-        int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
+        unsigned int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
 
         for(unsigned int j=0; j < nSteps; j++) {
             if(nSteps==1) step = 1;

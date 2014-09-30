@@ -169,6 +169,10 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
         }
     }
 
+    //Attempt at fixing the first derivative with an estimate 
+//    Dx[0] = (iv.X(1)-iv.X(0))/(iv.T(1)-iv.T(0));
+//    Dy[0] = (iv.Y(1)-iv.Y(0))/(iv.T(1)-iv.T(0));
+
     //create new InputVector by walking through each spline curve
     InputVector newIV;
     for(unsigned int i=0; i < nSplines; i++) {
@@ -181,12 +185,8 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
 
             newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
             newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
-            newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step;
+            newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
 
-            if(i==0) {
-                newX = iv.X(i) - Dx[i]*step + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
-                newY = iv.Y(i) - Dy[i]*step + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);
-            }
             newIV.AddPoint(newX,newY,newT);
         }
     }

@@ -2,6 +2,65 @@
 
 #include "math.h"
 
+//Helper functions
+namespace {
+    //This function simply returns the list of points from a quadratic bezier interpolation
+    //of three control points.
+    InputVector QuadraticBezierInterpolation(InputVector& iv, unsigned int Nsteps) {
+        InputVector newIV;
+
+        for(unsigned int i = 0; i <= Nsteps; i++)
+        {
+            //find the endpoints for the line that contains the new points (as a function of t)
+            double px1 = iv.X(0)+(iv.X(1)-iv.X(0))*(i/double(Nsteps));
+            double py1 = iv.Y(0)+(iv.Y(1)-iv.Y(0))*(i/double(Nsteps));
+            double px2 = iv.X(1)+(iv.X(2)-iv.X(1))*(i/double(Nsteps));
+            double py2 = iv.Y(1)+(iv.Y(2)-iv.Y(1))*(i/double(Nsteps));
+
+            double newT = iv.T(0)+(iv.T(2)-iv.T(0))*(i/double(Nsteps));
+
+            newIV.AddPoint(px1+(px2-px1)*(i/double(Nsteps)),py1+(py2-py1)*(i/double(Nsteps)),newT);
+        }
+
+        return newIV;
+    }
+
+
+    //Helper function that combines a vector of InputVectors into a single continuous InputVector.
+    //The input vectors must be ordered correctly in the vector
+    InputVector CombineInputVectors(std::vector<InputVector> IVvect) {
+        InputVector newIV;
+
+        for(unsigned int i = 0; i < IVvect.size(); i++) {
+            if(i==0) {
+                for(unsigned int j=0; j < IVvect[i].Length(); j++) {
+                    newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
+                }
+            }
+
+            else {
+                for(unsigned int j=1; j < IVvect[i].Length(); j++) {
+                    newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
+                }
+            }
+        }
+
+        return newIV;
+    }
+
+
+    //Helper function that returns the distance between point i in input vector iv and the next point in iv
+    double DistanceToNextPoint(InputVector& iv, unsigned int i) {
+        return sqrt(pow(iv.X(i+1)-iv.X(i),2) + pow(iv.Y(i+1)-iv.Y(i),2));
+    }
+
+    //Hermite basis functions for cubic spline interpolation
+    inline double h00(double t) { return 2.0*t*t*t - 3.0*t*t + 1.0; }
+    inline double h10(double t) { return t*t*t - 2.0*t*t + t; }
+    inline double h01(double t) { return -2.0*t*t*t + 3.0*t*t; }
+    inline double h11(double t) { return t*t*t - t*t; }
+}
+
 InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     const double length = iv.SpatialLength();
     const unsigned int points = iv.Length();
@@ -43,6 +102,92 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     return newiv;
 }
 
+InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool monotonic) {
+    const unsigned int points = iv.Length();
+
+    double *t = new double [points];
+    double *y[2] = {new double [points], new double [points]};
+    for(unsigned int i = 0; i <  points; i++) {
+        t[i] = iv.T(i);
+        y[0][i] = iv.X(i);
+        y[1][i] = iv.Y(i);
+    }
+    //slopes of the secant lines
+    double *delta[2] = {new double [points-1], new double [points-1]};
+    //tangents at each data point (average of the secants)
+    double *m[2] = {new double [points], new double [points]};
+
+    for(unsigned int dimension = 0; dimension < 2; dimension++) {
+        for(unsigned int i = 0; i <  points - 1; i++) {
+            delta[dimension][i] = (y[dimension][i+1] - y[dimension][i])/(t[i+1] - t[i]);
+        }
+        //one-sided differences for the endpoints
+        m[dimension][0] = delta[dimension][0];
+        m[dimension][points - 1] = delta[dimension][points - 2];
+        for(unsigned int i = 1; i <  points - 1; i++) {
+            m[dimension][i] = 0.5*(delta[dimension][i-1] + delta[dimension][i]);
+        }
+        if(monotonic) {
+            for(unsigned int i = 0; i <  points - 1; i++) {
+                //cases where the point is an extremum
+                if( y[dimension][i] == y[dimension][i+1]
+                        || (i > 0 &&
+                           ((y[dimension][i] >= y[dimension][i-1] && y[dimension][i] >= y[dimension][i+1])
+                           || (y[dimension][i] <= y[dimension][i-1] && y[dimension][i] <= y[dimension][i+1])))) {
+                    m[dimension][i] = 0;
+                    continue;
+                }
+                //check for and eliminate overshoot
+                const double alpha = m[dimension][i]/delta[dimension][i];
+                const double beta = m[dimension][i+1]/delta[dimension][i];
+                const double sum2 = alpha*alpha + beta*beta;
+                if(sum2 > 9) {
+                    const double tau = 3.0/sqrt(sum2);
+                    m[dimension][i] = tau*alpha*delta[dimension][i];
+                    m[dimension][i+1] = tau*beta*delta[dimension][i];
+
+                }
+            }
+        }
+    }
+
+    //create the new interpolated vector
+    InputVector newiv;
+    newiv.AddPoint(iv.X(0), iv.Y(0), iv.T(0));
+    const double start_time = iv.T(0), end_time = iv.T(-1);
+    const double total_time = end_time - start_time;
+    unsigned int lower = 0;
+    for(unsigned int i = 1; i < Nsteps-1; i++) {
+        double current_time = start_time + total_time*double(i)/double(Nsteps - 1);
+        while(iv.T(lower+1) < current_time) {
+            lower++;
+        }
+        const unsigned int upper = lower + 1;
+        const double h = iv.T(upper) - iv.T(lower);
+        const double t = (current_time - iv.T(lower))/h;
+
+        const double current_x = iv.X(lower)*h00(t) + h*m[0][lower]*h10(t) + iv.X(upper)*h01(t) + h*m[0][upper]*h11(t);
+        const double current_y = iv.Y(lower)*h00(t) + h*m[1][lower]*h10(t) + iv.Y(upper)*h01(t) + h*m[1][upper]*h11(t);
+
+        newiv.AddPoint(current_x, current_y, current_time);
+    }
+    if(Nsteps > 1) {
+        newiv.AddPoint(iv.X(-1), iv.Y(-1), iv.T(-1));
+    }
+
+    delete [] t;
+    for(unsigned int dimension = 0; dimension < 2; dimension++) {
+        delete [] m[dimension];
+        delete [] y[dimension];
+        delete [] delta[dimension];
+    }
+
+    return newiv;
+}
+
+InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    return HermiteCubicInterpolation(iv, Nsteps, true);
+}
 
 //Cubic spline interpolation
 InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
@@ -103,7 +248,7 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     for(unsigned int i = 0; i < nSplines; i++) {
         double newx, newy, newt;
         double step; 
-        int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
+        unsigned int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
 
         for(unsigned int j = 0; j < nSteps; j++) {
             if(nSteps == 1) step = 1;
@@ -158,15 +303,15 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
 
     //Backward substitution step of tridiagnoal matrix algorithm.
     //This obtains the value of the derivative of the interpolation curve at each point.
-    for(int i=nPoints-1; i>=0; i--) {
-        if(i==nPoints-1) {
-            Dx[i] = dpx[i];
-            Dy[i] = dpy[i];
-        }
-        else {
-            Dx[i] = dpx[i]-cpx[i]*Dx[i+1];
-            Dy[i] = dpy[i]-cpy[i]*Dy[i+1];
-        }
+    if(nPoints > 0) {
+        unsigned int i = nPoints - 1;
+        Dx[i] = dpx[i];
+        Dy[i] = dpy[i];
+        while(i > 0) {
+             Dx[i-1] = dpx[i-1]-cpx[i-1]*Dx[i];
+             Dy[i-1] = dpy[i-1]-cpy[i-1]*Dy[i];
+             i--;
+         }
     }
 
     //Attempt at fixing the first derivative with an estimate 
@@ -177,7 +322,7 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
     InputVector newIV;
     for(unsigned int i=0; i < nSplines; i++) {
         double newX, newY, newT, step;
-        int nSteps = int(Nsteps*dist2next(iv,i)/iv.SpatialLength());
+        unsigned int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
 
         for(unsigned int j=0; j < nSteps; j++) {
             if(nSteps==1) step = 1;
@@ -233,7 +378,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
         bezSeg.AddPoint(bezIV.X(i),bezIV.Y(i),bezIV.T(i));
         bezSeg.AddPoint(bezIV.X(i+1),bezIV.Y(i+1),bezIV.T(i+1));
 
-        int nSegSteps = int(Nsteps*((1.5*dist2next(bezIV,i-1))/bezIV.SpatialLength()));
+        int nSegSteps = int(Nsteps*((1.5*DistanceToNextPoint(bezIV,i-1))/bezIV.SpatialLength()));
         IVlist.push_back(QuadraticBezierInterpolation(bezSeg,nSegSteps));
 
         //Create the next linear segment that connects neighboring bezier segments
@@ -286,7 +431,7 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
         bezSeg.AddPoint(bezIV.X(i),bezIV.Y(i),bezIV.T(i));
         bezSeg.AddPoint(bezIV.X(i+1),bezIV.Y(i+1),bezIV.T(i+1));
 
-        int nSegSteps = int(Nsteps*((1.5*dist2next(bezIV,i-1))/bezIV.SpatialLength()));
+        int nSegSteps = int(Nsteps*((1.5*DistanceToNextPoint(bezIV,i-1))/bezIV.SpatialLength()));
         IVlist.push_back(QuadraticBezierInterpolation(bezSeg,nSegSteps));
     }
 
@@ -302,55 +447,4 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     return combinedIV;
 }
 
-
-//Helper function for the bezier interpolation.
-//This function simply returns the list of points from a quadratic bezier interpolation
-//of three control points.
-InputVector QuadraticBezierInterpolation(InputVector& iv, unsigned int Nsteps) {
-    InputVector newIV;
-
-    for(unsigned int i = 0; i <= Nsteps; i++)
-    {
-        //find the endpoints for the line that contains the new points (as a function of t)
-        double px1 = iv.X(0)+(iv.X(1)-iv.X(0))*(i/double(Nsteps));
-        double py1 = iv.Y(0)+(iv.Y(1)-iv.Y(0))*(i/double(Nsteps));
-        double px2 = iv.X(1)+(iv.X(2)-iv.X(1))*(i/double(Nsteps));
-        double py2 = iv.Y(1)+(iv.Y(2)-iv.Y(1))*(i/double(Nsteps));
-
-        double newT = iv.T(0)+(iv.T(2)-iv.T(0))*(i/double(Nsteps));
-
-        newIV.AddPoint(px1+(px2-px1)*(i/double(Nsteps)),py1+(py2-py1)*(i/double(Nsteps)),newT);
-    }
-
-    return newIV;
-}
-
-
-//Helper function that combines a vector of InputVectors into a single continuous InputVector.
-//The input vectors must be ordered correctly in the vector
-InputVector CombineInputVectors(std::vector<InputVector> IVvect) {
-    InputVector newIV;
-
-    for(unsigned int i = 0; i < IVvect.size(); i++) {
-        if(i==0) {
-            for(unsigned int j=0; j < IVvect[i].Length(); j++) {
-                newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
-            }
-        }
-
-        else {
-            for(unsigned int j=1; j < IVvect[i].Length(); j++) {
-                newIV.AddPoint(IVvect[i].X(j),IVvect[i].Y(j),IVvect[i].T(j));
-            }
-        }
-    }
-
-    return newIV;
-}
-
-
-//Helper function that returns the distance between point i in input vector iv and the next point in iv
-double dist2next(InputVector& iv, unsigned int i) {
-    return sqrt(pow(iv.X(i+1)-iv.X(i),2) + pow(iv.Y(i+1)-iv.Y(i),2));
-}
 

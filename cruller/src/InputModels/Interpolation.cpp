@@ -189,86 +189,9 @@ InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nste
     return HermiteCubicInterpolation(iv, Nsteps, true);
 }
 
-//Cubic spline interpolation
-InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
-    const unsigned int nPoints = iv.Length();
-    const unsigned int nSplines = nPoints-1;
-
-    //no fancy interpolation necessary for one or two letter words
-    if (nPoints <= 2)
-        return SpatialInterpolation(iv,Nsteps);
-
-    //spline coefficiencts
-    double ax[nSplines],bx[nSplines],cx[nSplines],dx[nSplines],alphax[nSplines],zx[nSplines];
-    double ay[nSplines],by[nSplines],cy[nSplines],dy[nSplines],alphay[nSplines],zy[nSplines];
-    cx[0]=0; cy[0]=0;
-
-    double tstep[nSplines],l[nSplines], mu[nSplines];
-    l[0]=1; mu[0]=0; zx[0]=0; zy[0]=0;
-
-    //calculate the spline coefficients
-    for(unsigned int i = 0; i < nSplines; i++) {
-        ax[i] = iv.X(i);
-        ay[i] = iv.Y(i);
-        tstep[i] = iv.T(i+1)-iv.T(i);
-    }
-    ax[nSplines]=iv.X(nSplines); ay[nSplines]=iv.Y(nSplines);
-
-    for(unsigned int i = 1; i < nSplines; i++) {
-        alphax[i] = 3*(ax[i+1]-ax[i])/tstep[i] - 3*(ax[i]-ax[i-1])/tstep[i-1];
-        alphay[i] = 3*(ay[i+1]-ay[i])/tstep[i] - 3*(ay[i]-ay[i-1])/tstep[i-1];
-
-        l[i] = 2*(tstep[i]+tstep[i-1])-tstep[i-1]*mu[i-1];
-        mu[i]= tstep[i]/l[i];
-
-        zx[i] = (alphax[i]-tstep[i-1]*zx[i-1])/l[i];
-        zy[i] = (alphay[i]-tstep[i-1]*zy[i-1])/l[i];
-    }
-
-    l[nSplines]=1; zx[nSplines]=0; zy[nSplines]=0; cx[nSplines]=0; cy[nSplines]=0;
-//    l[nSplines-1]=1; zx[nSplines-1]=0; zy[nSplines-1]=0; cx[nSplines]=0; cy[nSplines]=0;
-
-    for(int i = nSplines-1; i >= 0; i--) {
-        if(i != 0) {
-            cx[i] = zx[i] - mu[i]*cx[i+1];
-            cy[i] = zy[i] - mu[i]*cy[i+1];
-        }
-
-        bx[i] = (ax[i+1]-ax[i])/tstep[i] - tstep[i]*(cx[i+1]+2*cx[i])/3;
-        by[i] = (ay[i+1]-ay[i])/tstep[i] - tstep[i]*(cy[i+1]+2*cy[i])/3;
-
-        dx[i] = (cx[i+1]-cx[i])/3/tstep[i];
-        dy[i] = (cy[i+1]-cy[i])/3/tstep[i];
-    }
-
-    //create new input vector to fill with points from the various spline functions
-    InputVector newIV;
-    
-    //walk through each spline function to add to the new input vector
-    for(unsigned int i = 0; i < nSplines; i++) {
-        double newx, newy, newt;
-        double step; 
-        unsigned int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
-
-        for(unsigned int j = 0; j < nSteps; j++) {
-            if(nSteps == 1) step = 1;
-            else step = double(j)/double(nSteps);
-
-            newx = ax[i] + bx[i]*step + cx[i]*pow(step,2) + dx[i]*pow(step,3);
-            newy = ay[i] + by[i]*step + cy[i]*pow(step,2) + dy[i]*pow(step,3);
-            newt = iv.T(i) + tstep[i]*step;
-
-            newIV.AddPoint(newx,newy,newt);
-        }
-    }
-    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
-
-    return newIV;
-}
-
 
 //New cubic spline interpolation function
-InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
+InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     const unsigned int nPoints = iv.Length();
     const unsigned int nSplines = nPoints-1;
 

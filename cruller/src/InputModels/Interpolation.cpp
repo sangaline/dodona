@@ -53,6 +53,12 @@ namespace {
     double DistanceToNextPoint(InputVector& iv, unsigned int i) {
         return sqrt(pow(iv.X(i+1)-iv.X(i),2) + pow(iv.Y(i+1)-iv.Y(i),2));
     }
+
+    //Hermite basis functions for cubic spline interpolation
+    inline double h00(double t) { return 2.0*t*t*t - 3.0*t*t + 1.0; }
+    inline double h10(double t) { return t*t*t - 2.0*t*t + t; }
+    inline double h01(double t) { return -2.0*t*t*t + 3.0*t*t; }
+    inline double h11(double t) { return t*t*t - t*t; }
 }
 
 InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
@@ -96,6 +102,92 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     return newiv;
 }
 
+InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool monotonic) {
+    const unsigned int points = iv.Length();
+
+    double *t = new double [points];
+    double *y[2] = {new double [points], new double [points]};
+    for(unsigned int i = 0; i <  points; i++) {
+        t[i] = iv.T(i);
+        y[0][i] = iv.X(i);
+        y[1][i] = iv.Y(i);
+    }
+    //slopes of the secant lines
+    double *delta[2] = {new double [points-1], new double [points-1]};
+    //tangents at each data point (average of the secants)
+    double *m[2] = {new double [points], new double [points]};
+
+    for(unsigned int dimension = 0; dimension < 2; dimension++) {
+        for(unsigned int i = 0; i <  points - 1; i++) {
+            delta[dimension][i] = (y[dimension][i+1] - y[dimension][i])/(t[i+1] - t[i]);
+        }
+        //one-sided differences for the endpoints
+        m[dimension][0] = delta[dimension][0];
+        m[dimension][points - 1] = delta[dimension][points - 2];
+        for(unsigned int i = 1; i <  points - 1; i++) {
+            m[dimension][i] = 0.5*(delta[dimension][i-1] + delta[dimension][i]);
+        }
+        if(monotonic) {
+            for(unsigned int i = 0; i <  points - 1; i++) {
+                //cases where the point is an extremum
+                if( y[dimension][i] == y[dimension][i+1]
+                        || (i > 0 &&
+                           ((y[dimension][i] >= y[dimension][i-1] && y[dimension][i] >= y[dimension][i+1])
+                           || (y[dimension][i] <= y[dimension][i-1] && y[dimension][i] <= y[dimension][i+1])))) {
+                    m[dimension][i] = 0;
+                    continue;
+                }
+                //check for and eliminate overshoot
+                const double alpha = m[dimension][i]/delta[dimension][i];
+                const double beta = m[dimension][i+1]/delta[dimension][i];
+                const double sum2 = alpha*alpha + beta*beta;
+                if(sum2 > 9) {
+                    const double tau = 3.0/sqrt(sum2);
+                    m[dimension][i] = tau*alpha*delta[dimension][i];
+                    m[dimension][i+1] = tau*beta*delta[dimension][i];
+
+                }
+            }
+        }
+    }
+
+    //create the new interpolated vector
+    InputVector newiv;
+    newiv.AddPoint(iv.X(0), iv.Y(0), iv.T(0));
+    const double start_time = iv.T(0), end_time = iv.T(-1);
+    const double total_time = end_time - start_time;
+    unsigned int lower = 0;
+    for(unsigned int i = 1; i < Nsteps-1; i++) {
+        double current_time = start_time + total_time*double(i)/double(Nsteps - 1);
+        while(iv.T(lower+1) < current_time) {
+            lower++;
+        }
+        const unsigned int upper = lower + 1;
+        const double h = iv.T(upper) - iv.T(lower);
+        const double t = (current_time - iv.T(lower))/h;
+
+        const double current_x = iv.X(lower)*h00(t) + h*m[0][lower]*h10(t) + iv.X(upper)*h01(t) + h*m[0][upper]*h11(t);
+        const double current_y = iv.Y(lower)*h00(t) + h*m[1][lower]*h10(t) + iv.Y(upper)*h01(t) + h*m[1][upper]*h11(t);
+
+        newiv.AddPoint(current_x, current_y, current_time);
+    }
+    if(Nsteps > 1) {
+        newiv.AddPoint(iv.X(-1), iv.Y(-1), iv.T(-1));
+    }
+
+    delete [] t;
+    for(unsigned int dimension = 0; dimension < 2; dimension++) {
+        delete [] m[dimension];
+        delete [] y[dimension];
+        delete [] delta[dimension];
+    }
+
+    return newiv;
+}
+
+InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    return HermiteCubicInterpolation(iv, Nsteps, true);
+}
 
 //Cubic spline interpolation
 InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {

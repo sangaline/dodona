@@ -213,11 +213,11 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
     if (nPoints <= 2)
         return SpatialInterpolation(iv,Nsteps);
 
-    //algorithm coefficients
+    //Algorithm coefficients
     double Dx[nPoints],cpx[nSplines],dpx[nPoints];
     double Dy[nPoints],cpy[nSplines],dpy[nPoints];
 
-    //first step of tridiagonal matrix algorithm, a forward step to modify the coefficients
+    //First step of tridiagonal matrix algorithm, a forward step to modify the coefficients
     for(unsigned int i=0; i < nPoints; i++) {
         if(i==0) {
             cpx[i] = 0.5;
@@ -227,11 +227,26 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
             dpy[i] = 0.5*3.0*(iv.Y(i+1)-iv.Y(i));
         }
         else if (i < nPoints-1) {
-            cpx[i] = 1.0/(4.0-cpx[i-1]);
-            cpy[i] = 1.0/(4.0-cpy[i-1]);
+            //Constrain the first and last segment of the spline are straight lines
+            //and ensure that the derivatives match if mod==true
+            if(mod==true && i==1) {
+                    cpx[i] = 0;
+                    cpy[i] = 0;
 
-            dpx[i] = (3.0*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(4.0-cpx[i-1]);
-            dpy[i] = (3.0*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(4.0-cpy[i-1]); 
+                    dpx[i] = (iv.X(i)-iv.X(i-1));
+                    dpy[i] = (iv.Y(i)-iv.Y(i-1));
+            }
+            else if(mod==true && i==nPoints-2) {
+                    dpx[i] = iv.X(i+1)-iv.X(i);
+                    dpy[i] = iv.Y(i+1)-iv.Y(i);
+            }
+            else {
+                cpx[i] = 1.0/(4.0-cpx[i-1]);
+                cpy[i] = 1.0/(4.0-cpy[i-1]);
+
+                dpx[i] = (3.0*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(4.0-cpx[i-1]);
+                dpy[i] = (3.0*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(4.0-cpy[i-1]); 
+            }
         }
         else {
             dpx[i] = (3.0*(iv.X(i)-iv.X(i-1))-dpx[i-1])/(2.0-cpx[i-1]);
@@ -239,22 +254,10 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
         }
     }
 
-    //constrain first and last spline to be a line in the modified version
-    if(mod==true) {
-        cpx[1] = 0;
-        cpy[1] = 0;
-
-        dpx[1] = (iv.X(1)-iv.X(0));
-        dpy[1] = (iv.Y(1)-iv.Y(1));
-     
-        dpx[nPoints-2] = iv.X(nPoints-1)-iv.X(nPoints-2);
-        dpy[nPoints-2] = iv.Y(nPoints-1)-iv.Y(nPoints-2);
-    }
-
     //Backward substitution step of tridiagnoal matrix algorithm.
     //This obtains the value of the derivative of the interpolation curve at each point.
     if(nPoints > 0) {
-        //in the modified algorithm, the first and last splines are lines which are already known
+        //In the modified algorithm, the first and last splines are lines which are already known
         //so we don't need to solve for them.  
         unsigned int i = (mod==true) ? nPoints-2 : nPoints-1;
         Dx[i] = dpx[i];
@@ -276,7 +279,7 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
             if(nSteps==1) step = 1;
             else step = double(j)/double(nSteps);
 
-            //constrain first and last spline to be lines in the modified version
+            //Constrain first and last spline to be lines in the modified version
             if((i==0 || i==nSplines-1) && mod==true) {
                 newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step;
                 newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step;

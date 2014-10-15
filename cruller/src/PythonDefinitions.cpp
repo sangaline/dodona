@@ -224,7 +224,10 @@ BOOST_PYTHON_MODULE(cruller)
 /***************** Interpolation ************************/
     def("SpatialInterpolation", &SpatialInterpolation);
     def("MonotonicCubicSplineInterpolation", &MonotonicCubicSplineInterpolation);
+    def("HermiteCubicSplineInterpolation", &HermiteCubicSplineInterpolation);
     def("CubicSplineInterpolation", &CubicSplineInterpolation);
+    def("CubicSplineInterpolationV2", &CubicSplineInterpolationV2);
+    def("ModCubicSplineInterpolation", &ModCubicSplineInterpolation);
     def("BezierInterpolation", &BezierInterpolation);
     def("BezierSloppyInterpolation", &BezierSloppyInterpolation);
 /********************************************************/

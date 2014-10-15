@@ -1,4 +1,4 @@
-#include  "InputModels/Interpolation.h"
+#include "InputModels/Interpolation.h"
 
 #include "math.h"
 
@@ -190,8 +190,13 @@ InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nste
 }
 
 
+InputVector HermiteCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    return HermiteCubicInterpolation(iv, Nsteps, false);
+}
+
+
 //New cubic spline interpolation function
-InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, std::string algorithm) {
     const unsigned int nPoints = iv.Length();
     const unsigned int nSplines = nPoints-1;
 
@@ -224,6 +229,17 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
         }
     }
 
+    if(algorithm == "mod1") {
+        cpx[1] = 0;
+        cpy[1] = 0;
+
+        dpx[1] = (iv.X(1)-iv.X(0));
+        dpy[1] = (iv.Y(1)-iv.Y(1));
+     
+        dpx[nPoints-2] = ((iv.X(nPoints-1)-iv.X(nPoints-2))-dpx[nPoints-3])/(2.0-cpx[nPoints-3]);
+        dpy[nPoints-2] = ((iv.Y(nPoints-1)-iv.Y(nPoints-2))-dpy[nPoints-3])/(2.0-cpy[nPoints-3]);  
+    }
+
     //Backward substitution step of tridiagnoal matrix algorithm.
     //This obtains the value of the derivative of the interpolation curve at each point.
     if(nPoints > 0) {
@@ -237,9 +253,93 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
          }
     }
 
-    //Attempt at fixing the first derivative with an estimate 
-//    Dx[0] = (iv.X(1)-iv.X(0))/(iv.T(1)-iv.T(0));
-//    Dy[0] = (iv.Y(1)-iv.Y(0))/(iv.T(1)-iv.T(0));
+    //create new InputVector by walking through each spline curve
+    InputVector newIV;
+    for(unsigned int i=0; i < nSplines; i++) {
+        double newX, newY, newT, step;
+        unsigned int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
+
+        for(unsigned int j=0; j < nSteps; j++) {
+            if(nSteps==1) step = 1;
+            else step = double(j)/double(nSteps);
+
+            if((i==0 || i==nSplines-1) && algorithm=="mod1") {
+                newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step;
+                newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step;
+                newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step;
+            }
+ 
+            newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+            newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
+            newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+
+            newIV.AddPoint(newX,newY,newT);
+        }
+    }
+    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
+    return newIV;
+}
+
+
+
+InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    return CubicSplineInterpolationBase(iv, Nsteps, "normal");
+}
+
+InputVector ModCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    return CubicSplineInterpolationBase(iv, Nsteps, "mod1");
+}
+    
+    
+//New cubic spline interpolation function
+InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
+    if (iv.Length() <= 2)
+        return SpatialInterpolation(iv,Nsteps);
+
+    if(iv.Length() == 3)
+        return CubicSplineInterpolation(iv,Nsteps);
+
+    const unsigned int nPoints = iv.Length();
+    const unsigned int nSplines = nPoints-1;
+
+    //algorithm coefficients
+    double Dx[nPoints],cpx[nSplines],dpx[nPoints];
+    double Dy[nPoints],cpy[nSplines],dpy[nPoints];
+
+    //first step of tridiagonal matrix algorithm, a forward step to modify the coefficients
+    for(unsigned int i=1; i < nPoints-1; i++) {
+        if(i==1) {
+            cpx[i] = 0;
+            cpy[i] = 0;
+
+            dpx[i] = (iv.X(i)-iv.X(i-1));
+            dpy[i] = (iv.Y(i)-iv.Y(i-1));
+        }
+        else if (i < nPoints-2) {
+            cpx[i] = 1.0/(4.0-cpx[i-1]);
+            cpy[i] = 1.0/(4.0-cpy[i-1]);
+
+            dpx[i] = (3.0*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(4.0-cpx[i-1]);
+            dpy[i] = (3.0*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(4.0-cpy[i-1]); 
+        }
+        else {
+            dpx[i] = ((iv.X(i+1)-iv.X(i))-dpx[i-1])/(2.0-cpx[i-1]);
+            dpy[i] = ((iv.Y(i+1)-iv.Y(i))-dpy[i-1])/(2.0-cpy[i-1]); 
+        }
+    }
+
+    //Backward substitution step of tridiagnoal matrix algorithm.
+    //This obtains the value of the derivative of the interpolation curve at each point.
+    if(nPoints > 0) {
+        unsigned int i = nPoints - 1;
+        Dx[i] = dpx[i];
+        Dy[i] = dpy[i];
+        while(i > 0) {
+             Dx[i-1] = dpx[i-1]-cpx[i-1]*Dx[i];
+             Dy[i-1] = dpy[i-1]-cpy[i-1]*Dy[i];
+             i--;
+         }
+    }
 
     //create new InputVector by walking through each spline curve
     InputVector newIV;
@@ -251,9 +351,16 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
             if(nSteps==1) step = 1;
             else step = double(j)/double(nSteps);
 
-            newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
-            newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
-            newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+            if(i==0 || i==nSplines-1) {
+                newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step;
+                newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step;
+                newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step;
+            }
+            else {
+                newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+                newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
+                newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+            }
 
             newIV.AddPoint(newX,newY,newT);
         }
@@ -261,6 +368,7 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
     return newIV;
 }
+
 
 
 //Quadratic bezier interpollation (version 2)

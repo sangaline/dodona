@@ -6,7 +6,7 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
 InputVector HermiteCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps); 
 InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps);
 InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps);
-InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, std::string algorithm);
+InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, bool mod);
 InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps);
 InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps);
 InputVector ModCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps);

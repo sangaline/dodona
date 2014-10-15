@@ -61,6 +61,8 @@ namespace {
     inline double h11(double t) { return t*t*t - t*t; }
 }
 
+
+//Linear interpolation between points
 InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     const double length = iv.SpatialLength();
     const unsigned int points = iv.Length();
@@ -102,6 +104,9 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     return newiv;
 }
 
+
+//Cubic spline interpolation using the Hermite polynomial representation.
+//Has the option to do monotonic interpolation between points.
 InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool monotonic) {
     const unsigned int points = iv.Length();
 
@@ -185,18 +190,23 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
     return newiv;
 }
 
+
+//Monotonic hermite cubic spline interpolation
 InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     return HermiteCubicInterpolation(iv, Nsteps, true);
 }
 
 
+//Normal Hermite cubic spline interpolation
 InputVector HermiteCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     return HermiteCubicInterpolation(iv, Nsteps, false);
 }
 
 
-//New cubic spline interpolation function
-InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, std::string algorithm) {
+//New cubic spline interpolation function base.  Has the option to do normal cubic
+//spline interpolation or to do the "modified" cubic spline interpolation which 
+//constrains the first and last spline to be a straight line.
+InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, bool mod) {
     const unsigned int nPoints = iv.Length();
     const unsigned int nSplines = nPoints-1;
 
@@ -229,7 +239,8 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, s
         }
     }
 
-    if(algorithm == "mod1") {
+    //constrain first and last spline to be a line in the modified version
+    if(mod==true) {
         cpx[1] = 0;
         cpy[1] = 0;
 
@@ -243,10 +254,12 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, s
     //Backward substitution step of tridiagnoal matrix algorithm.
     //This obtains the value of the derivative of the interpolation curve at each point.
     if(nPoints > 0) {
-        unsigned int i = nPoints - 1;
+        //in the modified algorithm, the first and last splines are lines which are already known
+        //so we don't need to solve for them.  
+        unsigned int i = (mod==true) ? nPoints-2 : nPoints-1;
         Dx[i] = dpx[i];
         Dy[i] = dpy[i];
-        while(i > 0) {
+        while(i > (mod==true) ? 1 :0) {
              Dx[i-1] = dpx[i-1]-cpx[i-1]*Dx[i];
              Dy[i-1] = dpy[i-1]-cpy[i-1]*Dy[i];
              i--;
@@ -263,15 +276,17 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, s
             if(nSteps==1) step = 1;
             else step = double(j)/double(nSteps);
 
-            if((i==0 || i==nSplines-1) && algorithm=="mod1") {
+            //constrain first and last spline to be lines in the modified version
+            if((i==0 || i==nSplines-1) && mod==true) {
                 newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step;
                 newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step;
                 newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step;
             }
- 
-            newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
-            newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
-            newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+            else { 
+                newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+                newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
+                newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+            }
 
             newIV.AddPoint(newX,newY,newT);
         }
@@ -281,13 +296,20 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, s
 }
 
 
-
+//Normal cubic spline interplation using the triangular matrix algorithm, should be 
+//identical to the hermite cubic spline algorithm
 InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
-    return CubicSplineInterpolationBase(iv, Nsteps, "normal");
+    return CubicSplineInterpolationBase(iv, Nsteps, false);
 }
 
+
+//Modified cubic spline interpolation.  The first and last splines are constrained
+//to be straight lines, the points between are interpollated with a cubic spline.
 InputVector ModCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
-    return CubicSplineInterpolationBase(iv, Nsteps, "mod1");
+    if(iv.Length()==3)
+        return CubicSplineInterpolationBase(iv, Nsteps, false);
+    else
+        return CubicSplineInterpolationBase(iv, Nsteps, true);
 }
     
     

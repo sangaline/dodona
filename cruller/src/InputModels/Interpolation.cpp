@@ -247,8 +247,8 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
         dpx[1] = (iv.X(1)-iv.X(0));
         dpy[1] = (iv.Y(1)-iv.Y(1));
      
-        dpx[nPoints-2] = ((iv.X(nPoints-1)-iv.X(nPoints-2))-dpx[nPoints-3])/(2.0-cpx[nPoints-3]);
-        dpy[nPoints-2] = ((iv.Y(nPoints-1)-iv.Y(nPoints-2))-dpy[nPoints-3])/(2.0-cpy[nPoints-3]);  
+        dpx[nPoints-2] = iv.X(nPoints-1)-iv.X(nPoints-2);
+        dpy[nPoints-2] = iv.Y(nPoints-1)-iv.Y(nPoints-2);
     }
 
     //Backward substitution step of tridiagnoal matrix algorithm.
@@ -283,8 +283,10 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
                 newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step;
             }
             else { 
-                newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
-                newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
+                newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) +
+                    (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+                newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + 
+                    (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
                 newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
             }
 
@@ -334,8 +336,8 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
             cpx[i] = 0;
             cpy[i] = 0;
 
-            dpx[i] = (iv.X(i)-iv.X(i-1));
-            dpy[i] = (iv.Y(i)-iv.Y(i-1));
+            dpx[i] = iv.X(i)-iv.X(i-1);
+            dpy[i] = iv.Y(i)-iv.Y(i-1);
         }
         else if (i < nPoints-2) {
             cpx[i] = 1.0/(4.0-cpx[i-1]);
@@ -345,8 +347,8 @@ InputVector CubicSplineInterpolationV2(InputVector& iv, unsigned int Nsteps) {
             dpy[i] = (3.0*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(4.0-cpy[i-1]); 
         }
         else {
-            dpx[i] = ((iv.X(i+1)-iv.X(i))-dpx[i-1])/(2.0-cpx[i-1]);
-            dpy[i] = ((iv.Y(i+1)-iv.Y(i))-dpy[i-1])/(2.0-cpy[i-1]); 
+            dpx[i] = iv.X(i+1)-iv.X(i);
+            dpy[i] = iv.Y(i+1)-iv.Y(i);
         }
     }
 

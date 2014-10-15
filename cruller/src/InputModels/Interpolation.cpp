@@ -107,7 +107,7 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
 
 //Cubic spline interpolation using the Hermite polynomial representation.
 //Has the option to do monotonic interpolation between points.
-InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool monotonic) {
+InputVector HermiteCubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, bool monotonic) {
     const unsigned int points = iv.Length();
 
     double *t = new double [points];
@@ -193,13 +193,13 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
 
 //Monotonic hermite cubic spline interpolation
 InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
-    return HermiteCubicInterpolation(iv, Nsteps, true);
+    return HermiteCubicSplineInterpolationBase(iv, Nsteps, true);
 }
 
 
 //Normal Hermite cubic spline interpolation
 InputVector HermiteCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
-    return HermiteCubicInterpolation(iv, Nsteps, false);
+    return HermiteCubicSplineInterpolationBase(iv, Nsteps, false);
 }
 
 

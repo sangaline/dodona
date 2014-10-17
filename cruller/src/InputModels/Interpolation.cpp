@@ -110,6 +110,10 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
 InputVector HermiteCubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, bool monotonic) {
     const unsigned int points = iv.Length();
 
+    //if less than three letters don't do any fancy interpolation
+    if(points <= 2)
+        return SpatialInterpolation(iv, Nsteps);
+
     double *t = new double [points];
     double *y[2] = {new double [points], new double [points]};
     for(unsigned int i = 0; i <  points; i++) {

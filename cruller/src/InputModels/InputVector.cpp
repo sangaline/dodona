@@ -39,6 +39,21 @@ double InputVector::T(int i) {
     return tvector[i];
 }
 
+void InputVector::SetX(int i, double x) {
+    while(i<0) { i += Length(); }
+    xvector[i] = x;
+}
+
+void InputVector::SetY(int i, double y) {
+    while(i<0) { i += Length(); }
+    yvector[i] = y;
+}
+
+void InputVector::SetT(int i, double t) {
+    while(i<0) { i += Length(); }
+    tvector[i] = t;
+}
+
 double InputVector::SpatialLength() {
     double l = 0;
     for(unsigned int i = 1; i < xvector.size(); i++) {

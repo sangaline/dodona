@@ -22,6 +22,10 @@ class InputVector {
    double DeltaPhi(unsigned int i);
    const char* StringForm(Keyboard& k);
 
+   void SetX(int i, double x);
+   void SetY(int i, double y);
+   void SetT(int i, double t);
+
   private:
     friend class boost::serialization::access;
     template<typename Archive> void serialize(Archive& ar, const unsigned int version) {

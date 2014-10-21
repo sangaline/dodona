@@ -26,6 +26,8 @@ NeuralNetworkModel::NeuralNetworkModel(const char *filename, unsigned int vector
 //  8 - y distance2 of first point
 //  9 - x distance2 of last point
 // 10 - y distance2 of last point
+// IMPORTANT: If the number of inputs changes then make sure you change this next line!
+unsigned int NeuralNetworkModel::input_length = 11;
 void NeuralNetworkModel::CreateInputs(InputVector& v1, InputVector& v2, float* inputs) {
     const unsigned int vlength = v1.Length();
 

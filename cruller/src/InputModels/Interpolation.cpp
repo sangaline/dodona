@@ -1,4 +1,4 @@
-#include  "InputModels/Interpolation.h"
+#include "InputModels/Interpolation.h"
 
 #include "math.h"
 
@@ -61,6 +61,8 @@ namespace {
     inline double h11(double t) { return t*t*t - t*t; }
 }
 
+
+//Linear interpolation between points
 InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     const double length = iv.SpatialLength();
     const unsigned int points = iv.Length();
@@ -102,8 +104,15 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     return newiv;
 }
 
-InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool monotonic) {
+
+//Cubic spline interpolation using the Hermite polynomial representation.
+//Has the option to do monotonic interpolation between points.
+InputVector HermiteCubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, bool monotonic) {
     const unsigned int points = iv.Length();
+
+    //if less than three letters don't do any fancy interpolation
+    if(points <= 2)
+        return SpatialInterpolation(iv, Nsteps);
 
     double *t = new double [points];
     double *y[2] = {new double [points], new double [points]};
@@ -112,16 +121,16 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
         y[0][i] = iv.X(i);
         y[1][i] = iv.Y(i);
     }
-    //slopes of the secant lines
+    //Slopes of the secant lines
     double *delta[2] = {new double [points-1], new double [points-1]};
-    //tangents at each data point (average of the secants)
+    //Tangents at each data point (average of the secants)
     double *m[2] = {new double [points], new double [points]};
 
     for(unsigned int dimension = 0; dimension < 2; dimension++) {
         for(unsigned int i = 0; i <  points - 1; i++) {
             delta[dimension][i] = (y[dimension][i+1] - y[dimension][i])/(t[i+1] - t[i]);
         }
-        //one-sided differences for the endpoints
+        //One-sided differences for the endpoints
         m[dimension][0] = delta[dimension][0];
         m[dimension][points - 1] = delta[dimension][points - 2];
         for(unsigned int i = 1; i <  points - 1; i++) {
@@ -129,7 +138,7 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
         }
         if(monotonic) {
             for(unsigned int i = 0; i <  points - 1; i++) {
-                //cases where the point is an extremum
+                //Cases where the point is an extremum
                 if( y[dimension][i] == y[dimension][i+1]
                         || (i > 0 &&
                            ((y[dimension][i] >= y[dimension][i-1] && y[dimension][i] >= y[dimension][i+1])
@@ -137,7 +146,7 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
                     m[dimension][i] = 0;
                     continue;
                 }
-                //check for and eliminate overshoot
+                //Check for and eliminate overshoot
                 const double alpha = m[dimension][i]/delta[dimension][i];
                 const double beta = m[dimension][i+1]/delta[dimension][i];
                 const double sum2 = alpha*alpha + beta*beta;
@@ -151,7 +160,7 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
         }
     }
 
-    //create the new interpolated vector
+    //Create the new interpolated vector
     InputVector newiv;
     newiv.AddPoint(iv.X(0), iv.Y(0), iv.T(0));
     const double start_time = iv.T(0), end_time = iv.T(-1);
@@ -185,24 +194,34 @@ InputVector HermiteCubicInterpolation(InputVector& iv, unsigned int Nsteps, bool
     return newiv;
 }
 
+
+//Monotonic hermite cubic spline interpolation
 InputVector MonotonicCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
-    return HermiteCubicInterpolation(iv, Nsteps, true);
+    return HermiteCubicSplineInterpolationBase(iv, Nsteps, true);
 }
 
 
-//New cubic spline interpolation function
-InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+//Normal Hermite cubic spline interpolation
+InputVector HermiteCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    return HermiteCubicSplineInterpolationBase(iv, Nsteps, false);
+}
+
+
+//New cubic spline interpolation function base.  Has the option to do normal cubic
+//spline interpolation or to do the "modified" cubic spline interpolation which 
+//constrains the first and last spline to be a straight line.
+InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, bool mod) {
     const unsigned int nPoints = iv.Length();
     const unsigned int nSplines = nPoints-1;
 
     if (nPoints <= 2)
         return SpatialInterpolation(iv,Nsteps);
 
-    //algorithm coefficients
+    //Algorithm coefficients
     double Dx[nPoints],cpx[nSplines],dpx[nPoints];
     double Dy[nPoints],cpy[nSplines],dpy[nPoints];
 
-    //first step of tridiagonal matrix algorithm, a forward step to modify the coefficients
+    //First step of tridiagonal matrix algorithm, a forward step to modify the coefficients
     for(unsigned int i=0; i < nPoints; i++) {
         if(i==0) {
             cpx[i] = 0.5;
@@ -212,11 +231,26 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
             dpy[i] = 0.5*3.0*(iv.Y(i+1)-iv.Y(i));
         }
         else if (i < nPoints-1) {
-            cpx[i] = 1.0/(4.0-cpx[i-1]);
-            cpy[i] = 1.0/(4.0-cpy[i-1]);
+            //Constrain the first and last segment of the spline are straight lines
+            //and ensure that the derivatives match if mod==true
+            if(mod==true && i==1) {
+                    cpx[i] = 0;
+                    cpy[i] = 0;
 
-            dpx[i] = (3.0*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(4.0-cpx[i-1]);
-            dpy[i] = (3.0*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(4.0-cpy[i-1]); 
+                    dpx[i] = (iv.X(i)-iv.X(i-1));
+                    dpy[i] = (iv.Y(i)-iv.Y(i-1));
+            }
+            else if(mod==true && i==nPoints-2) {
+                    dpx[i] = iv.X(i+1)-iv.X(i);
+                    dpy[i] = iv.Y(i+1)-iv.Y(i);
+            }
+            else {
+                cpx[i] = 1.0/(4.0-cpx[i-1]);
+                cpy[i] = 1.0/(4.0-cpy[i-1]);
+
+                dpx[i] = (3.0*(iv.X(i+1)-iv.X(i-1))-dpx[i-1])/(4.0-cpx[i-1]);
+                dpy[i] = (3.0*(iv.Y(i+1)-iv.Y(i-1))-dpy[i-1])/(4.0-cpy[i-1]); 
+            }
         }
         else {
             dpx[i] = (3.0*(iv.X(i)-iv.X(i-1))-dpx[i-1])/(2.0-cpx[i-1]);
@@ -227,21 +261,19 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
     //Backward substitution step of tridiagnoal matrix algorithm.
     //This obtains the value of the derivative of the interpolation curve at each point.
     if(nPoints > 0) {
-        unsigned int i = nPoints - 1;
+        //In the modified algorithm, the first and last splines are lines which are already known
+        //so we don't need to solve for them.  
+        unsigned int i = (mod==true) ? nPoints-2 : nPoints-1;
         Dx[i] = dpx[i];
         Dy[i] = dpy[i];
-        while(i > 0) {
+        while(i > (mod==true) ? 1 : 0) {
              Dx[i-1] = dpx[i-1]-cpx[i-1]*Dx[i];
              Dy[i-1] = dpy[i-1]-cpy[i-1]*Dy[i];
              i--;
          }
     }
 
-    //Attempt at fixing the first derivative with an estimate 
-//    Dx[0] = (iv.X(1)-iv.X(0))/(iv.T(1)-iv.T(0));
-//    Dy[0] = (iv.Y(1)-iv.Y(0))/(iv.T(1)-iv.T(0));
-
-    //create new InputVector by walking through each spline curve
+    //Create new InputVector by walking through each spline curve
     InputVector newIV;
     for(unsigned int i=0; i < nSplines; i++) {
         double newX, newY, newT, step;
@@ -251,9 +283,19 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
             if(nSteps==1) step = 1;
             else step = double(j)/double(nSteps);
 
-            newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) + (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
-            newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
-            newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+            //Constrain first and last spline to be lines in the modified version
+            if((i==0 || i==nSplines-1) && mod==true) {
+                newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step;
+                newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step;
+                newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step;
+            }
+            else { 
+                newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) +
+                    (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
+                newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + 
+                    (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
+                newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+            }
 
             newIV.AddPoint(newX,newY,newT);
         }
@@ -263,16 +305,33 @@ InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
 }
 
 
+//Normal cubic spline interplation using the triangular matrix algorithm, should be 
+//identical to the hermite cubic spline algorithm
+InputVector CubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    return CubicSplineInterpolationBase(iv, Nsteps, false);
+}
+
+
+//Modified cubic spline interpolation.  The first and last splines are constrained
+//to be straight lines, the points between are interpollated with a cubic spline.
+InputVector ModCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps) {
+    if(iv.Length()==3)
+        return CubicSplineInterpolationBase(iv, Nsteps, false);
+    else
+        return CubicSplineInterpolationBase(iv, Nsteps, true);
+}
+
+
 //Quadratic bezier interpollation (version 2)
 InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
     const unsigned int nPoints = iv.Length();
     const unsigned int nBezPoints = 3*nPoints - 4;
 
-    //no fancy interpolation necessary for one or two letter words
+    //No fancy interpolation necessary for one or two letter words
     if (nPoints <= 2)
         return SpatialInterpolation(iv,Nsteps);
 
-    //create a new input vector with the bezier control points included
+    //Create a new input vector with the bezier control points included
     InputVector bezIV;
 
     bezIV.AddPoint(iv.X(0),iv.Y(0),iv.T(0));
@@ -287,13 +346,13 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
     //These will all be combined in end to form the final swype pattern
     std::vector<InputVector> IVlist;
 
-    //the first segmens is just a straight line
+    //The first segmens is just a straight line
     InputVector firstSeg;
     firstSeg.AddPoint(bezIV.X(0), bezIV.Y(0), bezIV.T(0));
     firstSeg.AddPoint(bezIV.X(1), bezIV.Y(1), bezIV.T(1));
     IVlist.push_back(firstSeg);
 
-    //create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
+    //Create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
     for(unsigned int i = 2; i < nBezPoints; i+=3) {
         //Create the next input vector segment to be bezier interpolated
         InputVector bezSeg;
@@ -311,7 +370,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
         IVlist.push_back(linSeg);
     }
 
-    //combine all of the segments into one input vector
+    //Combine all of the segments into one input vector
     InputVector combinedIV;
     combinedIV = CombineInputVectors(IVlist);
     return combinedIV;
@@ -324,11 +383,11 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     const unsigned int nPoints = iv.Length();
     const unsigned int nBezPoints = 2*nPoints - 1;
 
-    //no fancy interpolation necessary for one or two letter words
+    //No fancy interpolation necessary for one or two letter words
     if (nPoints <= 2)
         return SpatialInterpolation(iv,Nsteps);
 
-    //create a new input vector with the bezier control points included
+    //Create a new input vector with the bezier control points included
     InputVector bezIV;
 
     bezIV.AddPoint(iv.X(0),iv.Y(0),iv.T(0));
@@ -340,13 +399,13 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     //Create a list to hold the input veectors corresponding to various segments of the swype pattern
     std::vector<InputVector> IVlist;
 
-    //the first segmens is just a straight line
+    //The first segmens is just a straight line
     InputVector firstSeg;
     firstSeg.AddPoint(bezIV.X(0), bezIV.Y(0), bezIV.T(0));
     firstSeg.AddPoint(bezIV.X(1), bezIV.Y(1), bezIV.T(1));
     IVlist.push_back(firstSeg);
 
-    //create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
+    //Create and add the quadratic bezier interpolated input vectors that form the middle section of the swype pattern
     for(unsigned int i = 2; i < nBezPoints-1; i+=2) {
         //Create the next input vector segment to be bezier interpolated
         InputVector bezSeg;
@@ -358,13 +417,13 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
         IVlist.push_back(QuadraticBezierInterpolation(bezSeg,nSegSteps));
     }
 
-    //the final segment is also just a straight line
+    //The final segment is also just a straight line
     InputVector lastSeg;
     lastSeg.AddPoint(bezIV.X(bezIV.Length()-2),bezIV.Y(bezIV.Length()-2),bezIV.T(bezIV.Length()-2));
     lastSeg.AddPoint(bezIV.X(bezIV.Length()-1),bezIV.Y(bezIV.Length()-1),bezIV.T(bezIV.Length()-1));
     IVlist.push_back(lastSeg);
 
-    //combine all of the segments into a single input vector
+    //Combine all of the segments into a single input vector
     InputVector combinedIV;
     combinedIV = CombineInputVectors(IVlist);
     return combinedIV;

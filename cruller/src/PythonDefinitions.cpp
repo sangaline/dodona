@@ -224,8 +224,14 @@ BOOST_PYTHON_MODULE(cruller)
 /***************** Interpolation ************************/
     def("SpatialInterpolation", &SpatialInterpolation);
     def("MonotonicCubicSplineInterpolation", &MonotonicCubicSplineInterpolation);
+    def("HermiteCubicSplineInterpolation", &HermiteCubicSplineInterpolation);
     def("CubicSplineInterpolation", &CubicSplineInterpolation);
+    def("ModCubicSplineInterpolation", &ModCubicSplineInterpolation);
     def("BezierInterpolation", &BezierInterpolation);
     def("BezierSloppyInterpolation", &BezierSloppyInterpolation);
+/********************************************************/
+
+/***************** Neural Network Static Functions ******/
+    def("CreateNeuralNetworkInputs", &CreateNeuralNetworkInputs);
 /********************************************************/
 }

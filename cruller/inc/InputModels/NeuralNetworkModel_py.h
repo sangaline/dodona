@@ -8,9 +8,10 @@ using namespace boost::python;
 
 list CreateNeuralNetworkInputs(InputVector& v1, InputVector& v2) {
     list l;
-    float inputs[11];
+    unsigned int input_length = NeuralNetworkModel::InputLength();
+    float inputs[input_length];
     NeuralNetworkModel::CreateInputs(v1, v2, inputs);
-    for(unsigned int i = 0; i < 11; i++) {
+    for(unsigned int i = 0; i < input_length; i++) {
         l.append(inputs[i]);
     }
 

@@ -230,4 +230,8 @@ BOOST_PYTHON_MODULE(cruller)
     def("BezierInterpolation", &BezierInterpolation);
     def("BezierSloppyInterpolation", &BezierSloppyInterpolation);
 /********************************************************/
+
+/***************** Neural Network Static Functions ******/
+    def("CreateNeuralNetworkInputs", &CreateNeuralNetworkInputs);
+/********************************************************/
 }

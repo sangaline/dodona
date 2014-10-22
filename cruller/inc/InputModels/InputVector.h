@@ -14,6 +14,7 @@ class InputVector {
   public:
    unsigned int Length(); 
    unsigned int AddPoint(double x, double y, double t = 0);
+   void RemovePoint(int i);
    double X(int i);
    double Y(int i);
    double T(int i);

@@ -5,6 +5,7 @@
 #include "Keyboard.h"
 #include "Polygon.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
@@ -21,10 +22,11 @@ namespace {
                     iv.AddPoint(iv.X(doubles+i-1) + delta_x, iv.Y(doubles+i-1) + delta_y, 0.5*(iv.T(doubles+i) + iv.T(doubles+i-1)));
                     doubles++;
                 }
-                else {
-                    iv.SetX(i, iv.X(i-1));
-                    iv.SetY(i, iv.Y(i-1));
-                    iv.SetT(i, iv.T(i-1));
+                else { 
+                    if(i >= length) break;
+                    int iter = i-doubles;
+                    iv.RemovePoint(iter);
+                    doubles++;
                 }
             }
         }

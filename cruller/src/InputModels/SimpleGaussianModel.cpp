@@ -3,6 +3,7 @@
 #include "Polygon.h"
 
 #include "math.h"
+#include <cctype>
 
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -31,7 +32,7 @@ InputVector SimpleGaussianModel::RandomVector(const char* word, Keyboard& k) {
     InputVector sigma;
     double lastx = normal(), lasty = normal();
     for(unsigned int i = 0; i < strlen(word); i++) {
-        Polygon p = k.GetKey(word[i]);
+        Polygon p = k.GetKey(tolower(word[i]));
         const double t = p.TopExtreme();
         const double b = p.BottomExtreme();
         const double r = p.RightExtreme();

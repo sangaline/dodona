@@ -76,7 +76,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         word = frequencymap
         frequencymap = []
         for letter in k.OrderedKeyList():
-            if letter in word:
+            if letter in word.lower():
                 frequencymap.append(1.0)
             else:
                 frequencymap.append(0.2)

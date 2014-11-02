@@ -5,8 +5,33 @@
 #include "Keyboard.h"
 #include "Polygon.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+namespace {
+    void HandleDoubleLetters(InputVector &iv, const char* word, Keyboard& k, bool loop_letter) {
+        const unsigned int length = strlen(word);
+        unsigned int doubles = 0;
+        for(unsigned int i = 1; i < length + doubles; i++) {
+            if( word[i] == word[i-1] ) {
+                if(loop_letter) {
+                    Polygon p = k.GetKey(word[i]);
+                    const double delta_x = 0.5*(p.RightExtreme() - p.LeftExtreme());
+                    const double delta_y = 0.5*(p.TopExtreme() - p.BottomExtreme());
+                    iv.AddPoint(iv.X(doubles+i-1) + delta_x, iv.Y(doubles+i-1) + delta_y, 0.5*(iv.T(doubles+i) + iv.T(doubles+i-1)));
+                    doubles++;
+                }
+                else { 
+                    if(i >= length) break;
+                    int iter = i-doubles;
+                    iv.RemovePoint(iter);
+                    doubles++;
+                }
+            }
+        }
+    }
+};
 
 SimpleInterpolationModel::SimpleInterpolationModel(unsigned int vector_length, double xscale, double yscale, double correlation, double maxdistance, double maxsigma, bool loop) {
     maxd = maxdistance;
@@ -22,19 +47,13 @@ SimpleInterpolationModel::SimpleInterpolationModel(unsigned int vector_length, d
 
 InputVector SimpleInterpolationModel::RandomVector(const char* word, Keyboard& k) {
     InputVector iv = model.RandomVector(word, k);
-    if(loop_letter) {
-        const unsigned int length = strlen(word);
-        for(unsigned int i = 1; i < length; i++) {
-            if( word[i] == word[i-1] ) {
-                iv.AddPoint(iv.X(i-1), iv.Y(i-1), 1.5*iv.T(i) - 0.5*iv.T(i-1));
-            }
-        }
-    }
+    HandleDoubleLetters(iv, word, k, loop_letter);
     return Interpolation(iv, vlength);
 }
 
 InputVector SimpleInterpolationModel::PerfectVector(const char* word, Keyboard& k) {
     InputVector iv = model.PerfectVector(word, k);
+    HandleDoubleLetters(iv, word, k, loop_letter);
     return Interpolation(iv, vlength);
 }
 

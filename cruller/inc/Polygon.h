@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <utility>
-#include "boost/serialization/vector.hpp"
-#include "boost/serialization/utility.hpp"
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/utility.hpp>
 
 //Forward declaration of class boost::serialization::access
 namespace boost {namespace serialization {class access;}}

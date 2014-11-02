@@ -2,8 +2,10 @@
 
 #include "math.h"
 
+#include <vector>
 #include <string>
-#include "string.h"
+#include <string.h>
+
 using namespace std;
 
 unsigned int InputVector::Length() {
@@ -24,6 +26,16 @@ unsigned int InputVector::AddPoint(double x, double y, double t) {
 
     return Length();
 }
+
+void InputVector::RemovePoint(int i) {
+    if(i >= xvector.size()) 
+        return;
+    xvector.erase(xvector.begin() + i);
+    yvector.erase(yvector.begin() + i);
+    tvector.erase(tvector.begin() + i);
+    return;
+}
+
 double InputVector::X(int i) {
     while(i<0) { i += Length(); }
     return xvector[i];
@@ -37,6 +49,21 @@ double InputVector::Y(int i) {
 double InputVector::T(int i) {
     while(i<0) { i += Length(); }
     return tvector[i];
+}
+
+void InputVector::SetX(int i, double x) {
+    while(i<0) { i += Length(); }
+    xvector[i] = x;
+}
+
+void InputVector::SetY(int i, double y) {
+    while(i<0) { i += Length(); }
+    yvector[i] = y;
+}
+
+void InputVector::SetT(int i, double t) {
+    while(i<0) { i += Length(); }
+    tvector[i] = t;
 }
 
 double InputVector::SpatialLength() {

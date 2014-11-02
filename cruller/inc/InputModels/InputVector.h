@@ -14,6 +14,7 @@ class InputVector {
   public:
    unsigned int Length(); 
    unsigned int AddPoint(double x, double y, double t = 0);
+   void RemovePoint(int i);
    double X(int i);
    double Y(int i);
    double T(int i);
@@ -21,6 +22,10 @@ class InputVector {
    double TemporalLength();
    double DeltaPhi(unsigned int i);
    const char* StringForm(Keyboard& k);
+
+   void SetX(int i, double x);
+   void SetY(int i, double y);
+   void SetT(int i, double t);
 
   private:
     friend class boost::serialization::access;

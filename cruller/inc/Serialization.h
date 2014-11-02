@@ -39,6 +39,10 @@ template<typename T> void SaveToFile(T &o, const std::string& filename) {
 template<typename T> void LoadFromFile(T &o, const std::string& filename) {
     std::ifstream f;
     f.open (filename.c_str(), std::ios::binary);
+    if(!f.good()) {
+        std::string error_message = "File \"" + filename + "\" either does not exist or cannot be read.";
+        throw(error_message);
+    }
     std::string s;
     f.seekg(0, std::ios::end);
     s.resize(f.tellg());

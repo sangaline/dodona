@@ -46,7 +46,4 @@ template<typename T> void LoadFromFile(T &o, const std::string& filename) {
     f.read(&s[0], s.size());
     f.close();
     LoadGZString(o, s);
-return;
-    f >> s;
-    f.close();
 }

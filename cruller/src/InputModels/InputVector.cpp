@@ -28,8 +28,10 @@ unsigned int InputVector::AddPoint(double x, double y, double t) {
 }
 
 void InputVector::RemovePoint(int i) {
-    if(i >= xvector.size()) 
+    while(i<0) { i += Length(); }
+    if((unsigned int) i >= xvector.size()) {
         return;
+    }
     xvector.erase(xvector.begin() + i);
     yvector.erase(yvector.begin() + i);
     tvector.erase(tvector.begin() + i);

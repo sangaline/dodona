@@ -11,6 +11,12 @@ WordList::WordList() {
 }
 
 WordList::WordList(const WordList& wl) {
+    tree = new RadixTree();
+
+    (*this) = wl;
+}
+
+WordList& WordList::operator=(const WordList& wl) {
     for(unsigned int i = 0; i < 128; i++) {
         letters[i] = wl.letters[i];
     }
@@ -31,8 +37,9 @@ WordList::WordList(const WordList& wl) {
         Nword_vector[i] = wl.Nword_vector[i];
     }
 
-    tree = new RadixTree();
-    tree_current = wl.tree_current;
+    tree_current = false;
+
+    return *this;
 }
 
 WordList::WordList(wordmap wm) {

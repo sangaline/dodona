@@ -47,6 +47,7 @@ class WordList {
   public:
     WordList();
     WordList(const WordList& wl);
+    WordList& operator=(const WordList& wl);
     WordList(wordmap wm);
     ~WordList();
     WordList operator+(const WordList& other);

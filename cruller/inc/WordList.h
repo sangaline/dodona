@@ -85,6 +85,7 @@ class WordList {
             for(unsigned int i = 0; i < word_vector.size(); i++) {
                 AddWord(word_vector[i].c_str(), occurance_vector[i]);
             }
+            tree_current = false;
         }
     }
 };

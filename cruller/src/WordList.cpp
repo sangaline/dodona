@@ -215,7 +215,7 @@ void WordList::UpdateDistribution() {
 
 void WordList::UpdateTree() {
     if(tree_current == false) {
-        //tree->Reset();
+        tree->Reset();
         for(unsigned int i = 0; i < Words(); i++) {
             tree->AddWord(Word(i));
         }

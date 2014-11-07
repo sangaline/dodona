@@ -13,11 +13,7 @@ RadixTree::RadixTree(bool firstlast) : firstlast(firstlast) {
 }
 
 RadixTree::~RadixTree() {
-    for(unsigned int i = 0; i < 256; i++) {
-        if(nodes[i] != 0) {
-            delete nodes[i];
-        }
-    }
+    Reset();
 }
 
 // make the first and last letters the first two nodes

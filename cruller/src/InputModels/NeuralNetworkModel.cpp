@@ -8,9 +8,15 @@
 #include "math.h"
 using namespace std;
 
+NeuralNetworkModel::NeuralNetworkModel() {}
+
 NeuralNetworkModel::NeuralNetworkModel(const char *filename, unsigned int vector_length, double xscale, double yscale, double correlation, double maxdistance, double maxsigmas, bool loop) :
     SimpleInterpolationModel(vector_length, xscale, yscale, correlation, maxdistance, maxsigmas, loop) {
 
+    ann = fann_create_from_file(filename);
+}
+
+void NeuralNetworkModel::SetANN(const char *filename) {
     ann = fann_create_from_file(filename);
 }
 

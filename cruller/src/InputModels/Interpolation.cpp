@@ -212,14 +212,14 @@ InputVector HermiteCubicSplineInterpolation(InputVector& iv, unsigned int Nsteps
 //constrains the first and last spline to be a straight line.
 InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, bool mod) {
     const unsigned int nPoints = iv.Length();
-    const unsigned int nSplines = nPoints-1;
+    const unsigned int Nsplines = nPoints-1;
 
     if (nPoints <= 2)
         return SpatialInterpolation(iv,Nsteps);
 
     //Algorithm coefficients
-    double Dx[nPoints],cpx[nSplines],dpx[nPoints];
-    double Dy[nPoints],cpy[nSplines],dpy[nPoints];
+    double Dx[nPoints],cpx[Nsplines],dpx[nPoints];
+    double Dy[nPoints],cpy[Nsplines],dpy[nPoints];
 
     //First step of tridiagonal matrix algorithm, a forward step to modify the coefficients
     for(unsigned int i=0; i < nPoints; i++) {
@@ -275,32 +275,32 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
 
     //Create new InputVector by walking through each spline curve
     InputVector newIV;
-    for(unsigned int i=0; i < nSplines; i++) {
-        double newX, newY, newT, step;
-        unsigned int nSteps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
+    for(unsigned int i=0; i < Nsplines; i++) {
+        double newX, newY, newT, step_size;
+        unsigned int Nintermediate_steps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
 
-        for(unsigned int j=0; j < nSteps; j++) {
-            if(nSteps==1) step = 1;
-            else step = double(j)/double(nSteps);
+        for(unsigned int j=0; j < Nintermediate_steps; j++) {
+            if(Nintermediate_steps==1) step_size = 1;
+            else step_size = double(j)/double(Nintermediate_steps);
 
             //Constrain first and last spline to be lines in the modified version
-            if((i==0 || i==nSplines-1) && mod==true) {
-                newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step;
-                newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step;
-                newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step;
+            if((i==0 || i==Nsplines-1) && mod==true) {
+                newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step_size;
+                newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step_size;
+                newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step_size;
             }
             else { 
-                newX = iv.X(i) + Dx[i]*step + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step,2) +
-                    (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step,3);
-                newY = iv.Y(i) + Dy[i]*step + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step,2) + 
-                    (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step,3);            
-                newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step; 
+                newX = iv.X(i) + Dx[i]*step_size + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step_size,2) +
+                    (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step_size,3);
+                newY = iv.Y(i) + Dy[i]*step_size + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step_size,2) + 
+                    (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step_size,3);            
+                newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step_size; 
             }
 
             newIV.AddPoint(newX,newY,newT);
         }
     }
-    newIV.AddPoint(iv.X(nSplines),iv.Y(nSplines),iv.T(nSplines));
+    newIV.AddPoint(iv.X(-1),iv.Y(-1),iv.T(-1));
     return newIV;
 }
 

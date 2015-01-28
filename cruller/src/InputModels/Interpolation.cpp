@@ -273,35 +273,41 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
          }
     }
 
-    //Create new InputVector by walking through each spline curve
-    InputVector newIV;
-    for(unsigned int i=0; i < Nsplines; i++) {
-        double newX, newY, newT, step_size;
-        unsigned int Nintermediate_steps = int(Nsteps*DistanceToNextPoint(iv,i)/iv.SpatialLength());
-
-        for(unsigned int j=0; j < Nintermediate_steps; j++) {
-            if(Nintermediate_steps==1) step_size = 1;
-            else step_size = double(j)/double(Nintermediate_steps);
-
-            //Constrain first and last spline to be lines in the modified version
-            if((i==0 || i==Nsplines-1) && mod==true) {
-                newX = iv.X(i) + (iv.X(i+1)-iv.X(i))*step_size;
-                newY = iv.Y(i) + (iv.Y(i+1)-iv.Y(i))*step_size;
-                newT = iv.T(i) + (iv.T(i+1)-iv.T(i))*step_size;
-            }
-            else { 
-                newX = iv.X(i) + Dx[i]*step_size + (3*(iv.X(i+1)-iv.X(i))-2*Dx[i]-Dx[i+1])*pow(step_size,2) +
-                    (2*(iv.X(i)-iv.X(i+1))+Dx[i]+Dx[i+1])*pow(step_size,3);
-                newY = iv.Y(i) + Dy[i]*step_size + (3*(iv.Y(i+1)-iv.Y(i))-2*Dy[i]-Dy[i+1])*pow(step_size,2) + 
-                    (2*(iv.Y(i)-iv.Y(i+1))+Dy[i]+Dy[i+1])*pow(step_size,3);            
-                newT = iv.T(i)+(iv.T(i+1)-iv.T(i))*step_size; 
-            }
-
-            newIV.AddPoint(newX,newY,newT);
+    //Create the new interpolated vector
+    InputVector newiv;
+    newiv.AddPoint(iv.X(0), iv.Y(0), iv.T(0));
+    const double start_time = iv.T(0), end_time = iv.T(-1);
+    const double total_time = end_time - start_time;
+    unsigned int lower = 0;
+    for(unsigned int i = 1; i < Nsteps-1; i++) {
+        double current_time = start_time + total_time*double(i)/double(Nsteps - 1);
+        while(iv.T(lower+1) < current_time) {
+            lower++;
         }
+        const unsigned int upper = lower + 1;
+        const double h = iv.T(upper) - iv.T(lower);
+        const double t = (current_time - iv.T(lower))/h;
+
+
+        double current_x, current_y;
+        if((lower == 0 || upper == Nsteps-1) && mod) {
+            current_x = iv.X(lower) + (iv.X(upper)-iv.X(lower))*t;
+            current_y = iv.Y(lower) + (iv.Y(upper)-iv.Y(lower))*t;
+        }
+        else { 
+            current_x = iv.X(lower) + Dx[lower]*t + (3*(iv.X(upper)-iv.X(lower))-2*Dx[lower]-Dx[upper])*pow(t,2) +
+                (2*(iv.X(lower)-iv.X(upper))+Dx[lower]+Dx[upper])*pow(t,3);
+            current_y = iv.Y(lower) + Dy[lower]*t + (3*(iv.Y(upper)-iv.Y(lower))-2*Dy[lower]-Dy[upper])*pow(t,2) + 
+                (2*(iv.Y(lower)-iv.Y(upper))+Dy[lower]+Dy[upper])*pow(t,3);            
+        }
+
+        newiv.AddPoint(current_x, current_y, current_time);
     }
-    newIV.AddPoint(iv.X(-1),iv.Y(-1),iv.T(-1));
-    return newIV;
+    if(Nsteps > 1) {
+        newiv.AddPoint(iv.X(-1), iv.Y(-1), iv.T(-1));
+    }
+
+    return newiv;
 }
 
 

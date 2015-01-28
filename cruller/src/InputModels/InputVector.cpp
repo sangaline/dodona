@@ -40,17 +40,17 @@ void InputVector::RemovePoint(int i) {
 
 double InputVector::X(int i) {
     while(i<0) { i += Length(); }
-    return xvector[i];
+    return xvector.at(i);
 }
 
 double InputVector::Y(int i) {
     while(i<0) { i += Length(); }
-    return yvector[i];
+    return yvector.at(i);
 }
 
 double InputVector::T(int i) {
     while(i<0) { i += Length(); }
-    return tvector[i];
+    return tvector.at(i);
 }
 
 void InputVector::SetX(int i, double x) {

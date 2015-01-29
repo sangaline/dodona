@@ -64,8 +64,19 @@ namespace {
 
 //Linear interpolation between points
 InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
-    const double length = iv.SpatialLength();
     const unsigned int points = iv.Length();
+    
+    //If it's a one letter word then fill the entire input vector with the same point.
+    //This is to ensure that it has the same vector length as every other input vector.
+    if(points == 1) {
+        InputVector newiv;
+        for(unsigned int i = 0; i < Nsteps; i++) 
+            newiv.AddPoint(iv.X(0), iv.Y(0), iv.T(0));
+        return newiv;
+    }
+
+
+    const double length = iv.SpatialLength();
     const double steplength = length/(double(Nsteps)-1.0);
 
     InputVector newiv;

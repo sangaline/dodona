@@ -25,6 +25,7 @@ FitnessResult FitnessFunctions::RadixMonteCarloEfficiency(Keyboard& keyboard, In
             for(vector<string>::iterator it = matches.begin(); it != matches.end(); ++it) {
                 possibilities.insert(*it);
             }
+            delete stringform;
         }
         possibilities.insert(word);
 

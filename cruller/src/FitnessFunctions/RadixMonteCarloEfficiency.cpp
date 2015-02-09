@@ -57,6 +57,6 @@ FitnessResult FitnessFunctions::RadixMonteCarloEfficiency(Keyboard& keyboard, In
     const double fitness = efficiency_sum;
     const double error = sqrt( (efficiency_sum2 - pow(efficiency_sum, 2))/double(iterations) );
 
-    delete sigma;
+    delete [] sigma;
     return FitnessResult(iterations, fitness, error);
 }

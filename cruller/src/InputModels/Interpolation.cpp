@@ -68,13 +68,14 @@ InputVector SpatialInterpolation(InputVector& iv, unsigned int Nsteps) {
     
     //If it's a one letter word then fill the entire input vector with the same point.
     //This is to ensure that it has the same vector length as every other input vector.
+    //The time vector is normalized to always take 0.1 seconds for one letter words,
+    //regardless of the number of steps in the interpolation
     if(points == 1) {
         InputVector newiv;
         for(unsigned int i = 0; i < Nsteps; i++) 
-            newiv.AddPoint(iv.X(0), iv.Y(0), iv.T(0));
+            newiv.AddPoint(iv.X(0), iv.Y(0), iv.T(double(i)*(0.1/double(Nsteps))));
         return newiv;
     }
-
 
     const double length = iv.SpatialLength();
     const double steplength = length/(double(Nsteps)-1.0);

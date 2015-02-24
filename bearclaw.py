@@ -290,12 +290,13 @@ def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
 #Left off the '.' because I think that was it's own key
 def MakeT9Keyboard(alphabetStr='abcdefghijklmnopqrstuvwxyz', scale=0.9):
     shift = (1, -1)
-    a, b, c = scale, scale/2.0, sqrt(3)*scale/2
     h = cruller.Polygon()
-    h.AddVertex(0,0)
-    h.AddVertex(1,0)
-    h.AddVertex(1,-1)
-    h.AddVertex(0,-1)
+    pad = (1.0-scale)/2.0
+    h.AddVertex(pad,-pad)
+    h.AddVertex(1-pad,-pad)
+    h.AddVertex(1-pad,pad-1)
+    h.AddVertex(pad,pad-1)
+    h.Translate(-2.5, 1.5)
 
     l = []
     for j in range(3):

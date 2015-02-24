@@ -61,7 +61,7 @@ def DrawPolygons(polylist):
 
 def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None,
                 t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None, saveas = None,
-                nopalette = False, perfectvector = None):
+                nopalette = False, perfectvector = None, axis = 'on'):
     fig = None
     if figsize != None:
         fig = plt.figure(figsize=figsize)
@@ -214,6 +214,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
 
     if saveas:
         savefig(saveas)
+    plt.axis(axis)
     plt.show()
 
 def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):

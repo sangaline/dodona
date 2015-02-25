@@ -153,9 +153,9 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             if oneletter != None:
                 c = oneletter
             patheffects = None
-            if colored:
-                from matplotlib import patheffects
-                patheffects = [patheffects.withStroke(linewidth=3,foreground="w")]
+            tracecolor = 'ghostwhite' if colored else facecolor
+            from matplotlib import patheffects
+            patheffects = [patheffects.withStroke(linewidth=3,foreground=tracecolor)]
             ax.text(newl + 0.5*(newr-newl),newb + 0.5*(newt-newb), c, fontsize=18, path_effects=patheffects, horizontalalignment='center', verticalalignment='center')
     xpad = (r-l)*0.1
     ypad = (t-b)*0.1

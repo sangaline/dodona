@@ -7,6 +7,7 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 import collections
 import matplotlib.cm as cm
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import savefig
 
 from math import log, floor, sqrt, exp
@@ -61,7 +62,7 @@ def DrawPolygons(polylist):
 
 def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None,
                 t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None, saveas = None,
-                nopalette = False, perfectvector = None, axis = 'on', facecolor='orange'):
+                nopalette = False, perfectvector = None, axis = 'on', facecolor='orange', vectorcolormap = mpl.cm.autumn_r):
     fig = None
     if figsize != None:
         fig = plt.figure(figsize=figsize)
@@ -170,44 +171,39 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         ax.plot(x, y, path_effects=patheffects, lw=3, color=(53/255,120/255,255/255))
 
     if inputvector != None:
-        color = (0.0,0.0,0.0)
-        colorlist = [(0.0,0.0,0.0)]
-        finalcolor = [(1.0,1.0,1.0)]
-
         #Test if inputvector is a list or not
         if not isinstance(inputvector,collections.Iterable):
             inputvector = [inputvector]
-            color = [(.8, 0.5, 0.5)]
-        else:
-            colorlist = [(1.0,0.0,0.0),(0.0,0.0,1.0),(0.0,100/255.,0.0),
-                         (1.0,1.0,0.0),(1.0,0.0,1.0),(0.0,1.0,1.0)]
-            finalcolor =[(1.0,128/255.,128/255.),(148/255.,148/255.,1.0),(89/255.,189/255.,89/255.),
-                         (1.0,1.0,175/255.),(1.0,171/255.,1.0),(179/255.,1.0,1.0)]
-            color = colorlist
+            vectorcolormap = [vectorcolormap]
+        elif not isinstance(vectorcolormap,collections.Iterable) or not len(inputvector) == len(vectorcolormap):
+            lightscale = 0.5
+            darkscale = 0.5
+            vectorcolormap = []
+            for i, vector in enumerate(inputvector):
+                color = next(ax._get_lines.color_cycle)
+                color = mpl.colors.colorConverter.to_rgba(color)
+                cdict = {'alpha': ((0.0,color[3],color[3]),(1.0,color[3],color[3]))}
+                for j, channel in enumerate(['red', 'green', 'blue']):
+                    light = 1.0 - (1.0 - color[j])*lightscale
+                    dark = color[j]*darkscale
+                    cdict[channel] = ((0.0,light,light),(1.0,dark,dark))
+                vectorcolormap.append(LinearSegmentedColormap('vectorcolormap' + str(i), cdict))
 
-        iEntry = 0
-        for entry in inputvector:
-
-            points = entry.PointList()
+        for vectorindex, vector in enumerate(inputvector):
+            points = vector.PointList()
             times = [t[2] for t in points]
             tmin = min(times)
             tmax = max(times)
+
+            norm = mpl.colors.Normalize(vmin=0, vmax=1)
+            scalarmap = mpl.cm.ScalarMappable(norm, cmap=vectorcolormap[vectorindex])
             for i, p in enumerate(points):
-                if tmax > tmin:
-                    colortmp = (0.0,0.0,0.0)
-                    if len(colorlist) > 1:
-                        colortmp = (color[iEntry][0]+((finalcolor[iEntry][0]-color[iEntry][0])/(tmax-tmin))*p[2],
-                                    color[iEntry][1]+((finalcolor[iEntry][1]-color[iEntry][1])/(tmax-tmin))*p[2],
-                                    color[iEntry][2]+((finalcolor[iEntry][2]-color[iEntry][2])/(tmax-tmin))*p[2])
-                    else :
-                        colortmp = (color[iEntry][0],1.0 - ((p[2]-tmin)/(tmax-tmin)), color[iEntry][2])
+                scaledtime = 0.5
+                scaledtime = (p[2]-tmin)/(tmax-tmin) if tmax > tmin else 0.5
+                color = scalarmap.to_rgba(scaledtime)
 
-                    markersize = 15 if t9 else 10
-                    ax.plot(p[0], p[1],color=colortmp, markersize=markersize, marker='o')
-
-            iEntry = iEntry+1
-            if iEntry >= len(colorlist):
-                iEntry =0;
+                markersize = 15 if t9 else 10
+                ax.plot(p[0], p[1],color=color, markersize=markersize, marker='o')
 
     plt.axis(axis)
     if saveas:

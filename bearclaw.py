@@ -116,7 +116,8 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             ax2 = fig.add_axes([0.91, 0.04, 0.05, 0.92])
             cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=colormap, norm=norm, format = format, orientation='vertical')
 
-    for i, c in enumerate(k.OrderedKeyList()):
+    ordered_key_list = k.OrderedKeyList()
+    for i, c in enumerate(ordered_key_list):
         p = d[c]
         verts = p.VertexList()
         codes = [Path.MOVETO] + [Path.LINETO for i in range(len(verts)-2)] + [Path.CLOSEPOLY]
@@ -140,17 +141,13 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         patch = patches.PathPatch(path, facecolor=facecolor, lw=2)
         ax.add_patch(patch)
 
-        t9shift = 0.0
         if t9:
-            idx = i % 3
-            t9shift = (newr-newl)*0.25
-            if i == 25 or i == 18:
-                t9shift *= 3
+            if i in [0, 3, 6, 9, 12, 15, 19, 22]:
+                extras = 4 if i in [15, 22] else 3
+                for j in range(i+1, i + extras):
+                    c += ' ' + ordered_key_list[j]
             else:
-                if i > 18:
-                    idx = (i-1) % 3
-                t9shift *= idx
-            t9shift -= (newr-newl)*0.15
+                c = ''
 
         if letters:
             if oneletter != None:
@@ -159,7 +156,7 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             if colored:
                 from matplotlib import patheffects
                 patheffects = [patheffects.withStroke(linewidth=3,foreground="w")]
-            ax.text(newl + 0.2*(newr-newl) + t9shift,newb + 0.2*(newt-newb), c, fontsize=18, path_effects=patheffects)
+            ax.text(newl + 0.5*(newr-newl),newb + 0.5*(newt-newb), c, fontsize=18, path_effects=patheffects, horizontalalignment='center', verticalalignment='center')
     xpad = (r-l)*0.1
     ypad = (t-b)*0.1
     ax.set_xlim(l-xpad, r+xpad)

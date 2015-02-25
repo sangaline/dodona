@@ -202,7 +202,8 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
                     else :
                         colortmp = (color[iEntry][0],1.0 - ((p[2]-tmin)/(tmax-tmin)), color[iEntry][2])
 
-                    ax.plot(p[0], p[1],color=colortmp, markersize=10, marker='o')
+                    markersize = 15 if t9 else 10
+                    ax.plot(p[0], p[1],color=colortmp, markersize=markersize, marker='o')
 
             iEntry = iEntry+1
             if iEntry >= len(colorlist):

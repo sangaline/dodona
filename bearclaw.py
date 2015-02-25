@@ -209,9 +209,9 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
             if iEntry >= len(colorlist):
                 iEntry =0;
 
+    plt.axis(axis)
     if saveas:
         savefig(saveas)
-    plt.axis(axis)
     plt.show()
 
 def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):

@@ -255,6 +255,53 @@ def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
         k.AddKey(alphabetStr[i], l[i])
     return k
 
+def MakeDvorakKeyboard(alphabetStr='.pyfgcrlaoeuidhtnsqjkxbmwvz'):
+    width = 1.0
+    height = 1.5
+    gap = 0.2
+    starty = 0.0
+
+    #Dvorak specific start points
+    startx = 1.5*(width+gap)
+    l = []
+    for i in range(8):
+        p = cruller.Polygon()
+        p.AddVertex(startx + float(i)*(width+gap), starty)
+        p.AddVertex(startx + float(i)*(width+gap) + width, starty)
+        p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
+        p.AddVertex(startx + float(i)*(width+gap), starty-height)
+        l.append(p)
+    startx = 0.0
+    starty -= height + gap
+    for i in range(10):
+        p = cruller.Polygon()
+        p.AddVertex(startx + float(i)*(width+gap), starty)
+        p.AddVertex(startx + float(i)*(width+gap) + width, starty)
+        p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
+        p.AddVertex(startx + float(i)*(width+gap), starty-height)
+        l.append(p)
+    startx = 1.5*(width+gap)
+    starty -= height + gap
+    for i in range(9):
+        p = cruller.Polygon()
+        p.AddVertex(startx + float(i)*(width+gap), starty)
+        p.AddVertex(startx + float(i)*(width+gap) + width, starty)
+        p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
+        p.AddVertex(startx + float(i)*(width+gap), starty-height)
+        l.append(p)
+    starty -= height + gap
+    p = cruller.Polygon()
+    p.AddVertex(startx + float(6)*(width+gap), starty)
+    p.AddVertex(startx + float(6)*(width+gap) + width, starty)
+    p.AddVertex(startx + float(6)*(width+gap) + width, starty-height)
+    p.AddVertex(startx + float(6)*(width+gap), starty-height)
+    l.append(p)
+
+    k = cruller.Keyboard()
+    for i in range(len(alphabetStr)):
+        k.AddKey(alphabetStr[i], l[i])
+    return k
+
 def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
     shift = (sqrt(3), -1.5)
     a, b, c = scale, scale/2.0, sqrt(3)*scale/2

@@ -139,6 +139,8 @@ BOOST_PYTHON_MODULE(cruller)
     ;
     
     class_<SimpleGaussianModel, bases<InputModel> >("SimpleGaussianModel")
+        .def(init<double,double,double>())
+        .def(init<double,double>())
         .def("MarginalProbability", &SimpleGaussianModel::MarginalProbability)
         .def("SetXScale", &SimpleGaussianModel::SetXScale)
         .def("SetYScale", &SimpleGaussianModel::SetYScale)

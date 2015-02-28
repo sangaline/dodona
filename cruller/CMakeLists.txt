@@ -9,6 +9,13 @@ SET(LIBRARY_NAME cruller)
 AUX_SOURCE_DIRECTORY(src SOURCE_FILES)
 AUX_SOURCE_DIRECTORY(src/InputModels INPUT_MODELS)
 AUX_SOURCE_DIRECTORY(src/FitnessFunctions FITNESS_FUNCTIONS)
+
+option(fann "static" OFF)
+IF(NOT fann)
+  list(REMOVE_ITEM INPUT_MODELS src/InputModels/NeuralNetworkModel.cpp)
+  add_definitions(-DNO_FANN)
+ENDIF()
+
 ADD_LIBRARY(${LIBRARY_NAME} SHARED ${SOURCE_FILES} ${INPUT_MODELS} ${FITNESS_FUNCTIONS})
 
 option(static "static" OFF)
@@ -56,8 +63,9 @@ ELSE()
   MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
 ENDIF()
 
-#for the neural networks
-TARGET_LINK_LIBRARIES(${LIBRARY_NAME} fann)
+IF(fann)
+  TARGET_LINK_LIBRARIES(${LIBRARY_NAME} fann)
+ENDIF()
 
 IF(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   IF(CMAKE_COMPILER_IS_GNUCXX)

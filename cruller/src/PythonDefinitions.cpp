@@ -25,7 +25,9 @@
 #include "WordList_py.h"
 #include "InputModels/InputModel_py.h"
 #include "InputModels/SimpleInterpolationModel_py.h"
+#ifndef NO_FANN
 #include "InputModels/NeuralNetworkModel_py.h"
+#endif
 
 
 using namespace boost::python;
@@ -167,9 +169,11 @@ BOOST_PYTHON_MODULE(cruller)
         //.def("SetSeed", &SimpleInterpolationModel::SetSeed)
     ;
 
+#ifndef NO_FANN
     class_<NeuralNetworkModel, bases<SimpleInterpolationModel, InputModel> >("NeuralNetworkModel", init<const char*>())
         .def("CreateInputs", &NeuralNetworkInputs)
     ;
+#endif
 /********************************************************/
 
 /***************** InputVector class ********************/
@@ -235,6 +239,8 @@ BOOST_PYTHON_MODULE(cruller)
 /********************************************************/
 
 /***************** Neural Network Static Functions ******/
+#ifndef NO_FANN
     def("CreateNeuralNetworkInputs", &CreateNeuralNetworkInputs);
+#endif
 /********************************************************/
 }

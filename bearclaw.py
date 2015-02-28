@@ -312,6 +312,7 @@ def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
     h.AddVertex(0,a)
     h.AddVertex(-c,b)
     h.AddVertex(-c,-b)
+    h.Translate(-shift[0]/2.0, 0)
 
     l = []
     for j in range(3):

@@ -4,6 +4,17 @@ from donut import core, keyboards
 
 from random import random
 import numpy as np
+import multiprocessing as mp
+
+nProc = mp.cpu_count()
+def thread(inList, func):
+    pool = mp.Pool(processes=nProc)
+
+    outList = pool.map(func, inList)
+    pool.close()
+    pool.join()
+
+    return outList
 
 
 #Takes a generation (current list of keyboards) and evolves a new generation based on a genetic-ish algorithm

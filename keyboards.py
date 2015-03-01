@@ -1,4 +1,4 @@
-from donut import core
+from dodona import core
 from random import shuffle, choice
 
 import matplotlib as mpl

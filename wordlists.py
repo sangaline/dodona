@@ -1,4 +1,4 @@
-from donut import core
+from dodona import core
 
 def AlphaOnly(word):
     return ''.join(c for c in word.lower() if c.isalpha())

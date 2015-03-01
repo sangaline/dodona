@@ -1,6 +1,6 @@
 #Relevent functions and their definitions for the genetic algorithm
 
-from donut import core, keyboards
+from dodona import core, keyboards
 
 from random import random
 import numpy as np

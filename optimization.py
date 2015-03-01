@@ -1,6 +1,6 @@
 #Relevent functions and their definitions for the genetic algorithm
 
-from donut import cruller, bearclaw
+from donut import core, keyboards
 
 from random import random
 import numpy as np
@@ -11,15 +11,15 @@ import numpy as np
 #returns newkList which is the new generation (list) of keyboards
 
 def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
-    nk = len(kList)    
-    fitnessResultList = [ kList[i][1] for i in range(len(kList))  ]   
+    nk = len(kList)
+    fitnessResultList = [ kList[i][1] for i in range(len(kList))  ]
 
     #Pick pairs to repopulate the new generation with
     #Since each pair reproduces two new chromosomes this only needs to be done nChromosomes/2 times
     newkList = []
     for i in range(int(nk/2)):
         partnerA_index = NaturalSelection(fitnessResultList, pressurePoint)
-    
+
         #Check to see if the halting condition has been met (i.e. if the fitnesses are all too close to differentiate within error)
         if partnerA_index == -1:
             return kList
@@ -28,24 +28,24 @@ def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
 
         partnerA_letters = kList[partnerA_index][0].OrderedKeyList()
         partnerB_letters = kList[partnerB_index][0].OrderedKeyList()
-        
+
         #pick random crossover position
         co_index = int(np.random.rand()*26)
-       
+
         #Get freaky and make babies
         newChromeA_letters, newChromeB_letters = SwapGenes(partnerA_letters, partnerB_letters, co_index)
 
         #create new keyboard corresponding to the new chromosomes created above
         newKeyboardA_string = ''.join(newChromeA_letters)
         newKeyboardB_string = ''.join(newChromeB_letters)
-        newKeyboardA = bearclaw.MakeStandardKeyboard(newKeyboardA_string)
-        newKeyboardB = bearclaw.MakeStandardKeyboard(newKeyboardB_string)
+        newKeyboardA = keyboards.MakeStandardKeyboard(newKeyboardA_string)
+        newKeyboardB = keyboards.MakeStandardKeyboard(newKeyboardB_string)
 
         #Indroduce mutations
         if np.random.rand() < mutationRate:
-            newKeyboardA = bearclaw.RandomSwap(newKeyboardA,1)
+            newKeyboardA = keyboards.RandomSwap(newKeyboardA,1)
         if np.random.rand() < mutationRate:
-            newKeyboardB = bearclaw.RandomSwap(newKeyboardB,1)
+            newKeyboardB = keyboards.RandomSwap(newKeyboardB,1)
 
         newFitnessA = fitness(newKeyboardA)
         newFitnessB = fitness(newKeyboardB)
@@ -64,14 +64,14 @@ def Evolve(kList, fitness, pressurePoint = 0, mutationRate = 0.2):
 
 def NaturalSelection(frList, pressurePoint):
     weights = [ ]
-    fitnessList = [ frEntry.Fitness() for frEntry in frList ] 
+    fitnessList = [ frEntry.Fitness() for frEntry in frList ]
     sortedWeights = sorted(fitnessList)
 
     min = sortedWeights[pressurePoint]
     max = sortedWeights[-1]
     iMax = fitnessList.index(max)
     scale = max-min
-    
+
     for frEntry in frList:
         weights.append(frEntry.Fitness() - min + 2*frEntry.Error())
 
@@ -96,7 +96,7 @@ def NaturalSelection(frList, pressurePoint):
 def SwapGenes(keyBoard_A, keyBoard_B, co_index):
     keyBoard_A = [a for a in keyBoard_A]
     keyBoard_B = [b for b in keyBoard_B]
-        
+
     newGenesA = keyBoard_B[0:co_index] #the new genes to be swapped into chromosome A
     newGenesB = keyBoard_A[0:co_index] #   "           "            "  chromosome B
 

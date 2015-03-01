@@ -1,4 +1,4 @@
-from donut import cruller
+from donut import core
 from random import shuffle, choice
 
 import matplotlib as mpl
@@ -218,7 +218,7 @@ def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     starty = 0.0
     l = []
     for i in range(10):
-        p = cruller.Polygon()
+        p = core.Polygon()
         p.AddVertex(startx + float(i)*(width+gap), starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
@@ -227,7 +227,7 @@ def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     startx += 0.5*width
     starty -= height + gap
     for i in range(9):
-        p = cruller.Polygon()
+        p = core.Polygon()
         p.AddVertex(startx + float(i)*(width+gap), starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
@@ -236,21 +236,21 @@ def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):
     startx += width + gap
     starty -= height + gap
     for i in range(7):
-        p = cruller.Polygon()
+        p = core.Polygon()
         p.AddVertex(startx + float(i)*(width+gap), starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
         p.AddVertex(startx + float(i)*(width+gap), starty-height)
         l.append(p)
     starty -= height + gap
-    p = cruller.Polygon()
+    p = core.Polygon()
     p.AddVertex(startx + float(6)*(width+gap), starty)
     p.AddVertex(startx + float(6)*(width+gap) + width, starty)
     p.AddVertex(startx + float(6)*(width+gap) + width, starty-height)
     p.AddVertex(startx + float(6)*(width+gap), starty-height)
     l.append(p)
 
-    k = cruller.Keyboard()
+    k = core.Keyboard()
     for i in range(len(alphabetStr)):
         k.AddKey(alphabetStr[i], l[i])
     return k
@@ -265,7 +265,7 @@ def MakeDvorakKeyboard(alphabetStr='.pyfgcrlaoeuidhtnsqjkxbmwvz'):
     startx = 1.5*(width+gap)
     l = []
     for i in range(8):
-        p = cruller.Polygon()
+        p = core.Polygon()
         p.AddVertex(startx + float(i)*(width+gap), starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
@@ -274,7 +274,7 @@ def MakeDvorakKeyboard(alphabetStr='.pyfgcrlaoeuidhtnsqjkxbmwvz'):
     startx = 0.0
     starty -= height + gap
     for i in range(10):
-        p = cruller.Polygon()
+        p = core.Polygon()
         p.AddVertex(startx + float(i)*(width+gap), starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
@@ -283,21 +283,21 @@ def MakeDvorakKeyboard(alphabetStr='.pyfgcrlaoeuidhtnsqjkxbmwvz'):
     startx = 1.5*(width+gap)
     starty -= height + gap
     for i in range(9):
-        p = cruller.Polygon()
+        p = core.Polygon()
         p.AddVertex(startx + float(i)*(width+gap), starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty)
         p.AddVertex(startx + float(i)*(width+gap) + width, starty-height)
         p.AddVertex(startx + float(i)*(width+gap), starty-height)
         l.append(p)
     starty -= height + gap
-    p = cruller.Polygon()
+    p = core.Polygon()
     p.AddVertex(startx + float(6)*(width+gap), starty)
     p.AddVertex(startx + float(6)*(width+gap) + width, starty)
     p.AddVertex(startx + float(6)*(width+gap) + width, starty-height)
     p.AddVertex(startx + float(6)*(width+gap), starty-height)
     l.append(p)
 
-    k = cruller.Keyboard()
+    k = core.Keyboard()
     for i in range(len(alphabetStr)):
         k.AddKey(alphabetStr[i], l[i])
     return k
@@ -305,7 +305,7 @@ def MakeDvorakKeyboard(alphabetStr='.pyfgcrlaoeuidhtnsqjkxbmwvz'):
 def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
     shift = (sqrt(3), -1.5)
     a, b, c = scale, scale/2.0, sqrt(3)*scale/2
-    h = cruller.Polygon()
+    h = core.Polygon()
     h.AddVertex(0,-a)
     h.AddVertex(c,-b)
     h.AddVertex(c,b)
@@ -324,7 +324,7 @@ def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
             oldp = p
         h.Translate(0.5*shift[0], shift[1])
 
-    k = cruller.Keyboard()
+    k = core.Keyboard()
     for i in range(27):
         k.AddKey(alphabetStr[i], l[i])
     return k
@@ -332,7 +332,7 @@ def MakeHexagonalKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.', scale=0.9):
 #Left off the '.' because I think that was it's own key
 def MakeT9Keyboard(alphabetStr='abcdefghijklmnopqrstuvwxyz', scale=0.9):
     shift = (1, -1)
-    h = cruller.Polygon()
+    h = core.Polygon()
     pad = (1.0-scale)/2.0
     h.AddVertex(pad,-pad)
     h.AddVertex(1-pad,-pad)
@@ -354,7 +354,7 @@ def MakeT9Keyboard(alphabetStr='abcdefghijklmnopqrstuvwxyz', scale=0.9):
             oldp = p
         h.Translate(0, shift[1])
 
-    k = cruller.Keyboard()
+    k = core.Keyboard()
     for i in range(26):
         k.AddKey(alphabetStr[i], l[i])
 
@@ -369,7 +369,7 @@ def RandomKeyboard(keyboard = None):
 
     indices = list(range(len(letters)))
     shuffle(indices)
-    newk = cruller.Keyboard()
+    newk = core.Keyboard()
     for i, idx in enumerate(indices):
         newk.AddKey(letters[idx], polygons[i])
 
@@ -398,7 +398,7 @@ def RandomSwap(keyboard, Nswaps = 1):
 #        print("choices:", c)
         indices[c[0]], indices[c[1]] = indices[c[1]], indices[c[0]]
 
-    newk = cruller.Keyboard()
+    newk = core.Keyboard()
     for i, idx in enumerate(indices):
         newk.AddKey(letters[idx], polygons[i])
 

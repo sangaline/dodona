@@ -2,7 +2,7 @@
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
 
-//cruller include files
+//core include files
 #include "FitnessFunctions.h"
 #include "FitnessResult.h"
 #include "Serialization.h"
@@ -58,7 +58,7 @@ template<typename T> struct serialization_pickle_suite : pickle_suite {
 /***************** Python Module ************************/
 /********************************************************/
 
-BOOST_PYTHON_MODULE(cruller)
+BOOST_PYTHON_MODULE(core)
 {
 
 /***************** WordList class ***********************/

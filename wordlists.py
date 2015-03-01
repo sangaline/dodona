@@ -1,11 +1,11 @@
-from donut import cruller
+from donut import core
 
 def AlphaOnly(word):
     return ''.join(c for c in word.lower() if c.isalpha())
 
 def ReadBook(book, wordlist=None, cleaner=AlphaOnly):
     if wordlist == None:
-        wordlist = cruller.WordList()
+        wordlist = core.WordList()
     with open(book, "r", errors="replace") as f:
         for line in f:
             for word in line.split():
@@ -15,7 +15,7 @@ def ReadBook(book, wordlist=None, cleaner=AlphaOnly):
     return wordlist
 
 def MostCommon(wordlist, N):
-    w2 = cruller.WordList()
+    w2 = core.WordList()
     for i in range(min(N,wordlist.Words())):
         w2.AddWord(wordlist.Word(i), wordlist.Occurances(i))
     return w2

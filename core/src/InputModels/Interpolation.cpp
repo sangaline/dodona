@@ -203,7 +203,7 @@ InputVector HermiteCubicSplineInterpolationBase(InputVector& iv, unsigned int Ns
         delete [] delta[dimension];
     }
 
-    return newiv;
+    return SpatialInterpolation(newiv, Nsteps);
 }
 
 
@@ -319,7 +319,7 @@ InputVector CubicSplineInterpolationBase(InputVector& iv, unsigned int Nsteps, b
         newiv.AddPoint(iv.X(-1), iv.Y(-1), iv.T(-1));
     }
 
-    return newiv;
+    return SpatialInterpolation(newiv, Nsteps);
 }
 
 
@@ -391,7 +391,7 @@ InputVector BezierInterpolation(InputVector& iv, unsigned int Nsteps) {
     //Combine all of the segments into one input vector
     InputVector combinedIV;
     combinedIV = CombineInputVectors(IVlist);
-    return combinedIV;
+    return SpatialInterpolation(combinedIV,Nsteps);
 }
 
 
@@ -444,7 +444,7 @@ InputVector BezierSloppyInterpolation(InputVector& iv, unsigned int Nsteps) {
     //Combine all of the segments into a single input vector
     InputVector combinedIV;
     combinedIV = CombineInputVectors(IVlist);
-    return combinedIV;
+    return SpatialInterpolation(combinedIV,Nsteps);
 }
 
 

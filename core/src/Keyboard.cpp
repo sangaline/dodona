@@ -112,3 +112,13 @@ void Keyboard::RandomSwap(unsigned int N) {
         swap(polygons[entries[i1]], polygons[entries[i2]]);
     }
 }
+
+bool Keyboard::operator==(const Keyboard& other) {
+    if(idx != other.idx)
+        return false;    
+    for(unsigned int c = 0; c < idx; c++) {
+        if(!(GetKey(entries[c]) == other.GetKey(other.entries[c])))
+            return false;
+    }
+    return true;
+}

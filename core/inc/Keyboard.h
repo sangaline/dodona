@@ -16,6 +16,7 @@ class Keyboard {
   public:
     Keyboard();
     Keyboard(const Keyboard& k);
+    bool operator==(const Keyboard& other);
     void AddKey(const unsigned char c, const Polygon& p);
     void RemoveKey(const unsigned char c);
     Polygon GetKey(const unsigned char c) const;

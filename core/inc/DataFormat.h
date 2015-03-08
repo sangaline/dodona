@@ -1,5 +1,5 @@
-#ifndef TrainingDataFileFormat_h
-#define TrainingDataFileFormat_h
+#ifndef DataFormat_h
+#define DataFormat_h
 
 #include "WordList.h"
 #include "Keyboard.h"
@@ -15,7 +15,7 @@
 
 namespace boost {namespace serialization {class access;}}
 
-class TrainingDataFileFormat {
+class DataFormat {
   public:
     typedef std::pair<Keyboard, std::vector< std::pair<std::string, FitnessResult> > > resultEntry;
   private:
@@ -32,14 +32,14 @@ class TrainingDataFileFormat {
     std::vector<resultEntry> result_vector;
 
   public: 
-    TrainingDataFileFormat();
-    TrainingDataFileFormat(TrainingDataFileFormat const& td);
-    TrainingDataFileFormat(WordList& wordlist, std::string wordlistname, std::string inputmodel, std::string distancemeasure);
-    ~TrainingDataFileFormat();
-    TrainingDataFileFormat operator+(const TrainingDataFileFormat& other);
-    bool operator==(const TrainingDataFileFormat& other);
+    DataFormat();
+    DataFormat(DataFormat const& td);
+    DataFormat(WordList& wordlist, std::string wordlistname, std::string inputmodel, std::string distancemeasure);
+    ~DataFormat();
+    DataFormat operator+(const DataFormat& other);
+    bool operator==(const DataFormat& other);
 
-    void AddEntry(Keyboard k, std::string effType, FitnessResult eff);
+    void AddEntry(Keyboard k, std::string effType, FitnessResult eff, int index = -1);
     resultEntry GetEntry(const unsigned int index) const;
     unsigned int Entries() const { return result_vector.size(); }
 
@@ -59,7 +59,7 @@ class TrainingDataFileFormat {
   private:
     friend class boost::serialization::access;
     template<typename Archive> void serialize(Archive& ar, const unsigned int version) {
-        ar & w & input_model & distance_measure & result_vector;
+        ar & w & word_list  & input_model & distance_measure & result_vector;
     }
 };
 

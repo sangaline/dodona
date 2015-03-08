@@ -122,3 +122,8 @@ bool Keyboard::operator==(const Keyboard& other) {
     }
     return true;
 }
+
+void Keyboard::RandomNoop() {
+    boost::random::uniform_int_distribution<> dist(0, 1);
+    dist(generator);
+}

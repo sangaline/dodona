@@ -26,6 +26,7 @@ class Keyboard {
     void SwapCharacters(const unsigned char c1, const unsigned char c2);
     void Randomize();
     void RandomSwap(unsigned int N = 1);
+    void RandomNoop();
     void SetSeed(unsigned int s) { generator.seed(s); }
     void Reset();
 

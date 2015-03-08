@@ -106,3 +106,16 @@ bool Polygon::IsInside(double x, double y) {
     }
     return false;
 }
+
+bool Polygon::operator==(const Polygon& other) {
+    if(vertices.size() != other.VertexCount())
+        return false;
+
+    for(unsigned int it = 0; it != VertexCount() && it != other.VertexCount(); it++ ) {
+        if( (vertices[it].first != other.VertexX(it)) || (vertices[it].second != other.VertexY(it)))
+            return false;
+    }
+
+    return true;
+}
+

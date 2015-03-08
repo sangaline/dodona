@@ -6,6 +6,7 @@
 #include "FitnessFunctions.h"
 #include "FitnessResult.h"
 #include "Serialization.h"
+#include "DataFormat.h"
 
 #include "InputModels/SimpleGaussianModel.h"
 #include "InputModels/SimpleInterpolationModel.h"
@@ -25,6 +26,7 @@
 #include "WordList_py.h"
 #include "InputModels/InputModel_py.h"
 #include "InputModels/SimpleInterpolationModel_py.h"
+#include "DataFormat_py.h"
 #ifndef NO_FANN
 #include "InputModels/NeuralNetworkModel_py.h"
 #endif
@@ -236,6 +238,28 @@ BOOST_PYTHON_MODULE(core)
     def("ModCubicSplineInterpolation", &ModCubicSplineInterpolation);
     def("BezierInterpolation", &BezierInterpolation);
     def("BezierSloppyInterpolation", &BezierSloppyInterpolation);
+/********************************************************/
+
+/************** DataFormat ******************/
+    class_<DataFormat>("DataFormat", init<WordList&, std::string, std::string, std::string>())
+        .def(init<>())
+        .def("AddEntry", &DataFormat::AddEntry)
+        .def("GetEntry", &DataFormat::GetEntry)
+        .def("Entries", &DataFormat::Entries)
+        .def_pickle(serialization_pickle_suite<DataFormat>())
+        .def("SaveToFile", &SaveToFile<DataFormat>)
+        .def("PythonData", &DataFormatPythonForm)
+        .def("LoadFromFile", &LoadFromFile<DataFormat>)
+        .def("SetWordList", &DataFormat::SetWordList)
+        .def("SetWordListName", &DataFormat::SetWordListName)
+        .def("SetInputModelName", &DataFormat::SetInputModelName)
+        .def("SetDistanceMeasureName", &DataFormat::SetDistanceMeasureName)
+        .def("GetWordList", &DataFormat::GetWordList)
+        .def("GetWordListName", &DataFormat::GetWordListName)
+        .def("GetInputModelName", &DataFormat::GetInputModelName)
+        .def("GetDistanceMeasureName", &DataFormat::GetDistanceMeasureName)
+        .def(self+self)
+    ;
 /********************************************************/
 
 /***************** Neural Network Static Functions ******/

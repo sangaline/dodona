@@ -21,6 +21,8 @@ Keyboard::Keyboard(const Keyboard& k) {
     for(unsigned int i = 0; i < idx; i++) {
         entries[i] = k.entries[i];
     }
+
+    generator = k.generator;
 }
 
 void Keyboard::AddKey(const unsigned char c, const Polygon& p) {

@@ -165,12 +165,6 @@ BOOST_PYTHON_MODULE(core)
         .def("SetCorrelation", &SimpleInterpolationModel::SetCorrelation)
         .def("Interpolation", &SimpleInterpolationModelCallback::default_Interpolation)
         .def("SetInterpolation", &SetInterpolationByName)
-        //still need these...
-        //.def("RandomVector", &SimpleInterpolationModel::RandomVector)
-        //.def("PerfectVector", &SimpleInterpolationModel::PerfectVector)
-        //.def("Distance", &SimpleInterpolationModel::Distance)
-        //.def("VectorDistance", &SimpleInterpolationModel::VectorDistance)
-        //.def("SetSeed", &SimpleInterpolationModel::SetSeed)
     ;
 
 #ifndef NO_FANN

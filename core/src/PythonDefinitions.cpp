@@ -228,6 +228,7 @@ BOOST_PYTHON_MODULE(core)
 
 /***************** FitnessFunctions ********************/
     def("MonteCarloEfficiency", &FitnessFunctions::MonteCarloEfficiency);
+    def("ExactEfficiency", &FitnessFunctions::ExactEfficiency);
     def("FastEfficiency", &FitnessFunctions::FastEfficiency);
     def("RadixMonteCarloEfficiency", &FitnessFunctions::RadixMonteCarloEfficiency);
 /********************************************************/

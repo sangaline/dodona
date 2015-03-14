@@ -53,7 +53,8 @@ def DrawPolygons(polylist, facecolor = 'lightblue', figsize = None):
 
 def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = None, inputvector = None,
                 t9 = False, letters = True, frequencymap = None, oneletter = None, colormap = mpl.cm.cool, figsize = None, saveas = None,
-                nopalette = False, perfectvector = None, axis = 'off', facecolor = 'lightblue', vectorcolormap = mpl.cm.autumn_r):
+                nopalette = False, perfectvector = None, axis = 'off', facecolor = 'lightblue', vectorcolormap = mpl.cm.autumn_r, markersize = None,
+                transparent = True, perfectcolor = 'b'):
     if figsize != None:
         fig = plt.figure(figsize=figsize)
     else:
@@ -157,8 +158,10 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
         x = [x for x,y,t in points]
         y = [y for x,y,t in points]
         from matplotlib import patheffects
-        patheffects = [patheffects.withStroke(linewidth=5,foreground=(53*0.5/255,120*0.5/255,255*0.5/255))]
-        ax.plot(x, y, path_effects=patheffects, lw=3, color=(53/255,120/255,255/255))
+        perfecttrace = list(mpl.colors.colorConverter.to_rgba(tracecolor))
+        perfecttrace[3] = mpl.colors.colorConverter.to_rgba(perfectcolor)[3]
+        patheffects = [patheffects.withStroke(linewidth=6,foreground=tracecolor)]
+        ax.plot(x, y, path_effects=patheffects, lw=3, color=perfectcolor)
 
     if inputvector != None:
         #Test if inputvector is a list or not
@@ -192,12 +195,13 @@ def DrawKeyboard(k, wordlist = None, logarithmic = False, pmin = None, pmax = No
                 scaledtime = (p[2]-tmin)/(tmax-tmin) if tmax > tmin else 0.5
                 color = scalarmap.to_rgba(scaledtime)
 
-                markersize = 15 if t9 else 10
+                if not markersize:
+                    markersize = 15 if t9 else 10
                 ax.plot(p[0], p[1],color=color, markersize=markersize, marker='o')
 
     plt.axis(axis)
     if saveas:
-        savefig(saveas)
+        savefig(saveas, transparent=transparent)
     plt.show()
 
 def MakeStandardKeyboard(alphabetStr='qwertyuiopasdfghjklzxcvbnm.'):

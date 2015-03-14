@@ -5,6 +5,7 @@
 
 #include "InputModels/InputVector.h"
 #include "Keyboard.h"
+#include "WordList.h"
 
 class InputModel {
   protected:
@@ -20,6 +21,7 @@ class InputModel {
     virtual double Distance(InputVector& vector, const char* word, Keyboard& k) = 0;
     virtual double VectorDistance(InputVector& vector1, InputVector& vector2) = 0;
     virtual void SetSeed(unsigned int s) { generator.seed(s); }
+    virtual const char* BestMatch(InputVector& vector, Keyboard& k, WordList &w);
 };
 
 #endif

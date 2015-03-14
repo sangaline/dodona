@@ -105,6 +105,7 @@ unsigned int WordList::Occurances(const unsigned int index) {
 }
 
 unsigned int WordList::NWords(const unsigned int N) {
+    UpdateVectors();
     if(N < 1 || N > MAXN) {
         return 0;
     }

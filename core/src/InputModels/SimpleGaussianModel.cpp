@@ -66,20 +66,36 @@ double SimpleGaussianModel::MarginalProbability( InputVector& sigma, const char*
 
     double probability = 1;
     for(unsigned int i = 0; i < sigma.Length(); i++) {
-        Polygon p = k.GetKey(word[i]);
-        const double t = p.TopExtreme();
-        const double b = p.BottomExtreme();
+        const Polygon p = k.GetKey(word[i]);
         const double r = p.RightExtreme();
         const double l = p.LeftExtreme();
-
         const double x = sigma.X(i);
-        const double y = sigma.Y(i);
         const double xmu = 0.5*(r+l);
-        const double ymu = 0.5*(t+b);
-        const double xsd = xsigma*(r-l);
-        const double ysd = ysigma*(t-b);
+        if(xsigma > 0) {
+            const double xsd = xsigma*(r-l);
+            probability *= (0.3989422804/xsd)*exp(-0.5*(pow((x-xmu)/xsd,2)));
+        }
+        else {
+            if(xmu != x) {
+                probability = 0;
+                break;
+            }
+        }
 
-        probability *= (0.15915494309/(xsd*ysd))*exp(-0.5*(pow((x-xmu)/xsd,2)+pow((y-ymu)/ysd,2)));
+        const double t = p.TopExtreme();
+        const double b = p.BottomExtreme();
+        const double y = sigma.Y(i);
+        const double ymu = 0.5*(t+b);
+        if(ysigma > 0) {
+            const double ysd = ysigma*(t-b);
+            probability *= (0.3989422804/ysd)*exp(-0.5*(pow((y-ymu)/ysd,2)));
+        }
+        else {
+            if(ymu != y) {
+                probability = 0;
+                break;
+            }
+        }
     }
 
     return probability;
@@ -91,17 +107,22 @@ double SimpleGaussianModel::Distance( InputVector& sigma, const char* word, Keyb
     }
 
     double probability = 1;
-    for(unsigned int i = 0; i < sigma.Length(); i++) {
-        Polygon p = k.GetKey(word[i]);
-        const double t = p.TopExtreme();
-        const double b = p.BottomExtreme();
-        const double r = p.RightExtreme();
-        const double l = p.LeftExtreme();
-
-        const double xsd = xsigma*(r-l);
-        const double ysd = ysigma*(t-b);
-
-        probability *= (0.15915494309/(xsd*ysd));
+    if(xsigma > 0 && ysigma > 0) {
+        for(unsigned int i = 0; i < sigma.Length(); i++) {
+            const Polygon p = k.GetKey(word[i]);
+            if(xsigma > 0) {
+                const double r = p.RightExtreme();
+                const double l = p.LeftExtreme();
+                const double xsd = xsigma*(r-l);
+                probability *= 0.3989422804/xsd;
+            }
+            if(ysigma > 0) {
+                const double t = p.TopExtreme();
+                const double b = p.BottomExtreme();
+                const double ysd = ysigma*(t-b);
+                probability *= 0.3989422804/ysd;
+            }
+        }
     }
 
     return (probability - MarginalProbability(sigma, word, k))/probability;

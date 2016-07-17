@@ -35,6 +35,7 @@ as we do!
 * [Wordlists](#wordlists)
     * [Building Wordlists](#building-wordlists)
     * [Accessing Wordlists](#accessing-wordlists)
+    * [Premade Wordlist](#premade-wordlist)
 * [Input Models](#input-models)
     * [Input Vectors](#input-vectors)
     * [Building an Input Model](#building-an-input-model)
@@ -516,6 +517,17 @@ If you now think about how you would swipe along the keyboard if you were trying
 to spell out one of these words you'll see that they would all produce the same
 sequence 'poiuyt'. This method of accessing words can be very helpful when we're
 trying to figure out what somebody intended to write when they swipe a pattern.
+
+### Premade Wordlist
+
+You can also download our  [premade wordlist](http://nuclear.ucdavis.edu/~sangaline/wordlist.dat).
+The initial source of word frequency data was the Google Web Trillion Word Corpus
+as compiled by Peter Norvig. This dictionary contains approximately 300,000
+of the most commonly used words in the English language and their frequencies. However,
+more than half of the entries are misspelled words and abbreviations. Our final dictionary only
+contained words from the Google Web Trillion Word Corpus that also occurred in the Official
+Scrabble Dictionary, the Most Common Boys/Girls Names, or WinEdt’s US Dictionary.
+The result is a dictionary containing 95,881 English words and their frequencies.
 
 ## Input Models
 

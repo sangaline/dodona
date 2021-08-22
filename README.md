@@ -520,7 +520,7 @@ trying to figure out what somebody intended to write when they swipe a pattern.
 
 ### Premade Wordlist
 
-You can also download our  [premade wordlist](http://nuclear.ucdavis.edu/~sangaline/wordlist.dat).
+You can also download our  [premade wordlist](./media/wordlist.dat).
 The initial source of word frequency data was the Google Web Trillion Word Corpus
 as compiled by Peter Norvig. This dictionary contains approximately 300,000
 of the most commonly used words in the English language and their frequencies. However,

@@ -234,7 +234,7 @@ keyboards.DrawPolygons([square, triangle, translated_square], figsize=(3,3))
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_26_0.png)
+![png](./media/README_26_0.png)
 
 
 and you can quickly check whether a point falls within a polygon
@@ -291,7 +291,7 @@ keyboards.DrawKeyboard(simple_keyboard, figsize=(3,3), axis='on')
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_36_0.png)
+![png](./media/README_36_0.png)
 
 
 ### Included Keyboards
@@ -315,7 +315,7 @@ keyboards.DrawKeyboard(qwerty_keyboard, figsize=(8,4))
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_41_0.png)
+![png](./media/README_41_0.png)
 
 
 #### Dvorak Keyboard
@@ -329,7 +329,7 @@ keyboards.DrawKeyboard(dvorak_keyboard, figsize=(8,4), facecolor='lightpink')
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_44_0.png)
+![png](./media/README_44_0.png)
 
 
 #### T9 Keyboard
@@ -345,7 +345,7 @@ keyboards.DrawKeyboard(t9_keyboard, t9=True, figsize=(5,5))
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_47_0.png)
+![png](./media/README_47_0.png)
 
 
 Note that each square here actuall corresponds to three or four separate
@@ -388,7 +388,7 @@ keyboards.DrawKeyboard(hexagonal_keyboard, figsize=(8,4))
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_53_0.png)
+![png](./media/README_53_0.png)
 
 
 If you want a totally random arrangement of letters then you can easily do that
@@ -401,7 +401,7 @@ keyboards.DrawKeyboard(hexagonal_keyboard, figsize=(8,4))
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_55_0.png)
+![png](./media/README_55_0.png)
 
 
 ## Wordlists
@@ -566,7 +566,7 @@ keyboards.DrawKeyboard(qwerty_keyboard, inputvector=inputvector, figsize=(8,4))
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_79_0.png)
+![png](./media/README_79_0.png)
 
 
 #### Comparing Input Vectors
@@ -709,7 +709,7 @@ keyboards.DrawKeyboard(qwerty_keyboard, inputvector=random_vector, figsize=(8,4)
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_94_0.png)
+![png](./media/README_94_0.png)
 
 
 The perfect vector would look similar but the points would be in exactly the
@@ -757,11 +757,11 @@ keyboards.DrawKeyboard(qwerty_keyboard, inputvector=perfect_vector, figsize=(8,4
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_101_0.png)
+![png](./media/README_101_0.png)
 
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_101_1.png)
+![png](./media/README_101_1.png)
 
 
 We can also use a fancier interpolation to try and produce more variety in our
@@ -778,11 +778,11 @@ keyboards.DrawKeyboard(qwerty_keyboard, inputvector=perfect_vector, figsize=(8,4
 ```
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_103_0.png)
+![png](./media/README_103_0.png)
 
 
 
-![png](http://sangaline.com/github/dodona/README_files/README_103_1.png)
+![png](./media/README_103_1.png)
 
 
 ### Predefined Distance Measure

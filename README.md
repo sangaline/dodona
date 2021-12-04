@@ -116,8 +116,8 @@ Clone the repository from github.
 git clone https://github.com/sangaline/dodona.git
 ```
 Open `CMakeLists.txt` and edit lines 51 and 52 to point to where the appropriate
-python files are located on your computer.  There location depends on what
-package manager, if any, you used to install them.  It should look like this
+python files are located on your computer.  Their location depends on what
+package manager, if any, you used to install them.  It should look like this:
 ```
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   SET(PYTHON_LIBRARY /PATH/TO/PYTHON/LIBRARIES/libpython3.4.dylib)
@@ -136,34 +136,34 @@ cmake .
 make
 ```
 If you have FANN installed and plan on using it then you can compile the library
-with it by replacing the `cmake .` command above with
+with it by replacing the `cmake .` command above with:
 ```
 cmake -Dfann=ON .
 ```
 Now the library is compiled and the file `core.so` is located in the parent
 directory, `/PATHTO/dodona/`.  However, OSX uses `.dylib` files instead of `.so`
-so you need to link them by running the following command
+so you need to link them by running the following command:
 ```
 ln -s /PATHTO/dodona/core.so /PATHTO/dodona/core.dylib
 ```
 Lastly, to use with Python the path to the `/dodona` directory must be included
-in your `PYTHONPATH`.  You can double check this by running
+in your `PYTHONPATH`.  You can double check this by running:
 ```
 echo $PYTHONPATH
 ```
 If you do not see the correct path there then add it with the following command
-(in bash)
+(in bash):
 ```
 export PYTHONPATH=/PATHTO/:$PYTHONPATH
 ```
 Where, as before, `/PATHTO/` is the path leading to the `/dodona/` directory.
 
 *NOTE: This has not been tested on OSX 10.10 (Yosemite) yet.  It should work
-fine assuming there weren't any major changes to the XCode developer tools
+fine assuming there weren't any major changes to the XCode developer tools.
 
 #### Static Compiling
 
-Static compiling is not possible on OSX
+Static compiling is not possible on OSX.
 
 ### Importing the Library
 
@@ -226,7 +226,7 @@ print('The y-coordinates have been shifted by 2:\n', translated_square.VertexLis
 
 
 You can plot a collection of polygons to getan idea of how they would look as a
-keyboard
+keyboard:
 
 
 ```python
@@ -237,7 +237,7 @@ keyboards.DrawPolygons([square, triangle, translated_square], figsize=(3,3))
 ![png](./media/README_26_0.png)
 
 
-and you can quickly check whether a point falls within a polygon
+and you can quickly check whether a point falls within a polygon:
 
 
 ```python
